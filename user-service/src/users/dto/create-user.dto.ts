@@ -1,5 +1,6 @@
 import {
   IsArray,
+  IsBoolean,
   IsEmail,
   IsNotEmpty,
   IsOptional,
@@ -13,6 +14,14 @@ export class CreateUserDto {
 
   @IsStrongPassword()
   password: string;
+
+  @IsString()
+  @IsNotEmpty()
+  name: string;
+
+  @IsBoolean()
+  @IsOptional()
+  status: boolean;
 
   @IsOptional()
   @IsArray()

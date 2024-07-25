@@ -15,7 +15,7 @@ export class UsersRepository extends AbstractRepository<User> {
   async listByPage(page: number, limit: number, sort: 'asc' | 'desc') {
     return await this.model
       .find()
-      .sort({ email: sort })
+      .sort({ name: sort })
       .skip((page - 1) * limit)
       .limit(limit)
       .select('-password')

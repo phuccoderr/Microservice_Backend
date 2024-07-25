@@ -12,7 +12,7 @@ import { RedisCacheService } from 'src/redis/redis.service';
         store: redisStore,
         host: configService.get('REDIS_HOST'),
         port: configService.get('REDIS_PORT'),
-        ttl: 600, // seconds
+        ttl: 60, // seconds
       }),
       inject: [ConfigService],
     }),

@@ -9,6 +9,12 @@ export class User extends AbstractDocument {
   @Prop({ required: true })
   password: string;
 
+  @Prop({ required: true })
+  name: string;
+
+  @Prop({ required: true, default: true })
+  status: boolean;
+
   @Prop()
   roles?: string[];
 }

@@ -1,9 +1,6 @@
 import {
-  Inject,
   Injectable,
-  InternalServerErrorException,
   NotFoundException,
-  UnauthorizedException,
   UnprocessableEntityException,
 } from '@nestjs/common';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
@@ -12,7 +9,7 @@ import * as bcrypt from 'bcrypt';
 import { Pagination } from 'src/users/dto/pagination.dto';
 import { UpdateUserDto } from 'src/users/dto/update-user.dto';
 import { RedisCacheService } from 'src/redis/redis.service';
-import { allUserKey, limitKey, usersKey } from 'src/redis/key';
+import { allUserKey, usersKey } from 'src/redis/key';
 
 @Injectable()
 export class UsersService {
@@ -47,7 +44,12 @@ export class UsersService {
     }
 
     const users = await this.usersRepository.listByPage(page, limit, sort);
-    await this.redisService.set(allUserKey(page, limit, sort), users, limitKey);
+    if (users.length === 0) {
+      return users;
+    }
+
+    await this.redisService.set(allUserKey(page, limit, sort), users);
+
     return users;
   }
 
@@ -60,7 +62,9 @@ export class UsersService {
 
     try {
       const user = await this.usersRepository.findOne({ _id }, '-password');
-      await this.redisService.set(usersKey(_id), user, limitKey);
+
+      await this.redisService.set(usersKey(_id), user);
+
       return user;
     } catch (error) {
       throw new NotFoundException('User not found');
@@ -70,7 +74,10 @@ export class UsersService {
   async updateUser(_id: string, updateUserDto: UpdateUserDto) {
     try {
       await this.usersRepository.findOneAndUpdate({ _id }, updateUserDto);
+
       this.redisService.del(usersKey(_id));
+      this.redisService.clearAllUserCache();
+
       return 'Update success';
     } catch (error) {
       throw new NotFoundException('User not found');
@@ -78,13 +85,16 @@ export class UsersService {
   }
 
   async deleteUser(_id: string) {
-    try {
-      await this.usersRepository.findOneAndDelete({ _id });
-      this.redisService.del(usersKey(_id));
-      return 'Delete success';
-    } catch (error) {
+    const userDelete = await this.usersRepository.findOneAndDelete({ _id });
+
+    if (!userDelete) {
       throw new NotFoundException('User not found');
     }
+
+    this.redisService.del(usersKey(_id));
+    this.redisService.clearAllUserCache();
+
+    return 'Delete success';
   }
 
   async verifyUser(email: string) {
