@@ -1,5 +1,6 @@
 package com.phuc.categoryservice.configurations;
 
+import com.phuc.categoryservice.dtos.CategoryDto;
 import com.phuc.categoryservice.models.Category;
 import com.phuc.categoryservice.request.RequestCreateCategory;
 import org.modelmapper.ModelMapper;
@@ -17,6 +18,14 @@ public class MapperConfiguration {
     public ModelMapper modelMapper() {
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+
+        modelMapper.addMappings(new PropertyMap<CategoryDto,Category>() {
+            @Override
+            protected void configure() {
+                skip(destination.getParent());
+                skip(destination.getChildren());
+            }
+        });
 
         return modelMapper;
     }

@@ -26,4 +26,8 @@ export class Pagination {
   @IsString()
   @IsIn(['asc', 'desc'])
   sort?: 'asc' | 'desc';
+
+  @IsOptional()
+  @IsString()
+  keyword: string;
 }

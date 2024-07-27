@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { FilterQuery, Model } from 'mongoose';
 import { AbstractRepository } from 'src/database/abstract.repository';
 import { User } from 'src/users/models/user.schema';
 
@@ -12,13 +12,18 @@ export class UsersRepository extends AbstractRepository<User> {
     super(userModel);
   }
 
-  async listByPage(page: number, limit: number, sort: 'asc' | 'desc') {
+  async listByPage(
+    page: number,
+    limit: number,
+    sort: 'asc' | 'desc',
+    filter: FilterQuery<User>,
+  ) {
     return await this.model
-      .find()
+      .find({ $or: [{ name: filter.name }, { email: filter.email }] })
       .sort({ name: sort })
       .skip((page - 1) * limit)
       .limit(limit)
       .select('-password')
-      .exec();
+      .lean<User[]>(true);
   }
 }

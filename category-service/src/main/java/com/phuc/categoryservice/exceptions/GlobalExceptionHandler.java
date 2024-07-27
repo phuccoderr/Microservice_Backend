@@ -44,6 +44,39 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(DataAlreadyExistsException.class)
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
     public ResponseEntity<ResponseError> handleDataAlreadyExistsException(Exception ex) {
+
+        LOGGER.error(ex.getMessage(),ex);
+
+        return ResponseEntity.unprocessableEntity().body(
+                ResponseError.builder()
+                        .statusCode(HttpStatus.UNPROCESSABLE_ENTITY.value())
+                        .error(HttpStatus.UNPROCESSABLE_ENTITY.getReasonPhrase())
+                        .message(List.of(ex.getMessage()))
+                        .build()
+        );
+    }
+
+    @ExceptionHandler(DataNotFoundException.class)
+    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+    public ResponseEntity<ResponseError> handleDataNotFoundException(Exception ex) {
+
+        LOGGER.error(ex.getMessage(),ex);
+
+        return ResponseEntity.unprocessableEntity().body(
+                ResponseError.builder()
+                        .statusCode(HttpStatus.UNPROCESSABLE_ENTITY.value())
+                        .error(HttpStatus.UNPROCESSABLE_ENTITY.getReasonPhrase())
+                        .message(List.of(ex.getMessage()))
+                        .build()
+        );
+    }
+
+    @ExceptionHandler(DataDuplicatedException.class)
+    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+    public ResponseEntity<ResponseError> handleDataDuplicatedException(Exception ex) {
+
+        LOGGER.error(ex.getMessage(),ex);
+
         return ResponseEntity.unprocessableEntity().body(
                 ResponseError.builder()
                         .statusCode(HttpStatus.UNPROCESSABLE_ENTITY.value())
@@ -59,6 +92,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             HttpHeaders headers,
             HttpStatusCode status,
             WebRequest request) {
+
+        LOGGER.error(ex.getMessage(),ex);
 
         ResponseError responseError = ResponseError.builder()
                 .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
