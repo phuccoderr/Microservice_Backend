@@ -26,6 +26,7 @@ import { RefreshTokenRepository } from 'src/auth/refresh-token.repository';
         secret: configService.get('JWT_SECRET'),
         signOptions: {
           expiresIn: `${configService.get('JWT_EXPIRATION')}s`,
+          algorithm: 'HS256',
         },
       }),
       inject: [ConfigService],

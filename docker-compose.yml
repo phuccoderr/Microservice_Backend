@@ -1,66 +1,109 @@
 version: '3.8'
 
 services:
-  kong-database:
-    image: postgres:13
-    container_name: kong-database
+#  kong-database:
+#    image: postgres:13
+#    container_name: kong-database-container
+#    environment:
+#      POSTGRES_USER: kong
+#      POSTGRES_DB: kong
+#      POSTGRES_PASSWORD: kong
+#    restart: always
+#    ports:
+#      - "5432:5432"
+    # networks:
+    #   - default
+#
+#  kong-migrations:
+#    image: kong:latest
+#    container_name: kong-migrations-container
+#    depends_on:
+#      - kong-database
+#    restart: always
+#    command: "kong migrations finish"
+#    environment:
+#      KONG_DATABASE: postgres
+#      KONG_PG_HOST: kong-database
+#      KONG_PG_PASSWORD: kong
+#  #   networks:
+#  #     - default
+#
+#  kong:
+#    image: kong:latest
+#    container_name: kong-container
+#    depends_on:
+#      - kong-database
+#    restart: always
+#    environment:
+#      KONT_DATABASE: postgres
+#      KONG_PG_HOST: kong-database
+#      KONG_PG_PASSWORD: kong
+#      KONG_PROXY_ACCESS_LOG: /dev/stdout
+#      KONG_ADMIN_ACCESS_LOG: /dev/stdout
+#      KONG_PROXY_ERROR_LOG: /dev/stderr
+#      KONG_ADMIN_ERROR_LOG: /dev/stderr
+#      KONG_ADMIN_LISTEN: 0.0.0.0:8001
+#      KONG_ADMIN_GUI_URL: http://localhost:8002
+#      KONG_LICENSE_DATA:
+#    ports:
+#      - "8000:8000"
+#      - "8443:8443"
+#      - "8001:8001"
+#      - "8444:8444"
+#      - "8002:8002"
+#      - "8445:8445"
+#      - "8003:8003"
+#      - "8004:8004"
+    # networks:
+    #   - default
+
+  postgres:
+    image: postgres:14.2
+    container_name: postgres-container
     environment:
-      POSTGRES_USER: kong
-      POSTGRES_DB: kong
-      POSTGRES_PASSWORD: kong
+      POSTGRES_USER: postgres
+      POSTGRES_DB: users
+      POSTGRES_PASSWORD: password
     restart: always
     ports:
-      - "5432:5432"
-
-  kong-migrations:
-    image: kong:latest
-    container_name: kong-migrations
-    depends_on:
-      - kong-database
-    restart: always
-    environment:
-      KONG_DATABASE: postgres
-      KONG_PG_HOST: kong-database
-      KONG_PG_PASSWORD: kong
-
-  kong:
-    image: kong:latest
-    container_name: kong
-    depends_on:
-      - kong-database
-      - kong-migrations
-    restart: always
-    environment:
-      KONT_DATABASE: postgres
-      KONG_PG_HOST: kong-database
-      KONG_PG_PASSWORD: kong
-      KONG_PROXY_ACCESS_LOG: /dev/stdout
-      KONG_ADMIN_ACCESS_LOG: /dev/stdout
-      KONG_PROXY_ERROR_LOG: /dev/stderr
-      KONG_ADMIN_ERROR_LOG: /dev/stderr
-      KONG_ADMIN_LISTEN: 0.0.0.0:8001
-      KONG_ADMIN_GUI_URL: http://localhost:8002
-      KONG_LICENSE_DATA:
-    ports:
-      - "8000:8000"
-      - "8443:8443"
-      - "8001:8001"
-      - "8444:8444"
-      - "8002:8002"
-      - "8445:8445"
-      - "8003:8003"
-      - "8004:8004"
+      - "5433:5432"
+    volumes:
+      - ./db-data/postgres/:/var/lib/postgresql/data/
+    # networks:
+    #   - default
 
   mongo:
+    container_name: mongo-container
     image: mongo:7.0
     ports:
       - "27020:27017"
     volumes:
       - ./db-data/mongo/:/data/db
+    # networks:
+    #   - default
       
   redis:
+    container_name: redis-container
     image: redis:7.0-alpine
     ports:
       - "6379:6379"
     volumes:
       - ./db-data/redis/:/data
+    # networks:
+    #   - default
+
+  # user-service:
+  #   build:
+  #     context: ./user-service
+  #     dockerfile: Dockerfile
+  #   restart: always
+  #   env_file:
+  #     - ./user-service/.env
+  #   ports:
+  #     - "9120:9120"
+  #   networks:
+  #     - default
+
+# networks:
+#   default:
+#     driver: bridge

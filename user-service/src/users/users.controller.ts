@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  HttpStatus,
   Param,
   Patch,
   Post,
@@ -14,6 +15,7 @@ import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { Pagination } from 'src/users/dto/pagination.dto';
 import { UpdateUserDto } from 'src/users/dto/update-user.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { ResposneObject } from 'src/response/response-object.dto';
 
 @Controller('api/v1/users')
 export class UsersController {
@@ -22,33 +24,73 @@ export class UsersController {
   // @UseGuards(JwtAuthGuard)
   @Post()
   async createUser(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.createUser(createUserDto);
+    const result: string = await this.usersService.createUser(createUserDto);
+
+    const responseObject: ResposneObject = {
+      data: {},
+      status: HttpStatus.OK,
+      message: result,
+    };
+
+    return responseObject;
   }
 
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Get()
   async getUsers(@Query() pagination: Pagination) {
-    return this.usersService.getUsers(pagination);
+    const users = await this.usersService.getUsers(pagination);
+
+    const responseObject: ResposneObject = {
+      data: users,
+      status: HttpStatus.OK,
+      message: 'Get all users successfully',
+    };
+
+    return responseObject;
   }
 
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
   async getUser(@Param('id') _id: string) {
-    return this.usersService.getUser(_id);
+    const user = await this.usersService.getUser(_id);
+
+    const responseObject: ResposneObject = {
+      data: user,
+      status: HttpStatus.OK,
+      message: 'Get user successfully',
+    };
+
+    return responseObject;
   }
 
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Patch(':id')
   async updateUser(
     @Param('id') _id: string,
     @Body() updateUserDto: UpdateUserDto,
   ) {
-    return this.usersService.updateUser(_id, updateUserDto);
+    const result: string = await this.usersService.updateUser(
+      _id,
+      updateUserDto,
+    );
+    const responseObject: ResposneObject = {
+      data: {},
+      status: HttpStatus.OK,
+      message: result,
+    };
+    return responseObject;
   }
 
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   async deleteUser(@Param('id') _id: string) {
-    return this.usersService.deleteUser(_id);
+    const result: string = await this.usersService.deleteUser(_id);
+
+    const responseObject: ResposneObject = {
+      data: {},
+      status: HttpStatus.OK,
+      message: result,
+    };
+    return responseObject;
   }
 }

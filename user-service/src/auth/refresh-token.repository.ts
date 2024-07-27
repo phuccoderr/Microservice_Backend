@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { RefreshToken } from 'src/auth/models/refresh-token.schema';
@@ -24,5 +24,27 @@ export class RefreshTokenRepository {
     }).save();
 
     return token;
+  }
+
+  async findByToken(token: string): Promise<RefreshToken> {
+    const refreshToken = await this.refreshTokenModel
+      .findOne({ token })
+      .lean<RefreshToken>(true);
+
+    if (!refreshToken) {
+      throw new UnauthorizedException("Can't find refresh token");
+    }
+
+    return refreshToken;
+  }
+
+  async findByUserIdAndDelete(userId: string): Promise<RefreshToken> {
+    return await this.refreshTokenModel
+      .findOneAndDelete({ userId })
+      .lean<RefreshToken>(true);
+  }
+
+  async deleteByToken(refreshToken: string): Promise<void> {
+    await this.refreshTokenModel.deleteOne({ token: refreshToken });
   }
 }

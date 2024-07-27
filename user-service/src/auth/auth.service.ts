@@ -6,6 +6,8 @@ import * as bcrypt from 'bcrypt';
 import { RefreshTokenRepository } from 'src/auth/refresh-token.repository';
 import { TokenPayLoad } from 'src/auth/interfaces/token-payload.interface';
 import { JwtPayload } from 'src/auth/interfaces/jwt-payload.interface';
+import { RefreshToken } from 'src/auth/models/refresh-token.schema';
+import { UsersRepository } from 'src/users/users.repository';
 
 @Injectable()
 export class AuthService {
@@ -13,6 +15,7 @@ export class AuthService {
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
     private readonly refreshTokenRepository: RefreshTokenRepository,
+    private readonly usersRepository: UsersRepository,
   ) {}
 
   async login(request: LoginDto): Promise<JwtPayload> {
@@ -26,14 +29,67 @@ export class AuthService {
     const tokenPayload: TokenPayLoad = {
       email: user.email,
       _id: user._id.toHexString(),
+      roles: user.roles,
     };
 
-    const access_token = this.jwtService.sign(tokenPayload);
-    const refresh_token =
-      await this.refreshTokenRepository.generateRefreshToken(
-        user._id.toHexString(),
-      );
+    await this.refreshTokenRepository.findByUserIdAndDelete(
+      user._id.toHexString(),
+    );
 
-    return { access_token, refresh_token };
+    const accessToken = this.jwtService.sign(tokenPayload);
+    const refreshToken = await this.refreshTokenRepository.generateRefreshToken(
+      user._id.toHexString(),
+    );
+
+    const jwtPayload: JwtPayload = {
+      access_token: accessToken,
+      refresh_token: refreshToken,
+    };
+
+    return jwtPayload;
+  }
+
+  async logout(token: string): Promise<string> {
+    const refreshToken = await this.refreshTokenRepository.findByToken(token);
+
+    await this.refreshTokenRepository.deleteByToken(refreshToken.token);
+    return 'Log out Successfully!';
+  }
+
+  async refreshToken(token: string): Promise<JwtPayload> {
+    const refreshToken = await this.refreshTokenRepository.findByToken(token);
+    const user = await this.usersRepository.findOne(
+      { _id: refreshToken.userId },
+      '-password',
+    );
+
+    // check Expired
+    await this.verifyToken(refreshToken);
+
+    const tokenPayload: TokenPayLoad = {
+      email: refreshToken.userId,
+      _id: refreshToken.userId,
+      roles: user.roles,
+    };
+
+    const accessToken = this.jwtService.sign(tokenPayload);
+
+    const jwtPayload: JwtPayload = {
+      access_token: accessToken,
+      refresh_token: refreshToken.token,
+    };
+
+    return jwtPayload;
+  }
+
+  private async verifyToken(refreshToken: RefreshToken): Promise<string> {
+    const { token, expiresAt } = refreshToken;
+
+    if (new Date() > expiresAt) {
+      this.refreshTokenRepository.deleteByToken(token);
+      throw new UnauthorizedException('Token Expired');
+    }
+
+    return token;
   }
 }

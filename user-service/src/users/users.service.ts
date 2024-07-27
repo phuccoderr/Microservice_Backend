@@ -7,9 +7,9 @@ import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { UsersRepository } from 'src/users/users.repository';
 import * as bcrypt from 'bcrypt';
 import { Pagination } from 'src/users/dto/pagination.dto';
-import { UpdateUserDto } from 'src/users/dto/update-user.dto';
 import { RedisCacheService } from 'src/redis/redis.service';
 import { allUserKey, usersKey } from 'src/redis/key';
+import { UpdateUserDto } from 'src/users/dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -18,7 +18,7 @@ export class UsersService {
     private readonly usersRepository: UsersRepository,
   ) {}
 
-  async createUser(createUserDto: CreateUserDto) {
+  async createUser(createUserDto: CreateUserDto): Promise<string> {
     try {
       await this.usersRepository.create({
         ...createUserDto,
@@ -71,7 +71,7 @@ export class UsersService {
     }
   }
 
-  async updateUser(_id: string, updateUserDto: UpdateUserDto) {
+  async updateUser(_id: string, updateUserDto: UpdateUserDto): Promise<string> {
     try {
       await this.usersRepository.findOneAndUpdate({ _id }, updateUserDto);
 
@@ -84,7 +84,7 @@ export class UsersService {
     }
   }
 
-  async deleteUser(_id: string) {
+  async deleteUser(_id: string): Promise<string> {
     const userDelete = await this.usersRepository.findOneAndDelete({ _id });
 
     if (!userDelete) {
