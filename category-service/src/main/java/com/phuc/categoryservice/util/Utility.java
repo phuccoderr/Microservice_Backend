@@ -9,10 +9,15 @@ import org.modelmapper.ModelMapper;
 import java.text.Normalizer;
 import java.util.List;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
+
 
 public class Utility {
+
     static ModelMapper modelMapper = new ModelMapper();
+
+    private Utility() {
+        throw new UnsupportedOperationException("Utility class cannot be instantiated");
+    }
     public static String unAccent(String s) {
         String normalizer = Normalizer.normalize(s,Normalizer.Form.NFD);
         Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");

@@ -6,7 +6,7 @@ import com.phuc.categoryservice.repository.CategoryRepository;
 import com.phuc.categoryservice.request.RequestCreateCategory;
 import com.phuc.categoryservice.request.RequestUpdateCategory;
 import com.phuc.categoryservice.util.Utility;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -15,10 +15,10 @@ import org.springframework.stereotype.Service;
 
 
 @Service
+@RequiredArgsConstructor
 public class CategoryService implements ICategoryService {
 
-    @Autowired
-    private CategoryRepository repository;
+    private final CategoryRepository repository;
 
     @Override
     public Category saveCategory(RequestCreateCategory reqCreateCategory) throws DataAlreadyExistsException, DataNotFoundException {

@@ -6,68 +6,41 @@ import {
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { UsersRepository } from 'src/users/users.repository';
 import * as bcrypt from 'bcrypt';
-import { Pagination } from 'src/users/dto/pagination.dto';
-import { RedisCacheService } from 'src/redis/redis.service';
-import { allUserKey, usersKey } from 'src/redis/key';
 import { UpdateUserDto } from 'src/users/dto/update-user.dto';
+import { User } from 'src/users/models/user.schema';
+import { RequestPagination } from 'src/users/dto/request-pagination.dto';
 
 @Injectable()
 export class UsersService {
-  constructor(
-    private readonly redisService: RedisCacheService,
-    private readonly usersRepository: UsersRepository,
-  ) {}
+  constructor(private readonly usersRepository: UsersRepository) {}
 
-  async createUser(createUserDto: CreateUserDto): Promise<string> {
+  async createUser(createUserDto: CreateUserDto): Promise<User> {
     try {
-      await this.usersRepository.create({
+      return await this.usersRepository.create({
         ...createUserDto,
         password: await bcrypt.hash(createUserDto.password, 10),
       });
     } catch (error) {
       throw new UnprocessableEntityException('Email already exits');
     }
-    return 'Success create user';
   }
 
-  async getUsers(query: Pagination) {
-    const page = query.page || 1;
-    const limit = query.limit || 10;
-    const sort = query.sort || 'asc';
-    const keyword = query.keyword;
+  async getUsers(query: RequestPagination) {
+    const { keyword, page, limit, sort } = query;
 
     if (keyword) {
       const filter = { email: keyword, name: keyword };
       return await this.usersRepository.search(page, limit, sort, filter);
     }
 
-    const cachedAllUsers = await this.redisService.get(
-      allUserKey(page, limit, sort),
-    );
-
-    if (cachedAllUsers) {
-      return cachedAllUsers;
-    }
-
     const users = await this.usersRepository.listByPage(page, limit, sort);
-    if (users.length > 0) {
-      await this.redisService.set(allUserKey(page, limit, sort), users);
-    }
 
     return users;
   }
 
   async getUser(_id: string) {
-    const cachedUser = await this.redisService.get(usersKey(_id));
-
-    if (cachedUser) {
-      return cachedUser;
-    }
-
     try {
       const user = await this.usersRepository.findOne({ _id }, '-password');
-
-      await this.redisService.set(usersKey(_id), user);
 
       return user;
     } catch (error) {
@@ -75,14 +48,12 @@ export class UsersService {
     }
   }
 
-  async updateUser(_id: string, updateUserDto: UpdateUserDto): Promise<string> {
+  async updateUser(_id: string, updateUserDto: UpdateUserDto): Promise<User> {
     try {
-      await this.usersRepository.findOneAndUpdate({ _id }, updateUserDto);
-
-      this.redisService.del(usersKey(_id));
-      this.redisService.clearAllUserCache();
-
-      return 'Update success';
+      return await this.usersRepository.findOneAndUpdate(
+        { _id },
+        updateUserDto,
+      );
     } catch (error) {
       throw new NotFoundException('User not found');
     }
@@ -94,10 +65,6 @@ export class UsersService {
     if (!userDelete) {
       throw new NotFoundException('User not found');
     }
-
-    this.redisService.del(usersKey(_id));
-    this.redisService.clearAllUserCache();
-
     return 'Delete success';
   }
 

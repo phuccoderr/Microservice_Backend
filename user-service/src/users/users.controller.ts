@@ -12,55 +12,79 @@ import {
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
-import { Pagination } from 'src/users/dto/pagination.dto';
 import { UpdateUserDto } from 'src/users/dto/update-user.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import { ResposneObject } from 'src/response/response-object.dto';
+import { RedisCacheService } from 'src/redis/redis.service';
+import { User } from 'src/users/models/user.schema';
+import { allUserKey } from 'src/redis/key';
+import { RequestPagination } from 'src/users/dto/request-pagination.dto';
+import { ResponseObject } from 'src/response/response-object.dto';
+import { PaginationDto } from 'src/users/dto/pagination.dto';
 
 @Controller('api/v1/users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly redisService: RedisCacheService,
+  ) {}
 
   // @UseGuards(JwtAuthGuard)
   @Post()
-  async createUser(@Body() createUserDto: CreateUserDto) {
-    const result: string = await this.usersService.createUser(createUserDto);
+  async createUser(
+    @Body() createUserDto: CreateUserDto,
+  ): Promise<ResponseObject> {
+    const result: User = await this.usersService.createUser(createUserDto);
 
-    const responseObject: ResposneObject = {
-      data: {},
+    this.redisService.clearAllUserCache();
+
+    return {
+      data: result,
       status: HttpStatus.OK,
-      message: result,
+      message: 'Success create user',
     };
-
-    return responseObject;
   }
 
   @UseGuards(JwtAuthGuard)
   @Get()
-  async getUsers(@Query() pagination: Pagination) {
-    const users = await this.usersService.getUsers(pagination);
+  async getUsers(
+    @Query() pagination: RequestPagination,
+  ): Promise<ResponseObject> {
+    const { keyword, page, limit, sort } = pagination;
 
-    const responseObject: ResposneObject = {
-      data: users,
+    if (!keyword) {
+      const cachedAllUsers = await this.redisService.get(
+        allUserKey(page, limit, sort),
+      );
+      if (cachedAllUsers) {
+        return {
+          data: cachedAllUsers,
+          status: HttpStatus.OK,
+          message: 'Get all users successfully',
+        };
+      }
+    }
+
+    const users = await this.usersService.getUsers(pagination);
+    const paginationDto = this.buildPaginationDto(pagination, users);
+    this.redisService.set(allUserKey(page, limit, sort), paginationDto);
+
+    return {
+      data: paginationDto,
       status: HttpStatus.OK,
       message: 'Get all users successfully',
     };
-
-    return responseObject;
   }
 
   @UseGuards(JwtAuthGuard)
   @Get(':id')
-  async getUser(@Param('id') _id: string) {
+  async getUser(@Param('id') _id: string): Promise<ResponseObject> {
     const user = await this.usersService.getUser(_id);
 
-    const responseObject: ResposneObject = {
+    return {
       data: user,
       status: HttpStatus.OK,
       message: 'Get user successfully',
     };
-
-    return responseObject;
   }
 
   @UseGuards(JwtAuthGuard)
@@ -68,29 +92,45 @@ export class UsersController {
   async updateUser(
     @Param('id') _id: string,
     @Body() updateUserDto: UpdateUserDto,
-  ) {
-    const result: string = await this.usersService.updateUser(
-      _id,
-      updateUserDto,
-    );
-    const responseObject: ResposneObject = {
-      data: {},
+  ): Promise<ResponseObject> {
+    const result: User = await this.usersService.updateUser(_id, updateUserDto);
+
+    this.redisService.clearAllUserCache();
+
+    return {
+      data: result,
       status: HttpStatus.OK,
-      message: result,
+      message: 'Update user success',
     };
-    return responseObject;
   }
 
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  async deleteUser(@Param('id') _id: string) {
+  async deleteUser(@Param('id') _id: string): Promise<ResponseObject> {
     const result: string = await this.usersService.deleteUser(_id);
 
-    const responseObject: ResposneObject = {
+    this.redisService.clearAllUserCache();
+
+    return {
       data: {},
       status: HttpStatus.OK,
       message: result,
     };
-    return responseObject;
+  }
+
+  private buildPaginationDto(
+    pagination: RequestPagination,
+    users: User[],
+  ): PaginationDto {
+    const { page, limit } = pagination;
+
+    return {
+      total_items: users.length,
+      total_pages: Math.ceil(users.length / limit),
+      current_page: parseInt(String(page)),
+      start_count: (page - 1) * limit + 1,
+      end_count: page * limit > users.length ? users.length : page * limit,
+      entities: users,
+    };
   }
 }

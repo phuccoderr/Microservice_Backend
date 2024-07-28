@@ -14,7 +14,6 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
   data:
     redis:
-      database: 0
       host: localhost
       port: 6379
       timeout: 60
@@ -31,4 +30,4 @@ JWT_EXPIRATION: 60
 
 REDIS_HOST: localhost
 # REDIS_HOST=redis
-REDIS_PORT: 6379
+REDIS_PORT: 6380

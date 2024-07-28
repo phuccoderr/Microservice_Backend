@@ -1,15 +1,17 @@
 package com.phuc.categoryservice.dtos;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
+import com.phuc.categoryservice.models.Category;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
 @Setter
 @Getter
-@Builder
+@NoArgsConstructor
 public class PaginationDto {
     @JsonProperty("total_items")
     private Integer totalItems;
@@ -28,4 +30,16 @@ public class PaginationDto {
 
     @JsonProperty("entities")
     private List<?> entities;
+
+    public PaginationDto(Page<Category> pages, List<CategoryDto> listDtos) {
+        int pageSize = pages.getSize();
+        int oldCurrentPage = pages.getNumber();
+
+        this.currentPage = oldCurrentPage + 1;
+        this.totalPages = pages.getNumber();
+        this.totalItems = (int) pages.getTotalElements();
+        this.startCount = (oldCurrentPage * pageSize) + 1;
+        this.endCount = Math.min((oldCurrentPage * pageSize) + pageSize, totalItems);
+        this.entities = listDtos;
+    }
 }
