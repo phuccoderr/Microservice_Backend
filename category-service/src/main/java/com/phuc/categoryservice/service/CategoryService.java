@@ -1,15 +1,16 @@
 package com.phuc.categoryservice.service;
 
-import com.phuc.categoryservice.dtos.CategoryDto;
-import com.phuc.categoryservice.exceptions.DataAlreadyExistsException;
-import com.phuc.categoryservice.exceptions.DataDuplicatedException;
-import com.phuc.categoryservice.exceptions.DataNotFoundException;
+import com.phuc.categoryservice.exceptions.*;
 import com.phuc.categoryservice.models.Category;
 import com.phuc.categoryservice.repository.CategoryRepository;
 import com.phuc.categoryservice.request.RequestCreateCategory;
 import com.phuc.categoryservice.request.RequestUpdateCategory;
 import com.phuc.categoryservice.util.Utility;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 
@@ -18,8 +19,6 @@ public class CategoryService implements ICategoryService {
 
     @Autowired
     private CategoryRepository repository;
-
-
 
     @Override
     public Category saveCategory(RequestCreateCategory reqCreateCategory) throws DataAlreadyExistsException, DataNotFoundException {
@@ -37,6 +36,22 @@ public class CategoryService implements ICategoryService {
         }
 
         return repository.save(category);
+    }
+
+    @Override
+    public Page<Category> getAllCategories(Integer page, Integer limit, String sort, String keyword) throws ParamValidateException {
+
+        Utility.checkSortIsAscOrDesc(sort);
+
+        Sort sortDir = Sort.by("name");
+        sortDir = sort.equals("asc") ? sortDir.ascending() : sortDir.descending();
+
+        Pageable pageable = PageRequest.of(page - 1,limit,sortDir);
+        if (!keyword.isEmpty()) {
+            return repository.search(keyword, pageable);
+        } else  {
+            return repository.findAll(pageable);
+        }
     }
 
     @Override
@@ -63,12 +78,24 @@ public class CategoryService implements ICategoryService {
         return repository.save(category);
     }
 
+    @Override
+    public void deleteCategory(String id) throws DataNotFoundException, DataHasChildrenException {
+        Category category = getCategory(id);
+        if (!category.getChildren().isEmpty()) {
+            throw new DataHasChildrenException();
+        }
+
+        repository.deleteById(category.getId());
+    }
+
+
     private void checkNameUnique(String name) throws DataAlreadyExistsException {
         Category category = repository.findByName(name);
         if (category != null) {
             throw new DataAlreadyExistsException();
         }
     }
+
 
     private void updateParentCategory(String parentId, Category category )
             throws DataNotFoundException, DataDuplicatedException {

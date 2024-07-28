@@ -10,8 +10,6 @@ import { Pagination } from 'src/users/dto/pagination.dto';
 import { RedisCacheService } from 'src/redis/redis.service';
 import { allUserKey, usersKey } from 'src/redis/key';
 import { UpdateUserDto } from 'src/users/dto/update-user.dto';
-import { FilterQuery } from 'mongoose';
-import { User } from 'src/users/models/user.schema';
 
 @Injectable()
 export class UsersService {
@@ -38,31 +36,23 @@ export class UsersService {
     const sort = query.sort || 'asc';
     const keyword = query.keyword;
 
-    let filter: FilterQuery<User> = {};
-
-    if (keyword !== '') {
-      filter = { email: keyword, name: keyword };
+    if (keyword) {
+      const filter = { email: keyword, name: keyword };
+      return await this.usersRepository.search(page, limit, sort, filter);
     }
 
     const cachedAllUsers = await this.redisService.get(
-      allUserKey(page, limit, sort, keyword),
+      allUserKey(page, limit, sort),
     );
 
     if (cachedAllUsers) {
       return cachedAllUsers;
     }
 
-    const users = await this.usersRepository.listByPage(
-      page,
-      limit,
-      sort,
-      filter,
-    );
-    if (users.length === 0) {
-      return users;
+    const users = await this.usersRepository.listByPage(page, limit, sort);
+    if (users.length > 0) {
+      await this.redisService.set(allUserKey(page, limit, sort), users);
     }
-
-    await this.redisService.set(allUserKey(page, limit, sort, keyword), users);
 
     return users;
   }

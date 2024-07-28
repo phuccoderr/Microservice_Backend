@@ -12,7 +12,17 @@ export class UsersRepository extends AbstractRepository<User> {
     super(userModel);
   }
 
-  async listByPage(
+  async listByPage(page: number, limit: number, sort: 'asc' | 'desc') {
+    return await this.model
+      .find()
+      .sort({ name: sort })
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .select('-password')
+      .lean<User[]>(true);
+  }
+
+  async search(
     page: number,
     limit: number,
     sort: 'asc' | 'desc',

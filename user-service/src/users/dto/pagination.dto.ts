@@ -2,6 +2,7 @@ import { Type } from 'class-transformer';
 import {
   IsIn,
   IsInt,
+  IsNotEmpty,
   IsOptional,
   IsPositive,
   IsString,
@@ -29,5 +30,6 @@ export class Pagination {
 
   @IsOptional()
   @IsString()
-  keyword: string;
+  @IsNotEmpty()
+  keyword?: string;
 }
