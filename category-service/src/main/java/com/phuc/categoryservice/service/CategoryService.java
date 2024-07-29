@@ -21,7 +21,8 @@ public class CategoryService implements ICategoryService {
     private final CategoryRepository repository;
 
     @Override
-    public Category saveCategory(RequestCreateCategory reqCreateCategory) throws DataAlreadyExistsException, DataNotFoundException {
+    public Category saveCategory(RequestCreateCategory reqCreateCategory)
+            throws DataNotFoundException, DataErrorException {
         checkNameUnique(reqCreateCategory.getName());
 
         Category category = new Category();
@@ -39,7 +40,8 @@ public class CategoryService implements ICategoryService {
     }
 
     @Override
-    public Page<Category> getAllCategories(Integer page, Integer limit, String sort, String keyword) throws ParamValidateException {
+    public Page<Category> getAllCategories(Integer page, Integer limit, String sort, String keyword)
+            throws ParamValidateException {
 
         Utility.checkSortIsAscOrDesc(sort);
 
@@ -60,7 +62,8 @@ public class CategoryService implements ICategoryService {
     }
 
     @Override
-    public Category updateCategory(String id, RequestUpdateCategory reqUpdateCategory) throws DataNotFoundException, DataDuplicatedException, DataAlreadyExistsException {
+    public Category updateCategory(String id, RequestUpdateCategory reqUpdateCategory)
+            throws DataNotFoundException, DataErrorException {
         Category category = getCategory(id);
 
         String cateName = reqUpdateCategory.getName();
@@ -79,31 +82,31 @@ public class CategoryService implements ICategoryService {
     }
 
     @Override
-    public void deleteCategory(String id) throws DataNotFoundException, DataHasChildrenException {
+    public void deleteCategory(String id) throws DataNotFoundException, DataErrorException {
         Category category = getCategory(id);
         if (!category.getChildren().isEmpty()) {
-            throw new DataHasChildrenException();
+            throw new DataErrorException("Category cannot be deleted because it has child categories.");
         }
 
         repository.deleteById(category.getId());
     }
 
 
-    private void checkNameUnique(String name) throws DataAlreadyExistsException {
+    private void checkNameUnique(String name) throws DataErrorException {
         Category category = repository.findByName(name);
         if (category != null) {
-            throw new DataAlreadyExistsException();
+            throw new DataErrorException("Data already exists!");
         }
     }
 
 
     private void updateParentCategory(String parentId, Category category )
-            throws DataNotFoundException, DataDuplicatedException {
+            throws DataNotFoundException, DataErrorException {
 
         if (parentId.isEmpty()) {
             category.setParent(null);
         } else if (parentId.equals(category.getId())) {
-            throw new DataDuplicatedException();
+            throw new DataErrorException("Data duplicated parentId and Id");
         } else {
             Category parent = getCategory(parentId);
             category.setParent(parent);

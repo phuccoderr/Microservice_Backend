@@ -32,7 +32,7 @@ public class CategoryController {
     @PostMapping()
     public ResponseEntity<ResponseObject> createProduct(
             @RequestBody @Valid RequestCreateCategory requestCreateCategory)
-            throws DataAlreadyExistsException, DataNotFoundException {
+            throws DataNotFoundException, DataErrorException {
 
         Category category = categoryService.saveCategory(requestCreateCategory);
         CategoryDto categoryDto = Utility.toDto(category);
@@ -91,7 +91,7 @@ public class CategoryController {
     public ResponseEntity<ResponseObject> updateCategory(
             @PathVariable("id") String id,
             @RequestBody @Valid RequestUpdateCategory requestUpdateCategory)
-            throws DataNotFoundException, DataDuplicatedException, DataAlreadyExistsException {
+            throws DataNotFoundException, DataErrorException {
 
         Category category = categoryService.updateCategory(id, requestUpdateCategory);
         CategoryDto categoryDto = Utility.toDto(category);
@@ -105,7 +105,7 @@ public class CategoryController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<ResponseObject> deleteCategory(@PathVariable("id") String id)
-            throws DataNotFoundException, DataHasChildrenException {
+            throws DataNotFoundException, DataErrorException {
 
         categoryService.deleteCategory(id);
         categoryRedisService.clear();

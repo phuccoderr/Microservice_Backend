@@ -1,7 +1,7 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
-import { RefreshToken } from 'src/auth/models/refresh-token.schema';
+import { RefreshToken } from './models/refresh-token.schema';
 import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()

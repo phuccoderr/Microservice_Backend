@@ -21,10 +21,11 @@ public class CloudinaryService {
     private final Cloudinary cloudinary;
 
     @Transactional(rollbackFor = {FuncErrorException.class})
-    public void setExtraImage(MultipartFile[] extraFile, RequestCreateProduct requestCreateProduct) throws FuncErrorException {
+    public void setExtraImage(MultipartFile[] extraFile, RequestCreateProduct requestCreateProduct)
+            throws FuncErrorException {
         ArrayList<CloudinaryDto> images = new ArrayList<>();
 
-        if (extraFile != null && extraFile.length > 0 ) {
+        if (extraFile != null) {
             for (MultipartFile file : extraFile) {
                 FileUploadUtil.assertAllowed(file, FileUploadUtil.IMAGE_PATTERN);
 

@@ -27,8 +27,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return buildErrorResponse(ex, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @ExceptionHandler(DataAlreadyExistsException.class)
-    public ResponseEntity<ResponseError> handleDataAlreadyExistsException(Exception ex) {
+    @ExceptionHandler(DataErrorException.class)
+    public ResponseEntity<ResponseError> handleDataErrorException(Exception ex) {
 
         return buildErrorResponse(ex, HttpStatus.UNPROCESSABLE_ENTITY);
     }
@@ -39,20 +39,10 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return buildErrorResponse(ex, HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
-    @ExceptionHandler(DataDuplicatedException.class)
-    public ResponseEntity<ResponseError> handleDataDuplicatedException(Exception ex) {
-        return buildErrorResponse(ex, HttpStatus.UNPROCESSABLE_ENTITY);
-    }
-
     @ExceptionHandler(ParamValidateException.class)
     public ResponseEntity<ResponseError> handleParamValidateException(Exception ex) {
 
         return buildErrorResponse(ex, HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(DataHasChildrenException.class)
-    public ResponseEntity<ResponseError> handleDataHasChildrenException(Exception ex) {
-        return buildErrorResponse(ex, HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
     @Override

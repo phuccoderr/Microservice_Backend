@@ -2,9 +2,9 @@ spring:
   application:
     name: category-service
   datasource:
-    url: jdbc:postgresql://localhost:5433/users
-    username: postgres
-    password: password
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5433}/${POSTGRES_DB:users}
+    username: ${POSTGRES_USER:postgres}
+    password: ${POSTGRES_PASSWORD:password}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
@@ -14,9 +14,8 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
   data:
     redis:
-      host: localhost
-      port: 6379
-      timeout: 60
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
 
 
 server:
@@ -26,8 +25,3 @@ server:
 # ENVIRONMENT
 JWT_SECRET: vVarX3ETLuR35pAe8LLVSEieaIxvBrz6X2B0eiN1HY4cdf3jYwBUKISJhDDXD60gsZiL9HLTYPoVwrSGa628XGmjJkGF04J3f4On
 JWT_EXPIRATION: 60
-
-
-REDIS_HOST: localhost
-# REDIS_HOST=redis
-REDIS_PORT: 6380

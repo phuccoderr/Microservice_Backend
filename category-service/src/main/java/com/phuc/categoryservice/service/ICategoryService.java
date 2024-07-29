@@ -12,9 +12,9 @@ import java.util.List;
 
 public interface ICategoryService {
 
-    Category saveCategory(RequestCreateCategory category) throws DataNotFoundException, DataAlreadyExistsException;
+    Category saveCategory(RequestCreateCategory category) throws DataNotFoundException, DataErrorException;
     Page<Category> getAllCategories(Integer page, Integer limit, String sort, String keyword) throws ParamValidateException;
     Category getCategory(String id) throws DataNotFoundException;
-    Category updateCategory(String id, RequestUpdateCategory reqUpdateCategory) throws DataNotFoundException, DataDuplicatedException, DataAlreadyExistsException;
-    void deleteCategory(String id) throws DataNotFoundException, DataHasChildrenException;
+    Category updateCategory(String id, RequestUpdateCategory reqUpdateCategory) throws DataNotFoundException, DataErrorException;
+    void deleteCategory(String id) throws DataNotFoundException, DataErrorException;
 }

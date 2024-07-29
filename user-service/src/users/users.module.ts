@@ -2,9 +2,9 @@ import { UsersRepository } from './users.repository';
 import { Module } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
-import { DatabaseModule } from 'src/database/database.module';
-import { User, UserSchema } from 'src/users/models/user.schema';
-import { RedisModule } from 'src/redis/redis.module';
+import { DatabaseModule } from '../database/database.module';
+import { User, UserSchema } from './models/user.schema';
+import { RedisModule } from '../redis/redis.module';
 
 @Module({
   imports: [

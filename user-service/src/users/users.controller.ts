@@ -11,15 +11,15 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserDto } from 'src/users/dto/create-user.dto';
-import { UpdateUserDto } from 'src/users/dto/update-user.dto';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import { RedisCacheService } from 'src/redis/redis.service';
-import { User } from 'src/users/models/user.schema';
-import { allUserKey } from 'src/redis/key';
-import { RequestPagination } from 'src/users/dto/request-pagination.dto';
-import { ResponseObject } from 'src/response/response-object.dto';
-import { PaginationDto } from 'src/users/dto/pagination.dto';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RedisCacheService } from '../redis/redis.service';
+import { User } from './models/user.schema';
+import { allUserKey } from '../redis/key';
+import { RequestPagination } from './dto/request-pagination.dto';
+import { ResponseObject } from '../response/response-object.dto';
+import { PaginationDto } from '../users/dto/pagination.dto';
 
 @Controller('api/v1/users')
 export class UsersController {

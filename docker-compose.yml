@@ -57,7 +57,7 @@ services:
     # networks:
     #   - default
 
-  postgres:
+  postgresql:
     image: postgres:14.2
     container_name: postgres-container
     environment:
@@ -69,8 +69,8 @@ services:
       - "5433:5432"
     volumes:
       - ./db-data/postgres/:/var/lib/postgresql/data/
-    # networks:
-    #   - default
+#    networks:
+#      - default
 
   mongo:
     container_name: mongo-container
@@ -79,8 +79,8 @@ services:
       - "27020:27017"
     volumes:
       - ./db-data/mongo/:/data/db
-    # networks:
-    #   - default
+#    networks:
+#      - default
       
   redis:
     container_name: redis-container
@@ -89,21 +89,49 @@ services:
       - "6379:6379"
     volumes:
       - ./db-data/redis/:/data
-    # networks:
-    #   - default
+    networks:
+      - default
 
-  # user-service:
-  #   build:
-  #     context: ./user-service
-  #     dockerfile: Dockerfile
-  #   restart: always
-  #   env_file:
-  #     - ./user-service/.env
-  #   ports:
-  #     - "9120:9120"
-  #   networks:
-  #     - default
+  user-service:
+    container_name: user-service-container
+    build:
+      context: ./user-service
+      dockerfile: Dockerfile
+    restart: always
+    depends_on:
+      - mongo
+      - redis
+    env_file:
+      - ./user-service/.env
+    ports:
+      - "9120:9120"
+    networks:
+      - default
 
-# networks:
-#   default:
-#     driver: bridge
+  category-service:
+    container_name: category-service-container
+    build:
+      context: ./category-service
+      dockerfile: Dockerfile
+    restart: always
+    depends_on:
+      - mongo
+      - redis
+      - postgresql
+    environment:
+      POSTGRES_HOST: postgresql
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: users
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    ports:
+      - "9130:9130"
+#    networks:
+#      - default
+
+
+networks:
+  default:
+    driver: bridge

@@ -3,14 +3,14 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
-import { UsersModule } from 'src/users/users.module';
-import { JwtStrategy } from 'src/auth/strategies/jwt.strategy';
-import { DatabaseModule } from 'src/database/database.module';
+import { UsersModule } from './../users/users.module';
+import { JwtStrategy } from './strategies/jwt.strategy';
+import { DatabaseModule } from '../database/database.module';
 import {
   RefreshToken,
   RefreshTokenSchema,
-} from 'src/auth/models/refresh-token.schema';
-import { RefreshTokenRepository } from 'src/auth/refresh-token.repository';
+} from './models/refresh-token.schema';
+import { RefreshTokenRepository } from './refresh-token.repository';
 
 @Module({
   imports: [

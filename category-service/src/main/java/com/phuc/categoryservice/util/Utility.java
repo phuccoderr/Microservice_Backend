@@ -40,7 +40,7 @@ public class Utility {
 
     public void checkSortIsAscOrDesc(String sort) throws ParamValidateException {
         if (!sort.equals("asc") && !sort.equals("desc")) {
-            throw new ParamValidateException();
+            throw new ParamValidateException("Param error sort: must be asc or desc");
         }
     }
 

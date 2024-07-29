@@ -28,12 +28,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return buildErrorResponse(ex, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @ExceptionHandler(DataAlreadyExistsException.class)
-    public ResponseEntity<ResponseError> handleDataAlreadyExistsException(Exception ex) {
-
-        return buildErrorResponse(ex, HttpStatus.UNPROCESSABLE_ENTITY);
-    }
-
     @ExceptionHandler(DataErrorException.class)
     public ResponseEntity<ResponseError> handleDataNotFoundException(Exception ex) {
 

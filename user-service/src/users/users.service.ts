@@ -3,12 +3,12 @@ import {
   NotFoundException,
   UnprocessableEntityException,
 } from '@nestjs/common';
-import { CreateUserDto } from 'src/users/dto/create-user.dto';
-import { UsersRepository } from 'src/users/users.repository';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UsersRepository } from './users.repository';
 import * as bcrypt from 'bcrypt';
-import { UpdateUserDto } from 'src/users/dto/update-user.dto';
-import { User } from 'src/users/models/user.schema';
-import { RequestPagination } from 'src/users/dto/request-pagination.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { User } from './models/user.schema';
+import { RequestPagination } from './dto/request-pagination.dto';
 
 @Injectable()
 export class UsersService {
