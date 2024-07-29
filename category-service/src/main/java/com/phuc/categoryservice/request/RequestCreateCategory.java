@@ -15,7 +15,7 @@ public class RequestCreateCategory {
     private String name;
 
     @JsonProperty("status")
-    @NotNull(message = "status must be true or false")
+    @NotBlank(message = "status must be true or false")
     private Boolean status;
 
     @JsonProperty("parent_id")

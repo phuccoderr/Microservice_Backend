@@ -4,6 +4,7 @@ import com.phuc.categoryservice.dtos.CategoryDto;
 import com.phuc.categoryservice.exceptions.ParamValidateException;
 import com.phuc.categoryservice.models.BaseEntity;
 import com.phuc.categoryservice.models.Category;
+import lombok.experimental.UtilityClass;
 import org.modelmapper.ModelMapper;
 
 import java.text.Normalizer;
@@ -11,25 +12,23 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 
+@UtilityClass
 public class Utility {
 
     static ModelMapper modelMapper = new ModelMapper();
 
-    private Utility() {
-        throw new UnsupportedOperationException("Utility class cannot be instantiated");
-    }
-    public static String unAccent(String s) {
+    public String unAccent(String s) {
         String normalizer = Normalizer.normalize(s,Normalizer.Form.NFD);
         Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
         String noAccents = pattern.matcher(normalizer).replaceAll("");
         return noAccents.toLowerCase().replace(" ", "-");
     }
 
-    public static List<CategoryDto> toListDtos(List<Category> categories) {
+    public List<CategoryDto> toListDtos(List<Category> categories) {
         return categories.stream().map(Utility::toDto).toList();
     }
 
-    public static CategoryDto toDto(Category category) {
+    public CategoryDto toDto(Category category) {
         CategoryDto dto = modelMapper.map(category, CategoryDto.class);
 
         dto.setChildren(category.getChildren().stream().map(BaseEntity::getId).toList());
@@ -39,7 +38,7 @@ public class Utility {
         return dto;
     }
 
-    public static void checkSortIsAscOrDesc(String sort) throws ParamValidateException {
+    public void checkSortIsAscOrDesc(String sort) throws ParamValidateException {
         if (!sort.equals("asc") && !sort.equals("desc")) {
             throw new ParamValidateException();
         }
