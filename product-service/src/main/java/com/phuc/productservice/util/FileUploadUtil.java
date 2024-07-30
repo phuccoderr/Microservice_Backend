@@ -15,11 +15,11 @@ public class FileUploadUtil {
 
     public static final long MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
 
-    public static final String IMAGE_PATTERN = "([^\\s]+(\\.(?i)(jpg|png|gif|bmp))$)";
+    public static final String IMAGE_PATTERN = "([^\\s]+(\\.(?i)(jpg|png|gif|bmp))$)"; // regex .* file
 
     public static final String DATE_FORMAT = "yyyyMMddHHmmss";
 
-    public static final String FILE_NAME_FORMAT = "%s_%s_%s";
+    public static final String FILE_NAME_FORMAT = "%s_%s";
 
     public void assertAllowed(MultipartFile file, String pattern) throws FuncErrorException {
         long size = file.getSize();
@@ -29,7 +29,7 @@ public class FileUploadUtil {
 
         String fileName = file.getOriginalFilename();
         String extension = FilenameUtils.getExtension(fileName);
-        if (!isAllowedExtension(extension,pattern)) {
+        if (!isAllowedExtension(fileName,pattern)) {
             throw new FuncErrorException("Only jpg, png, gif, bmp files are allowed");
         }
     }

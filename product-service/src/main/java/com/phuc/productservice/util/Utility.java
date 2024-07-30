@@ -1,6 +1,7 @@
 package com.phuc.productservice.util;
 
 import com.phuc.productservice.dtos.ProductDto;
+import com.phuc.productservice.exceptions.ParamValidateException;
 import com.phuc.productservice.models.Product;
 import com.phuc.productservice.models.ProductImage;
 import lombok.experimental.UtilityClass;
@@ -20,6 +21,12 @@ public class Utility {
         return noAccents.toLowerCase().replace(" ", "-");
     }
 
+    public void checkSortIsAscOrDesc(String sort) throws ParamValidateException {
+        if (!sort.equals("asc") && !sort.equals("desc")) {
+            throw new ParamValidateException("Param error sort: must be asc or desc");
+        }
+    }
+
     public ProductDto toDto(Product product) {
         ProductDto dto = modelMapper.map(product, ProductDto.class);
 
@@ -29,5 +36,9 @@ public class Utility {
         }
 
         return dto;
+    }
+
+    public static List<ProductDto> toListDtos(List<Product> products) {
+        return products.stream().map(Utility::toDto).toList();
     }
 }

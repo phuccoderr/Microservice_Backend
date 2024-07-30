@@ -3,6 +3,7 @@ package com.phuc.productservice.exceptions;
 
 
 import com.phuc.productservice.response.ResponseError;
+import org.apache.coyote.BadRequestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -13,6 +14,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
@@ -32,6 +34,22 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<ResponseError> handleDataNotFoundException(Exception ex) {
 
         return buildErrorResponse(ex, HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+
+    @ExceptionHandler(FuncErrorException.class)
+    public ResponseEntity<ResponseError> handleFuncErrorException(Exception ex) {
+
+        return buildErrorResponse(ex, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(HttpClientErrorException.class)
+    public ResponseEntity<ResponseError> handleHttpClientErrorException(Exception ex) {
+        return buildErrorResponse(ex, HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<ResponseError> handleBadRequestException(Exception ex) {
+        return buildErrorResponse(ex, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(ParamValidateException.class)

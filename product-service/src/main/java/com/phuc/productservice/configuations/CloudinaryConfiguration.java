@@ -26,6 +26,7 @@ public class CloudinaryConfiguration {
         config.put("cloud_name",cloudName);
         config.put("api_key", cloudKey);
         config.put("api_secret", cloudSecret);
+        config.put("secure", "true"); // Sử dụng HTTPS
         return new Cloudinary(config);
     }
 }

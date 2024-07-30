@@ -1,25 +1,17 @@
 package com.phuc.productservice.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.phuc.productservice.dtos.CloudinaryDto;
-import com.phuc.productservice.models.ProductImage;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
-@Getter
 @Setter
-public class RequestCreateProduct {
+@Getter
+public class RequestUpdateProduct {
     @JsonProperty("name")
     @NotBlank(message = "name cannot empty or null")
     private String name;
