@@ -141,8 +141,21 @@ public class ProductController {
 
         return new ResponseEntity<>(ResponseObject.builder()
                 .status(HttpStatus.OK.value())
-                .message("Success create category")
+                .message("Success update product")
                 .data(dto).build(), HttpStatus.CREATED);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ResponseObject> deleteProduct(@PathVariable("id") String id) throws DataErrorException {
+
+        productService.deleteProductById(id);
+
+        productRedisService.clear();
+
+        return new ResponseEntity<>(ResponseObject.builder()
+                .status(HttpStatus.OK.value())
+                .message("Success delete product")
+                .data("").build(), HttpStatus.CREATED);
     }
 
 

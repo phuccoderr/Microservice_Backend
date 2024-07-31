@@ -26,8 +26,7 @@ public class CloudinaryService {
     private final Cloudinary cloudinary;
 
     @Async
-    public void deleteExtraImage(List<MultipartFile> extraImage, Product product)
-            throws FuncErrorException {
+    public void deleteExtraImage(List<MultipartFile> extraImage, Product product) {
         if (extraImage == null || extraImage.isEmpty()) {
             CompletableFuture.completedFuture(null);
             return;
@@ -40,8 +39,7 @@ public class CloudinaryService {
     }
 
     @Async
-    public void deleteMainImage(MultipartFile mainFile, Product product)
-            throws FuncErrorException {
+    public void deleteMainImage(MultipartFile mainFile, Product product) {
         if (mainFile != null && !mainFile.isEmpty()) {
             deleteImage(product.getImageId());
         }
@@ -77,7 +75,7 @@ public class CloudinaryService {
 //
 //
 
-    @Transactional(rollbackFor = {FuncErrorException.class})
+
     public void setMainImage(MultipartFile mainFile,Product product, RequestProduct productDTO)
             throws FuncErrorException {
 

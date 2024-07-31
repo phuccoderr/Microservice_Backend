@@ -46,7 +46,7 @@ public class ProductService implements IProductService {
 
 
 
-
+    @Override
     public Product createProduct(RequestProduct requestProduct, CategoryDto categoryDto) {
         Product product = new Product();
         setDtoToEntity(product,requestProduct);
@@ -62,6 +62,7 @@ public class ProductService implements IProductService {
         return repository.save(product);
     }
 
+    @Override
     public Product updateProduct(String proId,RequestProduct requestProduct, CategoryDto categoryDto) {
 
         Product proInDB = new Product();
@@ -79,6 +80,11 @@ public class ProductService implements IProductService {
         return repository.save(proInDB);
     }
 
+    public void deleteProductById(String proId) throws DataErrorException {
+        Product product = getProduct(proId);
+        repository.delete(product);
+    }
+
     @Override
     public void checkNameUnique(String name) throws DataErrorException {
         Product product = repository.findByName(name);
@@ -87,6 +93,7 @@ public class ProductService implements IProductService {
         }
     }
 
+    @Override
     public void checkNameUnique(String oldName, String newName) throws DataErrorException {
         if (!oldName.equals(newName)) {
             checkNameUnique(newName);
