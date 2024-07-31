@@ -52,4 +52,5 @@ public class RequestProduct {
     private String url;
     @JsonIgnore
     private Set<CloudinaryDto> extraImages = new HashSet<>();
+
 }

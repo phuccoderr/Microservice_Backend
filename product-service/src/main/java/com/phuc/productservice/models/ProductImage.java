@@ -29,4 +29,9 @@ public class ProductImage extends BaseEntity {
         this.url = cloudinaryDto.getUrl();
         this.product = product;
     }
+
+    public ProductImage(CloudinaryDto cloudinaryDto) {
+        this.imageId = cloudinaryDto.getPublicId();
+        this.url = cloudinaryDto.getUrl();
+    }
 }

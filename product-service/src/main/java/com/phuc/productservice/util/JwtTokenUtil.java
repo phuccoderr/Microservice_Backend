@@ -9,11 +9,11 @@ import org.springframework.stereotype.Component;
 public class JwtTokenUtil {
 
     @Value("${JWT_SECRET}")
-    private String SECRET_KEY;
+    private String secretKey;
 
     public Claims extractToken(String token) {
         return Jwts.parser()
-                .setSigningKey(SECRET_KEY.getBytes())
+                .setSigningKey(secretKey.getBytes())
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();

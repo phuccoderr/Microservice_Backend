@@ -5,105 +5,119 @@ import com.phuc.productservice.dtos.CloudinaryDto;
 import com.phuc.productservice.exceptions.FuncErrorException;
 import com.phuc.productservice.models.Product;
 import com.phuc.productservice.models.ProductImage;
-import com.phuc.productservice.request.RequestCreateProduct;
-import com.phuc.productservice.request.RequestUpdateProduct;
+import com.phuc.productservice.request.RequestProduct;
 import com.phuc.productservice.util.FileUploadUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 @RequiredArgsConstructor
+@EnableAsync
 public class CloudinaryService {
 
     private final Cloudinary cloudinary;
 
-    @Transactional(rollbackFor = {FuncErrorException.class})
-    public void deleteExtraImage(MultipartFile[] extraImage, Product product)
+    @Async
+    public void deleteExtraImage(List<MultipartFile> extraImage, Product product)
             throws FuncErrorException {
-        if (extraImage == null || extraImage.length == 0) return;
+        if (extraImage == null || extraImage.isEmpty()) {
+            CompletableFuture.completedFuture(null);
+            return;
+        }
         Set<ProductImage> extraImages = product.getExtraImages();
         for (ProductImage image : extraImages) {
             deleteImage(image.getImageId());
         }
+        CompletableFuture.completedFuture(null);
     }
 
-    @Transactional(rollbackFor = {FuncErrorException.class})
+    @Async
     public void deleteMainImage(MultipartFile mainFile, Product product)
             throws FuncErrorException {
         if (mainFile != null && !mainFile.isEmpty()) {
             deleteImage(product.getImageId());
         }
-
+        CompletableFuture.completedFuture(null);
     }
 
-    @Transactional(rollbackFor = {FuncErrorException.class})
-    public void setExtraImage(MultipartFile[] extraFile, Product product)
+
+    public void setExtraImage(List<MultipartFile> extraFile,Product productInDB, RequestProduct productDTO )
             throws FuncErrorException {
 
-        if (extraFile != null && extraFile.length > 0 ) {
+        Set<CloudinaryDto> images = new HashSet<>();
+        if (extraFile == null && extraFile.isEmpty() ) {
+            if (productInDB != null ) {
+                productInDB.getExtraImages().forEach(image ->
+                    images.add(new CloudinaryDto(image.getImageId(),image.getUrl()))
+                );
+                productDTO.setExtraImages(images);
+            } else {
+                productDTO.setExtraImages(images);
+            }
+        } else {
             for (MultipartFile file : extraFile) {
                 String fileName = FileUploadUtil.getFileName(file.getOriginalFilename());
 
                 FileUploadUtil.assertAllowed(file, FileUploadUtil.IMAGE_PATTERN);
 
-                CloudinaryDto result = upload(file, fileName);
-                product.addImage(result);
+                CloudinaryDto result = uploadImage(file, fileName);
+                images.add(result);
             }
+            productDTO.setExtraImages(images);
         }
     }
+//
+//
 
     @Transactional(rollbackFor = {FuncErrorException.class})
-    public void setMainImage(MultipartFile mainFile,Product product)
+    public void setMainImage(MultipartFile mainFile,Product product, RequestProduct productDTO)
             throws FuncErrorException {
-        if (mainFile != null && !mainFile.isEmpty()) {
+
+        if (mainFile == null || mainFile.isEmpty() && product != null) {
+            productDTO.setImageId(product.getImageId());
+            productDTO.setUrl(product.getUrl());
+
+        } else {
             FileUploadUtil.assertAllowed(mainFile, FileUploadUtil.IMAGE_PATTERN);
 
             String fileName = FileUploadUtil.getFileName(mainFile.getOriginalFilename());
 
-            CloudinaryDto result = upload(mainFile, fileName);
+            CloudinaryDto result = uploadImage(mainFile, fileName);
 
-            product.setImageId(result.getPublicId());
-            product.setUrl(result.getUrl());
+            productDTO.setImageId(result.getPublicId());
+            productDTO.setUrl(result.getUrl());
         }
-        if (product.getImageId() == null || product.getImageId().isEmpty()) {
-            product.setImageId("");
-            product.setUrl("default image!");
-        }
+
     }
 
-    private CloudinaryDto upload(MultipartFile file, String fileName) throws FuncErrorException {
+    public CloudinaryDto uploadImage(MultipartFile file, String fileName) throws FuncErrorException {
         try {
             Map result = cloudinary.uploader()
                     .upload(file.getBytes(), Map.of("public_id", "microservice/product/" + fileName));
-            String url = (String) result.get("secure_url");
             String publicId = (String) result.get("public_id");
-            return CloudinaryDto.builder().url(url).publicId(publicId).build();
+            String url = (String) result.get("secure_url");
+            return new CloudinaryDto(publicId,url);
         } catch (Exception ex) {
-            throw new FuncErrorException("Failed to upload file");
+            throw new FuncErrorException("File upload fail!");
         }
     }
 
-    private void deleteImage(String publicId) throws FuncErrorException {
-        try {
-            cloudinary.uploader().destroy(publicId, null);
-        } catch (IOException e) {
-            throw new FuncErrorException("Image delete fail");
-        }
-    }
+    private void deleteImage(String publicId) {
+        CompletableFuture.runAsync(() -> {
+            try {
+                cloudinary.uploader().destroy(publicId, null);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
 
-    private String getPublicIdFromUrl(String imageUrl) {
-        // https://res.cloudinary.com/dp4tp9gwa/image/upload/v1713253619/b8db51d6-d20b-420d-860e-3228352026f4.jpg
-        String[] parts = imageUrl.split("/");
-        String publicIdWithExtension = parts[parts.length - 1]; // b8db51d6-d20b-420d-860e-3228352026f4.jpg
-        String[] publicIdParts = publicIdWithExtension.split("\\."); // b8db51d6-d20b-420d-860e-3228352026f4
-        return publicIdParts[0]; // Public_id là phần trước dấu chấm trong publicIdWithExtension
     }
 }

@@ -1,24 +1,19 @@
 package com.phuc.productservice.controller;
 
-import com.cloudinary.Cloudinary;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.phuc.productservice.dtos.CategoryDto;
-import com.phuc.productservice.dtos.CloudinaryDto;
 import com.phuc.productservice.dtos.PaginationDto;
 import com.phuc.productservice.dtos.ProductDto;
 import com.phuc.productservice.exceptions.DataErrorException;
 import com.phuc.productservice.exceptions.FuncErrorException;
 import com.phuc.productservice.exceptions.ParamValidateException;
 import com.phuc.productservice.models.Product;
-import com.phuc.productservice.request.RequestCreateProduct;
 import com.phuc.productservice.request.RequestProduct;
-import com.phuc.productservice.request.RequestUpdateProduct;
 import com.phuc.productservice.response.ResponseObject;
 import com.phuc.productservice.service.CategoryService;
 import com.phuc.productservice.service.CloudinaryService;
 import com.phuc.productservice.service.ProductRedisService;
 import com.phuc.productservice.service.ProductService;
-import com.phuc.productservice.util.FileUploadUtil;
 import com.phuc.productservice.util.Utility;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -26,12 +21,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+
 import java.util.List;
 
 @RestController
@@ -91,7 +84,7 @@ public class ProductController {
     public ResponseEntity<ResponseObject> createProduct(
             @RequestPart("product") @Valid RequestProduct requestProduct,
             @RequestParam(value = "main_image", required = false)MultipartFile mainFile,
-            @RequestParam(value = "extra_images", required = false) MultipartFile[] extraFile,
+            @RequestParam(value = "extra_images", required = false) List<MultipartFile> extraFile,
             HttpServletRequest request
             ) throws DataErrorException, FuncErrorException {
 
@@ -102,12 +95,12 @@ public class ProductController {
             cateResponse = categoryService.getCategoryById(requestProduct.getCategoryId(), request);
         }
 
-        Product product = new Product();
+        cloudinaryService.setMainImage(mainFile,null, requestProduct);
+        cloudinaryService.setExtraImage(extraFile,null, requestProduct);
 
-        cloudinaryService.setMainImage(mainFile,product);
-        cloudinaryService.setExtraImage(extraFile, product);
+        Product product = productService.createProduct(requestProduct, cateResponse);
 
-        productService.createProduct(product,requestProduct, cateResponse);
+        productRedisService.clear();
 
         ProductDto dto = Utility.toDto(product);
 
@@ -122,7 +115,7 @@ public class ProductController {
             @PathVariable("id") String id,
             @RequestPart("product") @Valid RequestProduct requestProduct,
             @RequestParam(value = "main_image", required = false)MultipartFile mainFile,
-            @RequestParam(value = "extra_images", required = false) MultipartFile[] extraFile,
+            @RequestParam(value = "extra_images", required = false) List<MultipartFile> extraFile,
             HttpServletRequest request
     ) throws DataErrorException, FuncErrorException {
 
@@ -137,12 +130,14 @@ public class ProductController {
 
         cloudinaryService.deleteMainImage(mainFile,productInDB);
         cloudinaryService.deleteExtraImage(extraFile, productInDB);
-        cloudinaryService.setMainImage(mainFile, productInDB);
-        cloudinaryService.setExtraImage(extraFile, productInDB);
+        cloudinaryService.setMainImage(mainFile, productInDB, requestProduct);
+        cloudinaryService.setExtraImage(extraFile,productInDB, requestProduct);
 
-        productService.updateProduct(productInDB, requestProduct, cateResponse);
+        Product productUpdated = productService.updateProduct(id, requestProduct, cateResponse);
 
-        ProductDto dto = Utility.toDto(productInDB);
+        productRedisService.clear();
+
+        ProductDto dto = Utility.toDto(productUpdated);
 
         return new ResponseEntity<>(ResponseObject.builder()
                 .status(HttpStatus.OK.value())

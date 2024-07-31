@@ -1,13 +1,16 @@
 package com.phuc.productservice.dtos;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Setter
 @Getter
-@Builder
+@NoArgsConstructor
 public class CloudinaryDto {
     private String publicId;
     private String url;
+
+    public CloudinaryDto(String publicId,String url) {
+        this.publicId = publicId;
+        this.url = url;
+    }
 }

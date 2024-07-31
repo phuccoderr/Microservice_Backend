@@ -28,7 +28,6 @@ public class FileUploadUtil {
         }
 
         String fileName = file.getOriginalFilename();
-        String extension = FilenameUtils.getExtension(fileName);
         if (!isAllowedExtension(fileName,pattern)) {
             throw new FuncErrorException("Only jpg, png, gif, bmp files are allowed");
         }

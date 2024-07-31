@@ -2,14 +2,11 @@ package com.phuc.productservice.service;
 
 
 import com.phuc.productservice.dtos.CategoryDto;
-import com.phuc.productservice.dtos.CloudinaryDto;
 import com.phuc.productservice.exceptions.DataErrorException;
 import com.phuc.productservice.exceptions.ParamValidateException;
 import com.phuc.productservice.models.Product;
 import com.phuc.productservice.repository.ProductRepository;
-import com.phuc.productservice.request.RequestCreateProduct;
 import com.phuc.productservice.request.RequestProduct;
-import com.phuc.productservice.request.RequestUpdateProduct;
 import com.phuc.productservice.util.Utility;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -17,9 +14,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.zip.DataFormatException;
 
 @Service
 @RequiredArgsConstructor
@@ -50,24 +44,36 @@ public class ProductService implements IProductService {
         return repository.findById(proId).orElseThrow( () -> new DataErrorException("Data not Found!") );
     }
 
-    @Override
-    public Product createProduct(Product product,RequestProduct requestProduct, CategoryDto categoryDto) {
 
+
+
+    public Product createProduct(RequestProduct requestProduct, CategoryDto categoryDto) {
+        Product product = new Product();
         setDtoToEntity(product,requestProduct);
 
         if(categoryDto != null) {
             product.setCategoryId(categoryDto.getId());
         }
 
+        if (!requestProduct.getExtraImages().isEmpty()) {
+            requestProduct.getExtraImages().forEach(product::addImage
+            );
+        }
         return repository.save(product);
     }
 
-    public Product updateProduct(Product proInDB,RequestProduct requestProduct, CategoryDto categoryDto) throws DataErrorException {
+    public Product updateProduct(String proId,RequestProduct requestProduct, CategoryDto categoryDto) {
 
+        Product proInDB = new Product();
+        proInDB.setId(proId);
         setDtoToEntity(proInDB,requestProduct);
 
         if(categoryDto != null) {
             proInDB.setCategoryId(categoryDto.getId());
+        }
+
+        if (!requestProduct.getExtraImages().isEmpty()) {
+            requestProduct.getExtraImages().forEach(proInDB::addImage);
         }
 
         return repository.save(proInDB);
@@ -95,5 +101,8 @@ public class ProductService implements IProductService {
         product.setCost(reqProduct.getCost());
         product.setPrice(reqProduct.getPrice());
         product.setSale(reqProduct.getSale());
+        product.setUrl(reqProduct.getUrl());
+        product.setImageId(reqProduct.getImageId());
     }
+
 }
