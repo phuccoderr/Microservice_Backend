@@ -46,9 +46,12 @@ public class ProductDto {
     @JsonProperty("url")
     private String url;
 
+
     @JsonProperty("extra_images")
-    private List<String> extraImages = new ArrayList<>();
+    private List<ProductImageDto> extraImages = new ArrayList<>();
 
     @JsonProperty("category_id")
     private String categoryId;
+
+
 }

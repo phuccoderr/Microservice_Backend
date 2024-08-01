@@ -1,6 +1,5 @@
 package com.phuc.productservice.response;
 
-import com.phuc.productservice.dtos.CategoryDto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;

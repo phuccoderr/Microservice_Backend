@@ -2,7 +2,6 @@ package com.phuc.productservice.util;
 
 import com.phuc.productservice.exceptions.FuncErrorException;
 import lombok.experimental.UtilityClass;
-import org.apache.commons.io.FilenameUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.text.DateFormat;
@@ -15,7 +14,7 @@ public class FileUploadUtil {
 
     public static final long MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
 
-    public static final String IMAGE_PATTERN = "([^\\s]+(\\.(?i)(jpg|png|gif|bmp))$)"; // regex .* file
+    public static final String IMAGE_PATTERN = "([^\\s]+(\\.(?i)(jpe?g|png|gif|bmp))$)"; // regex .* file
 
     public static final String DATE_FORMAT = "yyyyMMddHHmmss";
 

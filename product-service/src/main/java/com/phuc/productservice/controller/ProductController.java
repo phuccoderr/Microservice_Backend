@@ -11,7 +11,6 @@ import com.phuc.productservice.models.Product;
 import com.phuc.productservice.request.RequestProduct;
 import com.phuc.productservice.response.ResponseObject;
 import com.phuc.productservice.service.CategoryService;
-import com.phuc.productservice.service.CloudinaryService;
 import com.phuc.productservice.service.ProductRedisService;
 import com.phuc.productservice.service.ProductService;
 import com.phuc.productservice.util.Utility;
@@ -24,7 +23,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-
 import java.util.List;
 
 @RestController
@@ -35,7 +33,6 @@ public class ProductController {
     private final ProductService productService;
     private final ProductRedisService productRedisService;
     private final CategoryService categoryService;
-    private final CloudinaryService cloudinaryService;
 
     @GetMapping()
     public ResponseEntity<ResponseObject> listByPage(
@@ -95,10 +92,7 @@ public class ProductController {
             cateResponse = categoryService.getCategoryById(requestProduct.getCategoryId(), request);
         }
 
-        cloudinaryService.setMainImage(mainFile,null, requestProduct);
-        cloudinaryService.setExtraImage(extraFile,null, requestProduct);
-
-        Product product = productService.createProduct(requestProduct, cateResponse);
+        Product product = productService.createProduct(mainFile,extraFile,requestProduct, cateResponse);
 
         productRedisService.clear();
 
@@ -115,9 +109,8 @@ public class ProductController {
             @PathVariable("id") String id,
             @RequestPart("product") @Valid RequestProduct requestProduct,
             @RequestParam(value = "main_image", required = false)MultipartFile mainFile,
-            @RequestParam(value = "extra_images", required = false) List<MultipartFile> extraFile,
             HttpServletRequest request
-    ) throws DataErrorException, FuncErrorException {
+    ) throws DataErrorException, FuncErrorException{
 
         Product productInDB = productService.getProduct(id);
 
@@ -128,12 +121,7 @@ public class ProductController {
             cateResponse = categoryService.getCategoryById(requestProduct.getCategoryId(), request);
         }
 
-        cloudinaryService.deleteMainImage(mainFile,productInDB);
-        cloudinaryService.deleteExtraImage(extraFile, productInDB);
-        cloudinaryService.setMainImage(mainFile, productInDB, requestProduct);
-        cloudinaryService.setExtraImage(extraFile,productInDB, requestProduct);
-
-        Product productUpdated = productService.updateProduct(id, requestProduct, cateResponse);
+        Product productUpdated = productService.updateProduct(productInDB, requestProduct, cateResponse, mainFile);
 
         productRedisService.clear();
 
@@ -142,8 +130,10 @@ public class ProductController {
         return new ResponseEntity<>(ResponseObject.builder()
                 .status(HttpStatus.OK.value())
                 .message("Success update product")
-                .data(dto).build(), HttpStatus.CREATED);
+                .data(dto).build(), HttpStatus.OK);
     }
+
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<ResponseObject> deleteProduct(@PathVariable("id") String id) throws DataErrorException {
@@ -155,8 +145,43 @@ public class ProductController {
         return new ResponseEntity<>(ResponseObject.builder()
                 .status(HttpStatus.OK.value())
                 .message("Success delete product")
-                .data("").build(), HttpStatus.CREATED);
+                .data("").build(), HttpStatus.OK);
     }
 
+    @PatchMapping("/add_files/{id}")
+    public ResponseEntity<ResponseObject> addFilesProduct(
+            @PathVariable("id") String id,
+            @RequestParam(value = "extra_images", required = false) List<MultipartFile> extraFiles
+    ) throws DataErrorException, FuncErrorException {
+        Product productInDB = productService.getProduct(id);
+
+        Product productUpdated = productService.addFiles(extraFiles, productInDB);
+
+        ProductDto dto = Utility.toDto(productUpdated);
+
+        productRedisService.clear();
+
+        return new ResponseEntity<>(ResponseObject.builder()
+                .status(HttpStatus.OK.value())
+                .message("Success add files product")
+                .data(dto).build(), HttpStatus.OK);
+    }
+
+    @DeleteMapping("/delete_files/{id}")
+    public ResponseEntity<ResponseObject> deleteFiles(
+            @PathVariable("id") String id,
+            @RequestBody List<String> listFiles
+    ) throws DataErrorException {
+        Product productInDB = productService.getProduct(id);
+
+        productService.deleteFiles(listFiles,productInDB);
+
+        productRedisService.clear();
+
+        return new ResponseEntity<>(ResponseObject.builder()
+                .status(HttpStatus.OK.value())
+                .message("Success delete files product")
+                .data("").build(), HttpStatus.OK);
+    }
 
 }

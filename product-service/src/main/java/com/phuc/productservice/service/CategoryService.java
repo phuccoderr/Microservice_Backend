@@ -5,8 +5,6 @@ import com.phuc.productservice.dtos.CategoryDto;
 import com.phuc.productservice.response.ResponseObject;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -21,9 +19,9 @@ public class CategoryService implements ICategoryService {
     private final ObjectMapper objectMapper;
     private final RestTemplate restTemplate;
 
-    private static final Logger GLOBAL_LOGGER = LoggerFactory.getLogger(CategoryService.class);
     private final String CATEGORY_SERVICE_URL = "http://localhost:9130/api/v1/categories/";
 
+    @Override
     public CategoryDto getCategoryById(String categoryId, HttpServletRequest request) {
         String jwtToken = request.getHeader("Authorization");
 
@@ -40,7 +38,7 @@ public class CategoryService implements ICategoryService {
                 ResponseObject.class
         );
 
-        ResponseObject dataMap = response.getBody();
-        return objectMapper.convertValue(dataMap.getData(), CategoryDto.class);
+        Object data = response.getBody().getData();
+        return objectMapper.convertValue(data, CategoryDto.class);
     }
 }

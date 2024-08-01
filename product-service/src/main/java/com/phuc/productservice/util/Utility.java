@@ -1,6 +1,8 @@
 package com.phuc.productservice.util;
 
+import com.phuc.productservice.dtos.CloudinaryDto;
 import com.phuc.productservice.dtos.ProductDto;
+import com.phuc.productservice.dtos.ProductImageDto;
 import com.phuc.productservice.exceptions.ParamValidateException;
 import com.phuc.productservice.models.Product;
 import com.phuc.productservice.models.ProductImage;
@@ -31,10 +33,14 @@ public class Utility {
         ProductDto dto = modelMapper.map(product, ProductDto.class);
 
         if (product.getExtraImages() != null) {
-            List<String> list = product.getExtraImages().stream().map(ProductImage::getUrl).toList();
-            dto.setExtraImages(list);
-        }
 
+            List<ProductImageDto> extraImagesDto = product.getExtraImages()
+                    .stream()
+                    .map(image -> new ProductImageDto(image.getId(), image.getUrl()))
+                    .toList();
+
+            dto.setExtraImages(extraImagesDto);
+        }
         return dto;
     }
 
