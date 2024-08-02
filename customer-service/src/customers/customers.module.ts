@@ -3,6 +3,7 @@ import { CustomersService } from './customers.service';
 import { CustomersController } from './customers.controller';
 import { DatabaseModule } from '../database/database.module';
 import { Customer, CustomerSchema } from './models/customer.schema';
+import { CustomersRepository } from './customers.repository';
 
 @Module({
   imports: [
@@ -10,6 +11,7 @@ import { Customer, CustomerSchema } from './models/customer.schema';
     DatabaseModule.forFeature([{name: Customer.name, schema: CustomerSchema}]),
   ],
   controllers: [CustomersController],
-  providers: [CustomersService],
+  providers: [CustomersService, CustomersRepository],
+  exports: [CustomersRepository]
 })
 export class CustomersModule {}

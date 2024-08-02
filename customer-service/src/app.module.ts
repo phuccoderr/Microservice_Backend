@@ -8,6 +8,7 @@ import { AuthModule } from './auth/auth.module';
 @Module({
   imports: [
     DatabaseModule,
+    AuthModule,
     CustomersModule,
     ConfigModule.forRoot({
       isGlobal: true

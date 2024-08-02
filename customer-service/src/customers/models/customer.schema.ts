@@ -1,7 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { AbstractDocument } from '../../database/abstract.schema';
 
-const authenticationType = ["FACEBOOK", "GOOGLE","DATABASE"]
+export enum AuthenticationType {
+  DATABASE= "DATABASE",
+  FACEBOOK = "FACEBOOK",
+  GOOGLE = "GOOGLE"
+}
 
 @Schema({versionKey: false})
 export class Customer extends AbstractDocument {
@@ -15,22 +19,22 @@ export class Customer extends AbstractDocument {
   status: boolean;
 
   @Prop({name: 'verification_code'})
-  verificationCode: string;
+  verification_code: string;
 
   @Prop({name: 'reset_password_token'})
-  resetPasswordToken: string;
+  reset_password_token: string;
 
-  @Prop({name: 'authentication_type', type: String, enum: authenticationType})
-  authenticationType = authenticationType;
+  @Prop({name: 'authentication_type', type: String, enum: AuthenticationType, default: AuthenticationType.DATABASE})
+  authentication_type: AuthenticationType;
 
   @Prop({name: 'first_name', required: true})
-  firstName: string;
+  first_name: string;
 
-  @Prop({name: 'last_name'})
-  lastName: string;
+  @Prop({name: 'last_name', required: true})
+  last_name: string;
 
   @Prop({name: 'phone_number'})
-  phoneNumber: string;
+  phone_number: string;
 
   @Prop({name: 'address'})
   address: string;
