@@ -15,7 +15,6 @@ type VerifyCustomerMessage struct {
 
 func (c *Consumer) handleVerifyCustomer(message *sarama.ConsumerMessage) error {
 	var verify VerifyCustomerMessage
-	fmt.Println(message.Value)
 	err := json.Unmarshal(message.Value, &verify)
 	if err != nil {
 		log.Printf("Error unmarshaling message: %v", err)
@@ -23,11 +22,23 @@ func (c *Consumer) handleVerifyCustomer(message *sarama.ConsumerMessage) error {
 	}
 
 	formMail := mail.Message{
-		From:     "phuctapcode@gmail.com",
-		To:       verify.Email,
-		Subject:  "Xác thực tài khoản",
-		Body:     "Chẳng có gì cả",
-		HTMLBody: "<p>Xac thuc di cha</p>",
+		From:    "phuctapcode@gmail.com",
+		To:      verify.Email,
+		Subject: "Xác thực tài khoản",
+		Body:    "Chẳng có gì cả",
+		HTMLBody: fmt.Sprintf(`<h3>Vui lòng nhấn đường link dưới đây để xác thực tài khoản của bạn!</h3>
+      				<a href="%s">
+			<button
+			  style="
+				padding: 20px;
+				background-color: gray;
+				border-radius: 10px;
+				color: white;
+			  "
+			>
+			  Verify customer
+			</button>
+      </a>`, verify.UrlVerify),
 	}
 
 	mailer := &mail.Mailer{

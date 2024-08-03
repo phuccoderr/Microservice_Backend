@@ -5,6 +5,7 @@ import { LoggerModule as PinoLoggerModule } from "nestjs-pino";
 import { DatabaseModule } from './database/database.module';
 import { AuthModule } from './auth/auth.module';
 import { KafkaModule } from './kafka/kafka.module';
+import { RedisModule } from './redis/redis.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { KafkaModule } from './kafka/kafka.module';
     AuthModule,
     CustomersModule,
     KafkaModule,
+    RedisModule,
     ConfigModule.forRoot({
       isGlobal: true
     }),

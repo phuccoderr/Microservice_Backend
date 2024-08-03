@@ -1,0 +1,1 @@
+export const customerKey = (id: string) => `customers#${id}`
