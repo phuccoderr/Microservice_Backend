@@ -8,7 +8,7 @@ import { LoginCustomerDto } from './dto/login-customer.dto';
 import { JwtPayload } from './dto/jwt-payload.dto';
 import { ConfigService } from '@nestjs/config';
 
-@Controller('api/v1/customers')
+@Controller('api/v1/customers/auth')
 export class AuthController {
   constructor(private readonly authService: AuthService,
               private readonly producerService: ProducerService,
@@ -25,7 +25,7 @@ export class AuthController {
     };
   }
 
-  @Post('refreshToken')
+  @Post('refresh')
   async refreshToken(@Query('token') token: string): Promise<ResponseObject> {
     const jwtPayload: JwtPayload = await this.authService.refreshToken(token);
 
