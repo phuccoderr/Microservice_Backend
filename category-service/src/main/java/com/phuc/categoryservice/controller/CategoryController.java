@@ -1,6 +1,7 @@
 package com.phuc.categoryservice.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.phuc.categoryservice.constants.Constants;
 import com.phuc.categoryservice.dtos.CategoryDto;
 import com.phuc.categoryservice.dtos.PaginationDto;
 import com.phuc.categoryservice.exceptions.*;
@@ -39,7 +40,7 @@ public class CategoryController {
         categoryRedisService.clear();
         return new ResponseEntity<>(ResponseObject.builder()
                 .status(HttpStatus.OK.value())
-                .message("Success create category")
+                .message(Constants.CREATE_SUCCESS)
                 .data(categoryDto).build(), HttpStatus.CREATED);
     }
 
@@ -56,7 +57,7 @@ public class CategoryController {
             if (paginationDto != null ) {
                 return new ResponseEntity<>(ResponseObject.builder()
                         .status(HttpStatus.OK.value())
-                        .message("Get categories successfully")
+                        .message(Constants.GET_ALL_SUCCESS)
                         .data(paginationDto).build(), HttpStatus.OK);
             }
         }
@@ -70,7 +71,7 @@ public class CategoryController {
 
         return new ResponseEntity<>(ResponseObject.builder()
                 .status(HttpStatus.OK.value())
-                .message("Get categories successfully")
+                .message(Constants.GET_ALL_SUCCESS)
                 .data(paginationDto).build(), HttpStatus.OK);
     }
 
@@ -83,7 +84,7 @@ public class CategoryController {
 
         return new ResponseEntity<>(ResponseObject.builder()
                 .status(HttpStatus.OK.value())
-                .message("Get category successfully")
+                .message(Constants.GET_SUCCESS)
                 .data(categoryDto).build(), HttpStatus.OK);
     }
 
@@ -99,7 +100,7 @@ public class CategoryController {
 
         return new ResponseEntity<>(ResponseObject.builder()
                 .status(HttpStatus.OK.value())
-                .message("Success update category")
+                .message(Constants.UPDATE_SUCCESS)
                 .data(categoryDto).build(), HttpStatus.OK);
     }
 
@@ -112,7 +113,7 @@ public class CategoryController {
 
         return new ResponseEntity<>(ResponseObject.builder()
                 .status(HttpStatus.OK.value())
-                .message("Delete category successfully")
+                .message(Constants.DELETE_SUCCESS)
                 .data(Collections.emptyList()).build(), HttpStatus.OK);
 
     }

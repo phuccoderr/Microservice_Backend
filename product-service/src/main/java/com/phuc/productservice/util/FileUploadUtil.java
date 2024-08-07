@@ -1,5 +1,6 @@
 package com.phuc.productservice.util;
 
+import com.phuc.productservice.constants.Constants;
 import com.phuc.productservice.exceptions.FuncErrorException;
 import lombok.experimental.UtilityClass;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,12 +24,12 @@ public class FileUploadUtil {
     public void assertAllowed(MultipartFile file, String pattern) throws FuncErrorException {
         long size = file.getSize();
         if (size > MAX_FILE_SIZE) {
-            throw new FuncErrorException("Max file size is 2MB");
+            throw new FuncErrorException(Constants.FILE_MAX_SIZE);
         }
 
         String fileName = file.getOriginalFilename();
         if (!isAllowedExtension(fileName,pattern)) {
-            throw new FuncErrorException("Only jpg, png, gif, bmp files are allowed");
+            throw new FuncErrorException(Constants.FILE_EXTENSION_FAIL);
         }
     }
 

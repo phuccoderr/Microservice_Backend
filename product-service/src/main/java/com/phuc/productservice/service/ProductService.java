@@ -1,5 +1,6 @@
 package com.phuc.productservice.service;
 
+import com.phuc.productservice.constants.Constants;
 import com.phuc.productservice.dtos.CategoryDto;
 import com.phuc.productservice.dtos.CloudinaryDto;
 import com.phuc.productservice.exceptions.DataErrorException;
@@ -51,7 +52,7 @@ public class ProductService implements IProductService {
 
     @Override
     public Product getProduct(String proId) throws DataErrorException {
-        return proRepository.findById(proId).orElseThrow( () -> new DataErrorException("Data not Found!") );
+        return proRepository.findById(proId).orElseThrow( () -> new DataErrorException(Constants.DB_NOT_FOUND) );
     }
 
 
@@ -115,7 +116,7 @@ public class ProductService implements IProductService {
     public void checkNameUnique(String name) throws DataErrorException {
         Product product = proRepository.findByName(name);
         if (product != null) {
-            throw new DataErrorException("Data already exists!");
+            throw new DataErrorException(Constants.DB_ALREADY_EXISTS);
         }
     }
 
@@ -146,7 +147,7 @@ public class ProductService implements IProductService {
         listFiles.forEach(fileId -> {
             try {
                 ProductImage productImage = proImageRepository.findById(fileId).orElseThrow(
-                        () -> new DataErrorException("Data not found!")
+                        () -> new DataErrorException(Constants.DB_NOT_FOUND)
                 );
                 cloudinaryService.deleteAsyncImage(productImage.getImageId());
                 proImageRepository.deleteByIdByProductId(productImage.getId(),product.getId());

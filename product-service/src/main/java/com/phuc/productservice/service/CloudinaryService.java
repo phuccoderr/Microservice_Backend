@@ -1,6 +1,7 @@
 package com.phuc.productservice.service;
 
 import com.cloudinary.Cloudinary;
+import com.phuc.productservice.constants.Constants;
 import com.phuc.productservice.dtos.CloudinaryDto;
 import com.phuc.productservice.exceptions.FuncErrorException;
 import lombok.RequiredArgsConstructor;
@@ -24,12 +25,12 @@ public class CloudinaryService {
     public CloudinaryDto uploadImage(MultipartFile file, String fileName) throws FuncErrorException {
         try {
             Map result = cloudinary.uploader()
-                    .upload(file.getBytes(), Map.of("public_id", "microservice/product/" + fileName));
+                    .upload(file.getBytes(), Map.of("public_id", Constants.CLOUD_FOLDER + fileName));
             String publicId = (String) result.get("public_id");
             String url = (String) result.get("secure_url");
             return new CloudinaryDto(publicId,url);
         } catch (Exception ex) {
-            throw new FuncErrorException("File upload fail!");
+            throw new FuncErrorException(Constants.UPLOAD_FILE_FAIL);
         }
     }
 

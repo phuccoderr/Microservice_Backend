@@ -1,6 +1,7 @@
 package com.phuc.productservice.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.phuc.productservice.constants.Constants;
 import com.phuc.productservice.dtos.CategoryDto;
 import com.phuc.productservice.dtos.PaginationDto;
 import com.phuc.productservice.dtos.ProductDto;
@@ -47,7 +48,7 @@ public class ProductController {
             if (paginationDto != null ) {
                 return new ResponseEntity<>(ResponseObject.builder()
                         .status(HttpStatus.OK.value())
-                        .message("Get products successfully")
+                        .message(Constants.GET_ALL_SUCCESS)
                         .data(paginationDto).build(), HttpStatus.OK);
             }
         }
@@ -60,7 +61,7 @@ public class ProductController {
 
         return new ResponseEntity<>(ResponseObject.builder()
                 .status(HttpStatus.OK.value())
-                .message("Get categories successfully")
+                .message(Constants.GET_ALL_SUCCESS)
                 .data(paginationDto).build(), HttpStatus.OK);
     }
 
@@ -73,7 +74,7 @@ public class ProductController {
 
         return new ResponseEntity<>(ResponseObject.builder()
                 .status(HttpStatus.OK.value())
-                .message("Get products successfully")
+                .message(Constants.GET_SUCCESS)
                 .data(dto).build(), HttpStatus.CREATED);
     }
 
@@ -100,7 +101,7 @@ public class ProductController {
 
         return new ResponseEntity<>(ResponseObject.builder()
                 .status(HttpStatus.OK.value())
-                .message("Success create category")
+                .message(Constants.CREATE_SUCCESS)
                 .data(dto).build(), HttpStatus.CREATED);
     }
 
@@ -129,7 +130,7 @@ public class ProductController {
 
         return new ResponseEntity<>(ResponseObject.builder()
                 .status(HttpStatus.OK.value())
-                .message("Success update product")
+                .message(Constants.UPDATE_SUCCESS)
                 .data(dto).build(), HttpStatus.OK);
     }
 
@@ -144,7 +145,7 @@ public class ProductController {
 
         return new ResponseEntity<>(ResponseObject.builder()
                 .status(HttpStatus.OK.value())
-                .message("Success delete product")
+                .message(Constants.DELETE_SUCCESS)
                 .data("").build(), HttpStatus.OK);
     }
 
@@ -163,7 +164,7 @@ public class ProductController {
 
         return new ResponseEntity<>(ResponseObject.builder()
                 .status(HttpStatus.OK.value())
-                .message("Success add files product")
+                .message(Constants.ADD_FILES_SUCCESS)
                 .data(dto).build(), HttpStatus.OK);
     }
 
@@ -180,7 +181,7 @@ public class ProductController {
 
         return new ResponseEntity<>(ResponseObject.builder()
                 .status(HttpStatus.OK.value())
-                .message("Success delete files product")
+                .message(Constants.DELETE_FILES_SUCCESS)
                 .data("").build(), HttpStatus.OK);
     }
 

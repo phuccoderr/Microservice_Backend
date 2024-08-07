@@ -1,0 +1,25 @@
+package com.phuc.productservice.constants;
+
+import lombok.experimental.UtilityClass;
+
+@UtilityClass
+public class Constants {
+    public static final String GET_ALL_SUCCESS = "Get products successfully!";
+    public static final String GET_SUCCESS = "Get product successfully!";
+    public static final String CREATE_SUCCESS = "Create product successfully!";
+    public static final String UPDATE_SUCCESS = "Update product successfully!";
+    public static final String DELETE_SUCCESS = "Delete product successfully!";
+    public static final String ADD_FILES_SUCCESS = "Add files product successfully!";
+    public static final String DELETE_FILES_SUCCESS = "Delete files product successfully!";
+
+    public static final String CLOUD_FOLDER = "microservice/product/";
+    public static final String UPLOAD_FILE_FAIL = "File upload fail!";
+    public static final String FILE_EXTENSION_FAIL = "Only jpg, png, gif, bmp files are allowed!";
+    public static final String FILE_MAX_SIZE = "Max file size is 2MB!";
+
+    public static final String DB_NOT_FOUND = "Data not Found!";
+    public static final String DB_ALREADY_EXISTS = "Data already exists!";
+
+    public static final String PARAM_SORT_FAIL = "Param error sort: must be asc or desc!";
+
+}

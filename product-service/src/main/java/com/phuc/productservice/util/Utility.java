@@ -1,5 +1,6 @@
 package com.phuc.productservice.util;
 
+import com.phuc.productservice.constants.Constants;
 import com.phuc.productservice.dtos.CloudinaryDto;
 import com.phuc.productservice.dtos.ProductDto;
 import com.phuc.productservice.dtos.ProductImageDto;
@@ -25,7 +26,7 @@ public class Utility {
 
     public void checkSortIsAscOrDesc(String sort) throws ParamValidateException {
         if (!sort.equals("asc") && !sort.equals("desc")) {
-            throw new ParamValidateException("Param error sort: must be asc or desc");
+            throw new ParamValidateException(Constants.PARAM_SORT_FAIL);
         }
     }
 

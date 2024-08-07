@@ -1,5 +1,6 @@
 package com.phuc.categoryservice.service;
 
+import com.phuc.categoryservice.constants.Constants;
 import com.phuc.categoryservice.exceptions.*;
 import com.phuc.categoryservice.models.Category;
 import com.phuc.categoryservice.repository.CategoryRepository;
@@ -85,7 +86,7 @@ public class CategoryService implements ICategoryService {
     public void deleteCategory(String id) throws DataNotFoundException, DataErrorException {
         Category category = getCategory(id);
         if (!category.getChildren().isEmpty()) {
-            throw new DataErrorException("Category cannot be deleted because it has child categories.");
+            throw new DataErrorException(Constants.DB_HAS_CHILDREN);
         }
 
         repository.deleteById(category.getId());
@@ -95,7 +96,7 @@ public class CategoryService implements ICategoryService {
     private void checkNameUnique(String name) throws DataErrorException {
         Category category = repository.findByName(name);
         if (category != null) {
-            throw new DataErrorException("Data already exists!");
+            throw new DataErrorException(Constants.DB_ALREADY_EXISTS);
         }
     }
 
@@ -106,7 +107,7 @@ public class CategoryService implements ICategoryService {
         if (parentId.isEmpty()) {
             category.setParent(null);
         } else if (parentId.equals(category.getId())) {
-            throw new DataErrorException("Data duplicated parentId and Id");
+            throw new DataErrorException(Constants.DB_DUPLICATED);
         } else {
             Category parent = getCategory(parentId);
             category.setParent(parent);
