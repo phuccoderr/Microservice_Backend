@@ -7,8 +7,8 @@ import { UsersModule } from './../users/users.module';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { DatabaseModule } from '../database/database.module';
 import {
-  RefreshToken,
-  RefreshTokenSchema,
+  UserRefreshToken,
+  UserRefreshTokenSchema,
 } from './models/refresh-token.schema';
 import { RefreshTokenRepository } from './refresh-token.repository';
 
@@ -16,7 +16,7 @@ import { RefreshTokenRepository } from './refresh-token.repository';
   imports: [
     UsersModule,
     DatabaseModule.forFeature([
-      { name: RefreshToken.name, schema: RefreshTokenSchema },
+      { name: UserRefreshToken.name, schema: UserRefreshTokenSchema },
     ]),
     ConfigModule.forRoot({
       isGlobal: true,

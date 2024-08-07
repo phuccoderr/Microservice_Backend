@@ -1,12 +1,13 @@
 import {
   IsArray,
   IsBoolean,
-  IsEmail,
+  IsEmail, IsEnum,
   IsNotEmpty,
   IsOptional,
   IsString,
-  IsStrongPassword,
-} from 'class-validator';
+  IsStrongPassword
+} from "class-validator";
+import { ROLE } from "@src/auth/decorators/role.enum";
 
 export class CreateUserDto {
   @IsEmail()
@@ -24,8 +25,6 @@ export class CreateUserDto {
   status: boolean;
 
   @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
-  @IsNotEmpty({ each: true })
-  roles?: string[];
+  @IsEnum(ROLE)
+  roles?: ROLE[];
 }

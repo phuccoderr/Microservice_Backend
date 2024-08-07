@@ -1,17 +1,15 @@
-import {
-  Injectable,
-  NotFoundException,
-  UnprocessableEntityException,
-} from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UsersRepository } from './users.repository';
-import * as bcrypt from 'bcrypt';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { User } from './models/user.schema';
-import { RequestPagination } from './dto/request-pagination.dto';
+import { Injectable, NotFoundException, OnModuleInit, UnprocessableEntityException } from "@nestjs/common";
+import { CreateUserDto } from "./dto/create-user.dto";
+import { UsersRepository } from "./users.repository";
+import * as bcrypt from "bcrypt";
+import { UpdateUserDto } from "./dto/update-user.dto";
+import { User } from "./models/user.schema";
+import { RequestPaginationDto } from "./dto/request-pagination.dto";
+import { DATABASE_CONST } from "@src/constants/db-constants";
+import { ROLE } from "@src/auth/decorators/role.enum";
 
 @Injectable()
-export class UsersService {
+export class UsersService implements OnModuleInit {
   constructor(private readonly usersRepository: UsersRepository) {}
 
   async createUser(createUserDto: CreateUserDto): Promise<User> {
@@ -21,11 +19,11 @@ export class UsersService {
         password: await bcrypt.hash(createUserDto.password, 10),
       });
     } catch (error) {
-      throw new UnprocessableEntityException('Email already exits');
+      throw new UnprocessableEntityException(error.message);
     }
   }
 
-  async getUsers(query: RequestPagination) {
+  async getUsers(query: RequestPaginationDto) {
     const { keyword, page, limit, sort } = query;
 
     if (keyword) {
@@ -33,18 +31,14 @@ export class UsersService {
       return await this.usersRepository.search(page, limit, sort, filter);
     }
 
-    const users = await this.usersRepository.listByPage(page, limit, sort);
-
-    return users;
+    return await this.usersRepository.listByPage(page, limit, sort);
   }
 
   async getUser(_id: string) {
     try {
-      const user = await this.usersRepository.findOne({ _id }, '-password');
-
-      return user;
+      return await this.usersRepository.findOne({ _id }, '-password');
     } catch (error) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException(DATABASE_CONST.NOTFOUND);
     }
   }
 
@@ -55,20 +49,32 @@ export class UsersService {
         updateUserDto,
       );
     } catch (error) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException(DATABASE_CONST.NOTFOUND);
     }
   }
 
-  async deleteUser(_id: string): Promise<string> {
-    const userDelete = await this.usersRepository.findOneAndDelete({ _id });
-
-    if (!userDelete) {
-      throw new NotFoundException('User not found');
+  async deleteUser(_id: string): Promise<void> {
+    try {
+      await this.usersRepository.findOneAndDelete({ _id });
+    } catch (error) {
+      throw new NotFoundException(DATABASE_CONST.NOTFOUND);
     }
-    return 'Delete success';
   }
 
-  async verifyUser(email: string) {
-    return await this.usersRepository.findOne({ email }, '');
+  async onModuleInit(): Promise<void> {
+    const createUserAdmin: CreateUserDto = {
+      email: "phuc@gmail.com",
+      name: "phuc",
+      password: "123456Phuc!",
+      status: true,
+      roles: [ROLE.ADMIN]
+    }
+    const initInDB = await this.usersRepository.findOne({email: createUserAdmin.email},"")
+    if (!initInDB) {
+      await this.usersRepository.create({
+        ...createUserAdmin,
+        password: await bcrypt.hash(createUserAdmin.password, 10),
+      })
+    }
   }
 }

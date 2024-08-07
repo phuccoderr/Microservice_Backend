@@ -1,16 +1,17 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { AbstractDocument } from '../../database/abstract.schema';
+import { Types } from "mongoose";
 
 @Schema({ versionKey: false })
-export class RefreshToken extends AbstractDocument {
-  @Prop({ required: true })
+export class UserRefreshToken extends AbstractDocument {
+  @Prop({ required: true, unique: true })
   token: string;
 
-  @Prop({ required: true })
+  @Prop({ type: Types.ObjectId, required: true, ref: "User" })
   userId: string;
 
   @Prop({ required: true })
   expiresAt: Date;
 }
 
-export const RefreshTokenSchema = SchemaFactory.createForClass(RefreshToken);
+export const UserRefreshTokenSchema = SchemaFactory.createForClass(UserRefreshToken);

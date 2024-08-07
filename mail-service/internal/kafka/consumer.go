@@ -1,6 +1,7 @@
 package kafka
 
 import (
+	"context"
 	"fmt"
 	"github.com/IBM/sarama"
 	"log"
@@ -14,50 +15,41 @@ type Consumer struct {
 	Config *config.Config
 }
 
-func (c *Consumer) ConnectConsumer() (sarama.Consumer, error) {
-	cfg := sarama.NewConfig()
-	cfg.Consumer.Return.Errors = true
+func (c *Consumer) ConsumeKafka() {
+	cfgKafka := sarama.NewConfig()
+	cfgKafka.Consumer.Return.Errors = true
+	cfgKafka.Consumer.Offsets.Initial = sarama.OffsetOldest
 
-	fmt.Println(c.Config.Kafka.Brokers)
-	return sarama.NewConsumer(c.Config.Kafka.Brokers, cfg)
-}
+	fmt.Println(c.Config.Kafka)
 
-func (c *Consumer) ConsumePartition(topic string, partition int32) {
-
-	fmt.Println(topic)
-	worker, err := c.ConnectConsumer()
+	consumer, err := sarama.NewConsumerGroup(c.Config.Kafka.Brokers, "my-group", cfgKafka)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("Error creating consumer group: %v", err)
 	}
 
-	consumerPar, err := worker.ConsumePartition(topic, partition, sarama.OffsetOldest)
-	if err != nil {
-		log.Fatalf("Error consuming partition: %v", err)
+	handler := &ConsumerGroupHandler{
+		Config: c.Config,
 	}
-	fmt.Println("Consumer started!")
 
-	sigchan := make(chan os.Signal, 1)
-	signal.Notify(sigchan, syscall.SIGINT, syscall.SIGTERM)
+	if handler.Config == nil {
+		log.Fatalf("ConsumerGroupHandler config is nil")
+	}
 
-	doneCh := make(chan struct{})
 	go func() {
 		for {
-			select {
-			case err := <-consumerPar.Errors():
-				fmt.Println(err)
-			case msg := <-consumerPar.Messages():
-				c.handleVerifyCustomer(msg)
-			case <-sigchan:
-				fmt.Println("Interrupt is detected")
-				doneCh <- struct{}{}
+			ctx := context.Background()
+			if err := consumer.Consume(ctx, c.Config.Kafka.Topics, handler); err != nil {
+				log.Fatalf("Error consuming messages: %v", err)
 			}
 		}
 	}()
 
-	<-doneCh
-	fmt.Println("Consumer stopped gracefully.")
+	sigchan := make(chan os.Signal, 1)
+	signal.Notify(sigchan, syscall.SIGINT, syscall.SIGTERM)
+	<-sigchan
 
-	if err := worker.Close(); err != nil {
-		panic(err)
+	if err := consumer.Close(); err != nil {
+		log.Fatalf("Error closing consumer: %v", err)
 	}
+
 }

@@ -2,42 +2,55 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { AbstractDocument } from '../../database/abstract.schema';
 
 export enum AuthenticationType {
-  DATABASE= "DATABASE",
-  FACEBOOK = "FACEBOOK",
-  GOOGLE = "GOOGLE"
+  DATABASE = 'DATABASE',
+  FACEBOOK = 'FACEBOOK',
+  GOOGLE = 'GOOGLE',
 }
 
-@Schema({versionKey: false})
+@Schema({ versionKey: false })
 export class Customer extends AbstractDocument {
-  @Prop({ name: 'email', unique: true, required: true })
+  @Prop({ unique: true, required: true })
   email: string;
 
-  @Prop({name: 'password'})
+  @Prop()
   password: string;
 
-  @Prop({name: 'status', default: false})
+  @Prop({
+    default:
+      'https://res-console.cloudinary.com/dp4tp9gwa/thumbnails/v1/image/upload/v1722999166/YXZhdGFyLWRlZmF1bHRfYWg5eHln/drilldown',
+  })
+  avatar?: string;
+
+  @Prop({ unique: true })
+  image_id?: string;
+
+  @Prop({ default: false })
   status: boolean;
 
-  @Prop({name: 'verification_code'})
+  @Prop({ unique: true })
   verification_code: string;
 
-  @Prop({name: 'reset_password_token'})
-  reset_password_token: string;
+  @Prop({ unique: true })
+  reset_password_token?: string;
 
-  @Prop({name: 'authentication_type', type: String, enum: AuthenticationType, default: AuthenticationType.DATABASE})
+  @Prop({
+    type: String,
+    enum: AuthenticationType,
+    default: AuthenticationType.DATABASE,
+  })
   authentication_type: AuthenticationType;
 
-  @Prop({name: 'first_name', required: true})
+  @Prop({ required: true })
   first_name: string;
 
-  @Prop({name: 'last_name', required: true})
+  @Prop({ required: true })
   last_name: string;
 
-  @Prop({name: 'phone_number'})
-  phone_number: string;
+  @Prop()
+  phone_number?: string;
 
-  @Prop({name: 'address'})
-  address: string;
+  @Prop()
+  address?: string;
 }
 
 export const CustomerSchema = SchemaFactory.createForClass(Customer);

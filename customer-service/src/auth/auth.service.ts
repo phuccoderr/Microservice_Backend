@@ -16,6 +16,8 @@ import { RefreshTokenRepository } from './refresh-token.repository';
 import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from './dto/jwt-payload.dto';
 import { CustomerRefreshToken } from './models/refresh-token.schema';
+import { DATABASE_CONST } from '../constants/db-constants';
+import { AUTH_CONSTANTS } from '../constants/auth-constants';
 
 @Injectable()
 export class AuthService {
@@ -28,16 +30,16 @@ export class AuthService {
   async login(customerLoginDto: LoginCustomerDto): Promise<JwtPayload> {
     const customer = await this.customersRepository.findOne({email: customerLoginDto.email}, "");
     if (!customer) {
-      throw new NotFoundException('Customer not found');
+      throw new NotFoundException(DATABASE_CONST.NOTFOUND);
     }
 
     if (!customer.status) {
-      throw new ForbiddenException('Customer not verify');
+      throw new ForbiddenException(AUTH_CONSTANTS.VERIFY_ACCOUNT);
     }
 
     const isMatch = await bcrypt.compare(customerLoginDto.password, customer.password);
     if (!isMatch) {
-      throw new UnauthorizedException('Password Not Match');
+      throw new UnauthorizedException(AUTH_CONSTANTS.PASSWORD_NOT_MATCH);
     }
 
     const tokenPayload: TokenPayload = {
@@ -45,8 +47,8 @@ export class AuthService {
       email: customerLoginDto.email,
     }
 
-    await this.refreshTokenRepository.findByCustomerIdAndDelete(
-      customer._id.toHexString(),
+    await this.refreshTokenRepository.findOneAndDelete(
+      {customerId: customer._id.toHexString(),}
     );
 
     const accessToken = this.jwtService.sign(tokenPayload)
@@ -58,25 +60,21 @@ export class AuthService {
     };
   }
 
-  async logout(token: string): Promise<string> {
-    await this.refreshTokenRepository.findByTokenAndDelete(token)
-    return 'Log out Successfully!';
+  async logout(token: string): Promise<void> {
+    await this.refreshTokenRepository.findOneAndDelete({token: token})
   }
 
   async register(createCustomerDto: CreateCustomerDto): Promise<Customer> {
     try {
       return await this.customersRepository.create({
-        address: '',
         authentication_type: AuthenticationType.DATABASE,
-        phone_number: '',
-        reset_password_token: '',
         status: false,
         verification_code: uuidv4(),
         ...createCustomerDto,
         password: await bcrypt.hash(createCustomerDto.password, 10)
       })
     } catch (error) {
-      throw new UnprocessableEntityException(error.message);
+      throw new UnprocessableEntityException(DATABASE_CONST.ALREADY);
     }
   }
 
@@ -84,7 +82,7 @@ export class AuthService {
 
     const customer = await this.customersRepository.findByVerificationCode(code);
     if (!customer || customer.status) {
-      throw new NotFoundException('Verify fail');
+      throw new UnauthorizedException(AUTH_CONSTANTS.VERIFY_FAIL);
     }
 
     await this.customersRepository.findOneAndUpdate(
@@ -93,14 +91,14 @@ export class AuthService {
   }
 
   async refreshToken (token: string): Promise<JwtPayload> {
-    const customerRefreshToken  = await this.refreshTokenRepository.findByToken(token);
+    const customerRefreshToken  = await this.refreshTokenRepository.findOne({token}, "");
     if (!customerRefreshToken) {
-      throw new NotFoundException("Can't find refresh token");
+      throw new NotFoundException(DATABASE_CONST.NOTFOUND + token);
     }
 
     const customer = await this.customersRepository.findOne({_id: customerRefreshToken.customerId},"-password");
     if (!customer) {
-      throw new NotFoundException("Can't find customer with refresh token");
+      throw new NotFoundException(DATABASE_CONST.NOTFOUND);
     }
 
     await this.verifyToken(customerRefreshToken)
@@ -122,8 +120,8 @@ export class AuthService {
     const { token, expiresAt } = refreshToken;
 
     if (new Date() > expiresAt) {
-      await this.refreshTokenRepository.findByTokenAndDelete(token);
-      throw new UnauthorizedException('Token Expired');
+      await this.refreshTokenRepository.findOneAndDelete({token});
+      throw new UnauthorizedException(AUTH_CONSTANTS.TOKEN_EXPIRED);
     }
 
     return token;

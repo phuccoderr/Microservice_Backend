@@ -1,4 +1,16 @@
-import { Body, Controller, Get, HttpStatus, Param, Patch, Query, Request, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get, HttpCode,
+  HttpStatus,
+  Param,
+  Patch,
+  Post,
+  Query,
+  Request,
+  UploadedFile,
+  UseGuards, UseInterceptors,
+} from '@nestjs/common';
 import { CustomersService } from './customers.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { ResponseObject } from '../response/response-object.dto';
@@ -8,11 +20,15 @@ import { UpdateAccountDto } from './dto/update-account.dto';
 import { ResponsePaginationDTO } from './dto/response-pagination.dto';
 import { Customer } from './models/customer.schema';
 import { RequestPaginationDto } from './dto/request-pagination.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { CloudinaryService } from '../cloudinary/cloudinary.service';
+import { CUSTOMER_CONSTANTS } from '../constants/customer-constants';
 
 @Controller('/api/v1/customers')
 export class CustomersController {
   constructor(private readonly customersService: CustomersService,
-              private readonly redisCacheService: RedisCacheService,) {}
+              private readonly redisCacheService: RedisCacheService,
+              private readonly cloudinaryService: CloudinaryService,) {}
 
   @UseGuards(JwtAuthGuard)
   @Get('account')
@@ -24,7 +40,7 @@ export class CustomersController {
       return {
         data: cacheCustomer,
         status: HttpStatus.OK,
-        message: 'Get Account Successfully!',
+        message: CUSTOMER_CONSTANTS.GET_ACCOUNT,
       };
     }
     const customer = await this.customersService.findByCustomerId(_id);
@@ -33,12 +49,13 @@ export class CustomersController {
     return {
       data: customer,
       status: HttpStatus.OK,
-      message: 'Get Account Successfully!',
+      message: CUSTOMER_CONSTANTS.GET_ACCOUNT,
     };
   }
 
   @UseGuards(JwtAuthGuard)
   @Patch('account')
+  @HttpCode(HttpStatus.OK)
   async updateAccount(@Request() req,@Body() updateAccountDto: UpdateAccountDto): Promise<ResponseObject> {
     const { _id } = req.user;
     const customer = await this.customersService.updateCustomer(_id,updateAccountDto);
@@ -49,7 +66,7 @@ export class CustomersController {
     return {
       data: customer,
       status: HttpStatus.OK,
-      message: 'Get Account Successfully!',
+      message: CUSTOMER_CONSTANTS.UPDATE_ACCOUNT,
     };
   }
 
@@ -66,7 +83,7 @@ export class CustomersController {
         return {
           data: cachedAllUsers,
           status: HttpStatus.OK,
-          message: 'Get all users successfully',
+          message: CUSTOMER_CONSTANTS.GET_ALL,
         };
       }
     }
@@ -79,7 +96,7 @@ export class CustomersController {
     return {
       data: paginationDto,
       status: HttpStatus.OK,
-      message: 'Get all customers successfully',
+      message: CUSTOMER_CONSTANTS.GET_ALL,
     };
   }
 
@@ -91,7 +108,30 @@ export class CustomersController {
     return {
       data: customer,
       status: HttpStatus.OK,
-      message: 'Get customer successfully',
+      message: CUSTOMER_CONSTANTS.GET_ACCOUNT,
+    };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FileInterceptor('file'))
+  @Post('upload')
+  @HttpCode(HttpStatus.OK)
+  async uploadImage(@UploadedFile() file: Express.Multer.File,@Request() req): Promise<ResponseObject> {
+    const { _id } = req.user;
+    const customer = await this.customersService.findByCustomerId(_id);
+
+    const result = await this.cloudinaryService.uploadFile(file);
+    this.cloudinaryService.deleteImage(customer.image_id)
+
+    await this.customersService.uploadAvatar(_id, result.url, result.public_id);
+
+    this.redisCacheService.del(customerKey(_id));
+    this.redisCacheService.set(_id, customer);
+
+    return {
+      data: {},
+      status: HttpStatus.OK,
+      message: CUSTOMER_CONSTANTS.UPLOAD_AVATAR,
     };
   }
 

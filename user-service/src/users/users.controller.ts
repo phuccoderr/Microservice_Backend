@@ -2,14 +2,14 @@ import {
   Body,
   Controller,
   Delete,
-  Get,
+  Get, HttpCode,
   HttpStatus,
   Param,
   Patch,
   Post,
   Query,
-  UseGuards,
-} from '@nestjs/common';
+  UseGuards
+} from "@nestjs/common";
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -17,9 +17,13 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RedisCacheService } from '../redis/redis.service';
 import { User } from './models/user.schema';
 import { allUserKey } from '../redis/key';
-import { RequestPagination } from './dto/request-pagination.dto';
+import { RequestPaginationDto } from './dto/request-pagination.dto';
 import { ResponseObject } from '../response/response-object.dto';
-import { PaginationDto } from '../users/dto/pagination.dto';
+import { ResponsePaginationDto } from './dto/response-pagination.dto';
+import { USER_CONSTANTS } from "@src/constants/user-constants";
+import { ROLE } from "@src/auth/decorators/role.enum";
+import { Roles } from "@src/auth/decorators/roles.decorator";
+import { RolesAuthGuard } from "@src/auth/guards/roles-auth.guard";
 
 @Controller('api/v1/users')
 export class UsersController {
@@ -30,6 +34,8 @@ export class UsersController {
 
   // @UseGuards(JwtAuthGuard)
   @Post()
+  @UseGuards(JwtAuthGuard,RolesAuthGuard)
+  @Roles(ROLE.ADMIN)
   async createUser(
     @Body() createUserDto: CreateUserDto,
   ): Promise<ResponseObject> {
@@ -39,15 +45,15 @@ export class UsersController {
 
     return {
       data: result,
-      status: HttpStatus.OK,
-      message: 'Success create user',
+      status: HttpStatus.CREATED,
+      message: USER_CONSTANTS.CREATE,
     };
   }
 
   @UseGuards(JwtAuthGuard)
   @Get()
   async getUsers(
-    @Query() pagination: RequestPagination,
+    @Query() pagination: RequestPaginationDto,
   ): Promise<ResponseObject> {
     const { keyword, page, limit, sort } = pagination;
 
@@ -59,7 +65,7 @@ export class UsersController {
         return {
           data: cachedAllUsers,
           status: HttpStatus.OK,
-          message: 'Get all users successfully',
+          message: USER_CONSTANTS.GET_ALL,
         };
       }
     }
@@ -71,7 +77,7 @@ export class UsersController {
     return {
       data: paginationDto,
       status: HttpStatus.OK,
-      message: 'Get all users successfully',
+      message: USER_CONSTANTS.GET_ALL,
     };
   }
 
@@ -83,12 +89,14 @@ export class UsersController {
     return {
       data: user,
       status: HttpStatus.OK,
-      message: 'Get user successfully',
+      message: USER_CONSTANTS.GET,
     };
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard,RolesAuthGuard)
+  @Roles(ROLE.ADMIN)
   @Patch(':id')
+  @HttpCode(HttpStatus.OK)
   async updateUser(
     @Param('id') _id: string,
     @Body() updateUserDto: UpdateUserDto,
@@ -100,28 +108,29 @@ export class UsersController {
     return {
       data: result,
       status: HttpStatus.OK,
-      message: 'Update user success',
+      message: USER_CONSTANTS.UPDATE,
     };
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard,RolesAuthGuard)
+  @Roles(ROLE.ADMIN)
   @Delete(':id')
   async deleteUser(@Param('id') _id: string): Promise<ResponseObject> {
-    const result: string = await this.usersService.deleteUser(_id);
+    await this.usersService.deleteUser(_id);
 
     this.redisService.clearAllUserCache();
 
     return {
       data: {},
       status: HttpStatus.OK,
-      message: result,
+      message: USER_CONSTANTS.DELETE,
     };
   }
 
   private buildPaginationDto(
-    pagination: RequestPagination,
+    pagination: RequestPaginationDto,
     users: User[],
-  ): PaginationDto {
+  ): ResponsePaginationDto {
     const { page, limit } = pagination;
 
     return {

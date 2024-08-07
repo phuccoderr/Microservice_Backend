@@ -120,6 +120,7 @@ services:
       ZOOKEEPER_AUTOPURGE_PURGE_INTERVAL: "0"
 
   mailhog:
+    container_name: mailhog-container
     image: 'mailhog/mailhog:latest'
     ports:
       - "1025:1025"

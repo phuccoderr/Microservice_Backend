@@ -1,29 +1,32 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from '@nestjs/jwt';
 import { LoginDto } from './dto/login.dto';
-import { UsersService } from '../users/users.service';
 import * as bcrypt from 'bcrypt';
 import { RefreshTokenRepository } from './refresh-token.repository';
-import { TokenPayLoad } from './interfaces/token-payload.interface';
-import { JwtPayload } from './interfaces/jwt-payload.interface';
-import { RefreshToken } from './models/refresh-token.schema';
+import { TokenPayLoad } from './dto/token-payload.dto';
+import { JwtPayload } from './dto/jwt-payload.dto';
+import { UserRefreshToken } from './models/refresh-token.schema';
 import { UsersRepository } from '../users/users.repository';
+import { DATABASE_CONST } from "@src/constants/db-constants";
+import { AUTH_CONSTANTS } from "@src/constants/auth-constants";
 
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
     private readonly refreshTokenRepository: RefreshTokenRepository,
     private readonly usersRepository: UsersRepository,
   ) {}
 
   async login(request: LoginDto): Promise<JwtPayload> {
-    const user = await this.usersService.verifyUser(request.email);
+    const user = await this.usersRepository.findOne({email: request.email}, "");
+    if (!user) {
+      throw new NotFoundException(DATABASE_CONST.NOTFOUND);
+    }
 
     const isMatch = await bcrypt.compare(request.password, user.password);
     if (!isMatch) {
-      throw new UnauthorizedException('Password Not Match');
+      throw new UnauthorizedException(AUTH_CONSTANTS.PASSWORD_NOT_MATCH);
     }
 
     const tokenPayload: TokenPayLoad = {
@@ -32,32 +35,25 @@ export class AuthService {
       roles: user.roles,
     };
 
-    await this.refreshTokenRepository.findByUserIdAndDelete(
-      user._id.toHexString(),
-    );
+    await this.refreshTokenRepository.findOneAndDelete({_id: user._id.toHexString()});
 
     const accessToken = this.jwtService.sign(tokenPayload);
     const refreshToken = await this.refreshTokenRepository.generateRefreshToken(
       user._id.toHexString(),
     );
 
-    const jwtPayload: JwtPayload = {
+    return {
       access_token: accessToken,
       refresh_token: refreshToken,
     };
-
-    return jwtPayload;
   }
 
-  async logout(token: string): Promise<string> {
-    const refreshToken = await this.refreshTokenRepository.findByToken(token);
-
-    await this.refreshTokenRepository.deleteByToken(refreshToken.token);
-    return 'Log out Successfully!';
+  async logout(token: string): Promise<void> {
+    await this.refreshTokenRepository.findOne({token},"");
   }
 
   async refreshToken(token: string): Promise<JwtPayload> {
-    const refreshToken = await this.refreshTokenRepository.findByToken(token);
+    const refreshToken = await this.refreshTokenRepository.findOne({token},"");
     const user = await this.usersRepository.findOne(
       { _id: refreshToken.userId },
       '-password',
@@ -74,20 +70,18 @@ export class AuthService {
 
     const accessToken = this.jwtService.sign(tokenPayload);
 
-    const jwtPayload: JwtPayload = {
+    return {
       access_token: accessToken,
       refresh_token: refreshToken.token,
     };
-
-    return jwtPayload;
   }
 
-  private async verifyToken(refreshToken: RefreshToken): Promise<string> {
+  private async verifyToken(refreshToken: UserRefreshToken): Promise<string> {
     const { token, expiresAt } = refreshToken;
 
     if (new Date() > expiresAt) {
-      this.refreshTokenRepository.deleteByToken(token);
-      throw new UnauthorizedException('Token Expired');
+      await this.refreshTokenRepository.findOneAndDelete({token});
+      throw new UnauthorizedException(AUTH_CONSTANTS.TOKEN_EXPIRED);
     }
 
     return token;

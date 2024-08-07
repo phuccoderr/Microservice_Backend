@@ -14,6 +14,7 @@ type Config struct {
 
 type KafkaConfig struct {
 	Brokers []string
+	Topics  []string
 }
 type Mail struct {
 	Domain      string
@@ -35,6 +36,8 @@ func LoadConfig() *Config {
 		Mailer: CreateMail(),
 		Kafka: KafkaConfig{
 			Brokers: []string{"localhost:9092"},
+			Topics: []string{os.Getenv("KAFKA_TOPIC_VERIFY_ACCOUNT"),
+				os.Getenv("KAFKA_TOPIC_VERIFY_PASSWORD")},
 		},
 	}
 }

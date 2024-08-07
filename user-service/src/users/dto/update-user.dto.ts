@@ -1,4 +1,5 @@
 import { IsArray, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { ROLE } from "@src/auth/decorators/role.enum";
 
 export class UpdateUserDto {
   @IsString()
@@ -9,5 +10,5 @@ export class UpdateUserDto {
   @IsArray()
   @IsString({ each: true })
   @IsNotEmpty({ each: true })
-  roles?: string[];
+  roles?: ROLE[];
 }

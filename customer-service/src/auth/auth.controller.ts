@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpStatus, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, Query } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { ResponseObject } from '../response/response-object.dto';
@@ -7,6 +7,7 @@ import { VerifyPayLoad } from './dto/kafka-verify.dto';
 import { LoginCustomerDto } from './dto/login-customer.dto';
 import { JwtPayload } from './dto/jwt-payload.dto';
 import { ConfigService } from '@nestjs/config';
+import { AUTH_CONSTANTS } from '../constants/auth-constants';
 
 @Controller('api/v1/customers/auth')
 export class AuthController {
@@ -15,39 +16,43 @@ export class AuthController {
               private readonly configService: ConfigService,) {}
 
   @Post('login')
+  @HttpCode(HttpStatus.OK)
   async login(@Body() loginCustomerDto: LoginCustomerDto): Promise<ResponseObject> {
     const jwtPayload: JwtPayload = await this.authService.login(loginCustomerDto)
 
     return {
       data: jwtPayload,
       status: HttpStatus.OK,
-      message: 'Login Successfully!',
+      message: AUTH_CONSTANTS.LOGIN,
     };
   }
 
   @Post('refresh')
+  @HttpCode(HttpStatus.OK)
   async refreshToken(@Query('token') token: string): Promise<ResponseObject> {
     const jwtPayload: JwtPayload = await this.authService.refreshToken(token);
 
     return {
       data: jwtPayload,
       status: HttpStatus.OK,
-      message: 'Refresh Token Successfully!',
+      message: AUTH_CONSTANTS.REFRESH_TOKEN,
     };
   }
 
   @Post('logout')
+  @HttpCode(HttpStatus.OK)
   async logout(@Query('token') token: string): Promise<ResponseObject> {
-    const result: string = await this.authService.logout(token);
+    await this.authService.logout(token);
 
     return {
       data: {},
       status: HttpStatus.OK,
-      message: result,
+      message: AUTH_CONSTANTS.LOGOUT,
     };
   }
 
   @Post('register')
+  @HttpCode(HttpStatus.CREATED)
   async register(@Body() createCustomerDto: CreateCustomerDto, ): Promise<ResponseObject> {
 
     const user = await this.authService.register(createCustomerDto);
@@ -59,14 +64,15 @@ export class AuthController {
       url: `${url}?token=${user.verification_code}`,
     }
 
-   this.producerService.produce("customer-verify-events-topics", {
+    const kafkaTopicVerify = this.configService.get("KAFKA_TOPIC_VERIFY_ACCOUNT");
+    this.producerService.produce(kafkaTopicVerify, {
      value: JSON.stringify(payload),
-   })
+    })
 
     return {
       data: url,
       status: HttpStatus.CREATED,
-      message: 'register successfully',
+      message: AUTH_CONSTANTS.REGISTER,
     }
   }
 
@@ -78,11 +84,12 @@ export class AuthController {
     return {
       data: {},
       status: HttpStatus.OK,
-      message: 'verification successfull',
+      message: AUTH_CONSTANTS.VERIFY_SUCCESS,
     }
   }
 
   @Post('forgot_password')
+  @HttpCode(HttpStatus.OK)
   async forgotPassword(@Query('email') email: string): Promise<ResponseObject> {
     const customer = await this.authService.forgotPassword(email);
 
@@ -92,19 +99,20 @@ export class AuthController {
       email: email,
       url: `${url}?token=${customer.reset_password_token}`,
     }
-
-    this.producerService.produce("customer-forgot-password-events-topics", {
+    const kafkaTopicPassword = this.configService.get("KAFKA_TOPIC_VERIFY_PASSWORD");
+    this.producerService.produce(kafkaTopicPassword, {
       value: JSON.stringify(payload),
     })
 
     return {
       data: url,
       status: HttpStatus.OK,
-      message: 'Verify forgot password successfully',
+      message: AUTH_CONSTANTS.FORGOT_PASSWORD,
     }
   }
 
   @Post('reset_password')
+  @HttpCode(HttpStatus.OK)
   async resetPassword(@Query('token') token: string,
                       @Query('password') password: string): Promise<ResponseObject> {
     await this.authService.resetPassword(token,password);
@@ -112,7 +120,7 @@ export class AuthController {
     return {
       data: {},
       status: HttpStatus.OK,
-      message: 'Reset password successfully',
+      message: AUTH_CONSTANTS.RESET_PASSWORD,
     }
   }
 }

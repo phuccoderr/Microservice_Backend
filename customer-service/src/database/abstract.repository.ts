@@ -1,6 +1,7 @@
 import { AbstractDocument } from './abstract.schema';
 import { FilterQuery, Model, Types, UpdateQuery } from 'mongoose';
 import { NotFoundException, Logger } from '@nestjs/common';
+import { DATABASE_CONST } from '../constants/db-constants';
 
 export abstract class AbstractRepository<TDocument extends AbstractDocument> {
 
@@ -39,9 +40,15 @@ export abstract class AbstractRepository<TDocument extends AbstractDocument> {
 
     if (!document) {
       this.logger.warn('Document was not found with filterQuery', filterQuery);
-      throw new NotFoundException('Document was not found');
+      throw new NotFoundException(DATABASE_CONST.NOTFOUND);
     }
 
     return document;
+  }
+
+  async findOneAndDelete(
+    filterQuery: FilterQuery<TDocument>,
+  ): Promise<TDocument> {
+    return this.model.findOneAndDelete(filterQuery).lean<TDocument>(true);
   }
 }

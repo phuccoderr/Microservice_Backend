@@ -8,7 +8,7 @@ import {
   Max,
 } from 'class-validator';
 
-export class RequestPagination {
+export class RequestPaginationDto {
   @IsOptional()
   @Type(() => Number)
   @IsInt()
