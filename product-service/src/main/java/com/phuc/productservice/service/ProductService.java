@@ -196,6 +196,7 @@ public class ProductService implements IProductService {
         product.setCost(reqProduct.getCost());
         product.setPrice(reqProduct.getPrice());
         product.setSale(reqProduct.getSale());
+        product.setStock(reqProduct.getStock());
     }
 
 }

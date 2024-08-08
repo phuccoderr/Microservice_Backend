@@ -42,6 +42,9 @@ public class ProductDto {
     @JsonProperty("sale")
     private Float sale;
 
+    @JsonProperty("stock")
+    private Integer stock;
+
     @JsonProperty("url")
     private String url;
 

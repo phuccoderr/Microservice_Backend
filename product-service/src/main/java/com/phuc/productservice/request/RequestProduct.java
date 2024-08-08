@@ -42,6 +42,11 @@ public class RequestProduct {
     @Max(value = 100, message = "sale cannot greater than 0")
     private Float sale;
 
+    @JsonProperty("stock")
+    @NotNull(message = "stock cannot be null")
+    @Min(value = 0, message = "sale cannot be less than 0")
+    private Integer stock;
+
     @JsonProperty("category_id")
     @NotNull(message = "category_id cannot null")
     private String categoryId;

@@ -24,6 +24,7 @@ public class Product extends BaseEntity{
 
     private String description;
     private Boolean status;
+    private Integer stock;
     private Float cost;
     private Float price;
     private Float sale;
