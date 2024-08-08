@@ -1,9 +1,11 @@
 package com.phuc.categoryservice.configurations;
 
+import com.phuc.categoryservice.constants.Constants;
 import com.phuc.categoryservice.filter.JwtTokenFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -28,7 +30,11 @@ public class SecurityConfiguration {
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests( authz ->
                 authz
-                        .requestMatchers("/api/v1/category").hasAnyAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.GET, Constants.API_CATEGORIES).authenticated()
+                        .requestMatchers(HttpMethod.GET, Constants.API_CATEGORIES + "/*").authenticated()
+                        .requestMatchers(HttpMethod.POST, Constants.API_CATEGORIES).hasAnyAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.PATCH, Constants.API_CATEGORIES + "/*").hasAnyAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, Constants.API_CATEGORIES + "/*").hasAnyAuthority("ADMIN")
                         .anyRequest().permitAll())
                 .sessionManagement(
                         session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
