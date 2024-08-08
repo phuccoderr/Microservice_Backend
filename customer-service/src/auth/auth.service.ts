@@ -97,9 +97,6 @@ export class AuthService {
     }
 
     const customer = await this.customersRepository.findOne({_id: customerRefreshToken.customerId},"-password");
-    if (!customer) {
-      throw new NotFoundException(DATABASE_CONST.NOTFOUND);
-    }
 
     await this.verifyToken(customerRefreshToken)
 

@@ -4,6 +4,9 @@ import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class Constants {
+
+    public static final String API_PRODUCTS = "/api/v1/products";
+
     public static final String GET_ALL_SUCCESS = "Get products successfully!";
     public static final String GET_SUCCESS = "Get product successfully!";
     public static final String CREATE_SUCCESS = "Create product successfully!";
@@ -21,5 +24,8 @@ public class Constants {
     public static final String DB_ALREADY_EXISTS = "Data already exists!";
 
     public static final String PARAM_SORT_FAIL = "Param error sort: must be asc or desc!";
+
+    public static final String TOKEN_EXPIRED = "JWT token is expired!";
+    public static final String TOKEN_INVALID = "Invalid JWT token!";
 
 }

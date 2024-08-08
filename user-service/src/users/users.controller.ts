@@ -2,14 +2,15 @@ import {
   Body,
   Controller,
   Delete,
-  Get, HttpCode,
+  Get,
+  HttpCode,
   HttpStatus,
   Param,
   Patch,
   Post,
   Query,
-  UseGuards
-} from "@nestjs/common";
+  UseGuards,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -20,10 +21,10 @@ import { allUserKey } from '../redis/key';
 import { RequestPaginationDto } from './dto/request-pagination.dto';
 import { ResponseObject } from '../response/response-object.dto';
 import { ResponsePaginationDto } from './dto/response-pagination.dto';
-import { USER_CONSTANTS } from "@src/constants/user-constants";
-import { ROLE } from "@src/auth/decorators/role.enum";
-import { Roles } from "@src/auth/decorators/roles.decorator";
-import { RolesAuthGuard } from "@src/auth/guards/roles-auth.guard";
+import { USER_CONSTANTS } from '@src/constants/user-constants';
+import { ROLE } from '@src/auth/decorators/role.enum';
+import { Roles } from '@src/auth/decorators/roles.decorator';
+import { RolesAuthGuard } from '@src/auth/guards/roles-auth.guard';
 
 @Controller('api/v1/users')
 export class UsersController {
@@ -32,9 +33,8 @@ export class UsersController {
     private readonly redisService: RedisCacheService,
   ) {}
 
-  // @UseGuards(JwtAuthGuard)
   @Post()
-  @UseGuards(JwtAuthGuard,RolesAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesAuthGuard)
   @Roles(ROLE.ADMIN)
   async createUser(
     @Body() createUserDto: CreateUserDto,
@@ -93,7 +93,7 @@ export class UsersController {
     };
   }
 
-  @UseGuards(JwtAuthGuard,RolesAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesAuthGuard)
   @Roles(ROLE.ADMIN)
   @Patch(':id')
   @HttpCode(HttpStatus.OK)
@@ -112,7 +112,7 @@ export class UsersController {
     };
   }
 
-  @UseGuards(JwtAuthGuard,RolesAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesAuthGuard)
   @Roles(ROLE.ADMIN)
   @Delete(':id')
   async deleteUser(@Param('id') _id: string): Promise<ResponseObject> {

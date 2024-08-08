@@ -35,7 +35,7 @@ export class AuthService {
       roles: user.roles,
     };
 
-    await this.refreshTokenRepository.findOneAndDelete({_id: user._id.toHexString()});
+    await this.refreshTokenRepository.findOneAndDelete({userId: user._id.toHexString()});
 
     const accessToken = this.jwtService.sign(tokenPayload);
     const refreshToken = await this.refreshTokenRepository.generateRefreshToken(
@@ -49,11 +49,14 @@ export class AuthService {
   }
 
   async logout(token: string): Promise<void> {
-    await this.refreshTokenRepository.findOne({token},"");
+    await this.refreshTokenRepository.findOneAndDelete({token})
   }
 
   async refreshToken(token: string): Promise<JwtPayload> {
     const refreshToken = await this.refreshTokenRepository.findOne({token},"");
+    if (!refreshToken) {
+      throw new NotFoundException(DATABASE_CONST.NOTFOUND)
+    }
     const user = await this.usersRepository.findOne(
       { _id: refreshToken.userId },
       '-password',
