@@ -66,11 +66,11 @@ services:
       POSTGRES_PASSWORD: password
     restart: always
     ports:
-      - "5433:5432"
+      - "5432:5432"
     volumes:
       - ./db-data/postgres/:/var/lib/postgresql/data/
-#    networks:
-#      - default
+    networks:
+      - default
 
   mongo:
     container_name: mongo-container
@@ -79,8 +79,8 @@ services:
       - "27020:27017"
     volumes:
       - ./db-data/mongo/:/data/db
-#    networks:
-#      - default
+    networks:
+      - default
       
   redis:
     container_name: redis-container
@@ -136,10 +136,30 @@ services:
     depends_on:
       - mongo
       - redis
+      - postgresql
+      - kafka
     env_file:
       - ./user-service/.env
     ports:
       - "9120:9120"
+    networks:
+      - default
+
+  customer-service:
+    container_name: customer-service-container
+    build:
+      context: ./customer-service
+      dockerfile: Dockerfile
+    restart: always
+    depends_on:
+      - mongo
+      - redis
+      - postgresql
+      - kafka
+    env_file:
+      - ./customer-service/.env
+    ports:
+      - "9150:9150"
     networks:
       - default
 
@@ -148,11 +168,11 @@ services:
     build:
       context: ./category-service
       dockerfile: Dockerfile
-    restart: always
     depends_on:
       - mongo
       - redis
       - postgresql
+      - kafka
     environment:
       POSTGRES_HOST: postgresql
       POSTGRES_PORT: 5432
@@ -163,8 +183,51 @@ services:
       REDIS_PORT: 6379
     ports:
       - "9130:9130"
-#    networks:
-#      - default
+    networks:
+      - default
+
+  product-service:
+    container_name: product-service-container
+    build:
+      context: ./product-service
+      dockerfile: Dockerfile
+    depends_on:
+      - mongo
+      - redis
+      - postgresql
+      - kafka
+    environment:
+      POSTGRES_HOST: postgresql
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: users
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    ports:
+      - "9140:9140"
+    networks:
+      - default
+
+  mail-service:
+    container_name: mail-service-container
+    build:
+      context: ./mail-service
+      dockerfile: Dockerfile
+    restart: always
+    depends_on:
+      - mongo
+      - redis
+      - postgresql
+      - kafka
+    environment:
+      MAIL_DOMAIN: mailhog
+      MAIL_HOST: mailhog
+      MAIL_PORT: 1025
+      MAIL_ENCRYPITION: none
+      KAFKA_BROKERS: kafka:29092
+      KAFKA_TOPIC_VERIFY_ACCOUNT: customer-verify-events-topics
+      KAFKA_TOPIC_VERIFY_PASSWORD: customer-password-events-topics
 
 
 networks:

@@ -11,7 +11,6 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 public class ProductDto {
     @JsonProperty("id")
     private String id;

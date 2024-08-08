@@ -27,10 +27,10 @@ export class Customer extends AbstractDocument {
   @Prop({ default: false })
   status: boolean;
 
-  @Prop({ unique: true })
+  @Prop()
   verification_code: string;
 
-  @Prop({ unique: true })
+  @Prop()
   reset_password_token?: string;
 
   @Prop({

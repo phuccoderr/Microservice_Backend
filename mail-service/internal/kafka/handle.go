@@ -66,7 +66,7 @@ func (c *ConsumerGroupHandler) handleVerifyPassword(message *sarama.ConsumerMess
 			>
 			  Change Password
 			</button>
-      </a>`, verify.UrlVerify, constants.TITLE_RESET_PASSWORD),
+      </a>`, constants.TITLE_RESET_PASSWORD, verify.UrlVerify),
 	}
 
 	mailer := &mail.Mailer{
@@ -105,7 +105,7 @@ func (c *ConsumerGroupHandler) handleVerifyCustomer(message *sarama.ConsumerMess
 			>
 			  Verify customer
 			</button>
-      </a>`, verify.UrlVerify, constants.TITLE_VERIFY_ACCOUNT),
+      </a>`, constants.TITLE_VERIFY_ACCOUNT, verify.UrlVerify),
 	}
 
 	mailer := &mail.Mailer{

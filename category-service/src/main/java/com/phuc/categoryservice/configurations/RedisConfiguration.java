@@ -16,7 +16,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 @Configuration
-@EnableRedisRepositories
 public class RedisConfiguration {
 
     @Bean
