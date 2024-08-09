@@ -51,6 +51,9 @@ export class Customer extends AbstractDocument {
 
   @Prop()
   address?: string;
+
+  @Prop({type: [String], default: "CUSTOMER"})
+  roles?: string[];
 }
 
 export const CustomerSchema = SchemaFactory.createForClass(Customer);

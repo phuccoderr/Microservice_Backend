@@ -44,7 +44,8 @@ export class AuthService {
 
     const tokenPayload: TokenPayload = {
       _id: customer._id.toHexString(),
-      email: customerLoginDto.email,
+      email: customer.email,
+      roles: customer.roles
     }
 
     await this.refreshTokenRepository.findOneAndDelete(
@@ -103,6 +104,7 @@ export class AuthService {
     const tokenPayload: TokenPayload = {
       _id: customer._id.toHexString(),
       email: customer.email,
+      roles: customer.roles
     }
 
     const accessToken = this.jwtService.sign(tokenPayload);

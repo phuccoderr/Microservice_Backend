@@ -30,8 +30,8 @@ public class SecurityConfiguration {
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests( authz ->
                         authz
-                                .requestMatchers(HttpMethod.GET, Constants.API_PRODUCTS).permitAll()
-                                .requestMatchers(HttpMethod.GET, Constants.API_PRODUCTS + "/*").permitAll()
+                                .requestMatchers(HttpMethod.GET, Constants.API_PRODUCTS).authenticated()
+                                .requestMatchers(HttpMethod.GET, Constants.API_PRODUCTS + "/*").authenticated()
                                 .requestMatchers(HttpMethod.POST, Constants.API_PRODUCTS).hasAnyAuthority("ADMIN")
                                 .requestMatchers(HttpMethod.PATCH, Constants.API_PRODUCTS + "/*").hasAnyAuthority("ADMIN")
                                 .requestMatchers(HttpMethod.DELETE, Constants.API_PRODUCTS + "/*").hasAnyAuthority("ADMIN")

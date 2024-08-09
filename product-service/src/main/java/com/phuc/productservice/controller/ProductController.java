@@ -75,7 +75,7 @@ public class ProductController {
         return new ResponseEntity<>(ResponseObject.builder()
                 .status(HttpStatus.OK.value())
                 .message(Constants.GET_SUCCESS)
-                .data(dto).build(), HttpStatus.CREATED);
+                .data(dto).build(), HttpStatus.OK);
     }
 
     @PostMapping
@@ -100,7 +100,7 @@ public class ProductController {
         ProductDto dto = Utility.toDto(product);
 
         return new ResponseEntity<>(ResponseObject.builder()
-                .status(HttpStatus.OK.value())
+                .status(HttpStatus.CREATED.value())
                 .message(Constants.CREATE_SUCCESS)
                 .data(dto).build(), HttpStatus.CREATED);
     }
