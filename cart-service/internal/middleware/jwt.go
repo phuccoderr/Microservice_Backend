@@ -73,3 +73,13 @@ func JWTDecodeToken(tokenString string) (*CustomClaims, error) {
 	}
 	return nil, errors.New(constants.JWT_PARSE_CLAIMS)
 }
+
+func JWTGetCustomerID(c *gin.Context) (string, error) {
+	token, _ := JWTGetToken(c)
+	decodeToken, err := JWTDecodeToken(token)
+	if err != nil {
+		return "", err
+	}
+
+	return decodeToken.ID, nil
+}
