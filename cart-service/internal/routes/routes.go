@@ -24,6 +24,7 @@ func (r Routes) CartRoute(router *gin.Engine) {
 		private.POST("/add", handler.AddProductToCart)
 		private.GET("", handler.GetCart)
 		private.DELETE("/product/:id", handler.DeleteCart)
+		private.GET("/checkout", handler.Checkout)
 	}
 
 }

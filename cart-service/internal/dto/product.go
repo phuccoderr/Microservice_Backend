@@ -1,4 +1,4 @@
-package response
+package dto
 
 type ProductResponse struct {
 	Id          string  `json:"id"`
@@ -7,9 +7,9 @@ type ProductResponse struct {
 	Description string  `json:"description"`
 	Status      bool    `json:"status"`
 	Stock       int     `json:"stock"`
-	Cost        float32 `json:"cost"`
-	Price       float32 `json:"price"`
-	Sale        float32 `json:"sale"`
+	Cost        float64 `json:"cost"`
+	Price       float64 `json:"price"`
+	Sale        float64 `json:"sale"`
 	ImageID     string  `gorm:"column:image_id" json:"image_id"`
 	URL         string  `json:"url"`
 

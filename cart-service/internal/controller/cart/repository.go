@@ -31,10 +31,10 @@ func (r CartRepository) findByCustomerAndProduct(customerId string, productId st
 	return cart, nil
 }
 
-func (r CartRepository) findByCustomer(customerId string) (*models.Cart, error) {
-	cart := &models.Cart{}
+func (r CartRepository) findByCustomer(customerId string) ([]models.Cart, error) {
+	var carts []models.Cart
 
-	result := r.Db.Where("customer_id = ?", customerId).First(cart)
+	result := r.Db.Where("customer_id = ?", customerId).Find(&carts)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			// Không tìm thấy bản ghi
@@ -43,7 +43,7 @@ func (r CartRepository) findByCustomer(customerId string) (*models.Cart, error) 
 		return nil, result.Error
 	}
 
-	return cart, nil
+	return carts, nil
 }
 
 func (r CartRepository) deleteByCustomerAndProduct(customerId string, productId string) error {

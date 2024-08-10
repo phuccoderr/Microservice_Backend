@@ -2,17 +2,19 @@ package cart
 
 import (
 	"cart-service/internal/constants"
+	"cart-service/internal/dto"
 	"cart-service/internal/models"
-	"cart-service/internal/response"
 	"errors"
 	"github.com/google/uuid"
 	"strconv"
+	"time"
 )
 
 type ICartService interface {
-	addProductToCart(customerId string, product *response.ProductResponse, quantity int) error
-	getCart(customerId string) (*models.Cart, error)
+	addProductToCart(customerId string, product *dto.ProductResponse, quantity int) error
+	getCart(customerId string) ([]models.Cart, error)
 	deleteCart(customerId string, productId string) error
+	checkOut(carts []models.Cart) *dto.Checkout
 }
 
 type cartService struct {
@@ -25,7 +27,7 @@ func NewCartService(repository *CartRepository) ICartService {
 	}
 }
 
-func (s cartService) addProductToCart(customerId string, product *response.ProductResponse, quantity int) error {
+func (s cartService) addProductToCart(customerId string, product *dto.ProductResponse, quantity int) error {
 	cart, err := s.Repository.findByCustomerAndProduct(customerId, product.Id)
 	if err != nil {
 		return err
@@ -43,20 +45,24 @@ func (s cartService) addProductToCart(customerId string, product *response.Produ
 		cart.Id = uuid.New().String()
 		cart.CustomerId = customerId
 		cart.ProductId = product.Id
+		cart.Price = product.Price
+		cart.ProductImage = product.URL
+		cart.Cost = product.Cost
 	}
 
 	cart.Quantity = updateQuantity
+	cart.Total = cart.Price * float64(cart.Quantity)
 	s.Repository.Db.Save(cart)
 	return nil
 }
 
-func (s cartService) getCart(customerId string) (*models.Cart, error) {
-	customer, err := s.Repository.findByCustomer(customerId)
-	if err != nil || customer == nil {
+func (s cartService) getCart(customerId string) ([]models.Cart, error) {
+	carts, err := s.Repository.findByCustomer(customerId)
+	if err != nil || carts == nil {
 		return nil, errors.New(constants.DB_NOT_FOUND)
 	}
 
-	return customer, nil
+	return carts, nil
 }
 
 func (s cartService) deleteCart(customerId string, productId string) error {
@@ -65,4 +71,18 @@ func (s cartService) deleteCart(customerId string, productId string) error {
 		return err
 	}
 	return nil
+}
+
+func (s cartService) checkOut(carts []models.Cart) *dto.Checkout {
+	checkout := &dto.Checkout{}
+	for _, item := range carts {
+		checkout.ProductTotal += item.Total
+		checkout.ProductCost += item.Cost
+	}
+
+	checkout.DeliverDays = time.Now().AddDate(0, 0, 7)
+	checkout.ShippingCost = 30.000
+	checkout.ProductTotal += checkout.ShippingCost
+
+	return checkout
 }

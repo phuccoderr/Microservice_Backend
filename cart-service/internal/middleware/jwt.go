@@ -2,7 +2,7 @@ package middleware
 
 import (
 	"cart-service/internal/constants"
-	"cart-service/internal/response"
+	"cart-service/internal/dto"
 	"errors"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
@@ -24,7 +24,7 @@ func JWTMiddleware() gin.HandlerFunc {
 		tokenString, err := JWTGetToken(c)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusUnauthorized,
-				response.BuildResponseError(constants.JWT_NOT_FOUND, "Unauthorized", http.StatusUnauthorized))
+				dto.BuildResponseError(constants.JWT_NOT_FOUND, "Unauthorized", http.StatusUnauthorized))
 			return
 		}
 		token, err := jwt.ParseWithClaims(tokenString, &CustomClaims{}, func(token *jwt.Token) (interface{}, error) {
@@ -33,7 +33,7 @@ func JWTMiddleware() gin.HandlerFunc {
 
 		if err != nil || !token.Valid {
 			c.AbortWithStatusJSON(http.StatusUnauthorized,
-				response.BuildResponseError(constants.JWT_TOKEN_INVALID, "Unauthorized", http.StatusUnauthorized))
+				dto.BuildResponseError(constants.JWT_TOKEN_INVALID, "Unauthorized", http.StatusUnauthorized))
 			return
 		}
 
