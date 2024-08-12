@@ -69,7 +69,6 @@ public class ProductController {
     public ResponseEntity<ResponseObject> getProduct(@PathVariable("id") String id) throws DataErrorException {
         Product product = productService.getProduct(id);
 
-        productRedisService.clear();
         ProductDto dto = Utility.toDto(product);
 
         return new ResponseEntity<>(ResponseObject.builder()

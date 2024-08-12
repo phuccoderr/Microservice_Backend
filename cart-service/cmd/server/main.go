@@ -1,10 +1,9 @@
 package main
 
 import (
-	"cart-service/internal/models"
+	"cart-service/internal/cache"
 	"cart-service/internal/routes"
 	"cart-service/pkg/config"
-	"cart-service/pkg/database"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"log"
@@ -12,22 +11,18 @@ import (
 )
 
 func main() {
-	cfg := config.LoadConfig()
+	config.LoadConfig()
 
-	connect := database.Connect(cfg.GetPostgresURL())
-
-	connect.AutoMigrate(&models.Cart{})
+	cache.ConnectRedis()
 
 	server := gin.Default()
 	server.Use(gin.Logger())
 	server.SetTrustedProxies([]string{"127.0.0.1"})
 
-	routes := &routes.Routes{
-		Db: connect,
-	}
+	routes := &routes.Routes{}
 	routes.CartRoute(server)
 
-	port, err := strconv.Atoi(cfg.Server.Port)
+	port, err := strconv.Atoi(config.Server.Port)
 	if err != nil {
 		log.Println(err)
 	}

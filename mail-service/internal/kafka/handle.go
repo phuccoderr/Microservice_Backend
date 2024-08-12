@@ -8,6 +8,7 @@ import (
 	"mail-service/config"
 	"mail-service/constants"
 	"mail-service/internal/mail"
+	"time"
 )
 
 type ConsumerGroupHandler struct {
@@ -27,13 +28,25 @@ type VerifyCustomerMessage struct {
 	UrlVerify string `json:"url"`
 }
 
+type PlaceOrderMessage struct {
+	ProductTotal  float64   `json:"product_total"`
+	ProductCost   float64   `json:"product_cost"`
+	ShippingCost  float64   `json:"shipping_cost"`
+	Address       string    `json:"address"`
+	DeliverDays   time.Time `json:"deliver_days"`
+	PaymentMethod string    `json:"payment_method"`
+	CustomerEmail string    `json:"customer_email"`
+}
+
 func (c *ConsumerGroupHandler) ConsumeClaim(sess sarama.ConsumerGroupSession, claim sarama.ConsumerGroupClaim) error {
 	for msg := range claim.Messages() {
 		switch msg.Topic {
-		case "customer-verify-events-topics":
+		case constants.KAFKA_TOPIC_VERIFY_ACCOUNT:
 			c.handleVerifyCustomer(msg)
-		case "customer-password-events-topics":
+		case constants.KAFKA_TOPIC_VERIFY_PASSWORD:
 			c.handleVerifyPassword(msg)
+		case constants.KAFKA_TOPIC_PLACE_ORDER:
+			c.handlePlaceOrderCustomer(msg)
 		default:
 			fmt.Println("Unknown topic")
 		}
@@ -106,6 +119,33 @@ func (c *ConsumerGroupHandler) handleVerifyCustomer(message *sarama.ConsumerMess
 			  Verify customer
 			</button>
       </a>`, constants.TITLE_VERIFY_ACCOUNT, verify.UrlVerify),
+	}
+
+	mailer := &mail.Mailer{
+		Config: c.Config,
+	}
+	err = mailer.SendSMTPMessage(formMail)
+	if err != nil {
+		log.Printf("Error send email: %v", err)
+		return err
+	}
+	return nil
+}
+
+func (c *ConsumerGroupHandler) handlePlaceOrderCustomer(message *sarama.ConsumerMessage) error {
+	var placeOrder PlaceOrderMessage
+	err := json.Unmarshal(message.Value, &placeOrder)
+	if err != nil {
+		log.Printf("Error unmarshaling message: %v", err)
+		return err
+	}
+
+	formMail := mail.Message{
+		From:     constants.EMAIL_FROM,
+		To:       placeOrder.CustomerEmail,
+		Subject:  constants.VERIFY_PLACEORDER,
+		Body:     constants.BODY,
+		HTMLBody: fmt.Sprintf(`<h3>%s</h3>`, constants.TITLE_PLACE_ORDER),
 	}
 
 	mailer := &mail.Mailer{

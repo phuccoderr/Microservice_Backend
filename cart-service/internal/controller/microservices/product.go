@@ -24,7 +24,6 @@ func CallGetProduct(productId, token string) (*dto.ProductResponse, error) {
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
-	log.Println(resp)
 	if err != nil {
 		log.Println(err.Error())
 		return nil, errors.New(constants.MICROSERVICE_FAIL)
@@ -40,7 +39,7 @@ func CallGetProduct(productId, token string) (*dto.ProductResponse, error) {
 	err = json.NewDecoder(resp.Body).Decode(responseObject)
 	if err != nil {
 		log.Println(err.Error())
-		return nil, errors.New(constants.MICROSERVICE_FAIL)
+		return nil, errors.New(constants.MICROSERVICE_READ_RESP)
 	}
 
 	return responseObject.Data.(*dto.ProductResponse), nil

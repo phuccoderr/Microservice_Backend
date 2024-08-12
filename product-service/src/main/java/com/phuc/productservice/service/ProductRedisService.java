@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -20,7 +21,11 @@ public class ProductRedisService implements IProductRedisService{
     private final ObjectMapper redisObjectMapper;
     @Override
     public void clear() {
-        redisTemplate.getConnectionFactory().getConnection().flushAll();
+        String pattern = "all_products:*";
+        Set<String> keys = redisTemplate.keys(pattern);
+        if (keys != null && !keys.isEmpty()) {
+            redisTemplate.delete(keys);
+        }
     }
 
     @Override

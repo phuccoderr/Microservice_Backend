@@ -33,7 +33,8 @@ func LoadConfig() *Config {
 		Kafka: KafkaConfig{
 			Brokers: []string{os.Getenv("KAFKA_BROKERS")},
 			Topics: []string{os.Getenv("KAFKA_TOPIC_VERIFY_ACCOUNT"),
-				os.Getenv("KAFKA_TOPIC_VERIFY_PASSWORD")},
+				os.Getenv("KAFKA_TOPIC_VERIFY_PASSWORD"),
+				os.Getenv("KAFKA_TOPIC_PLACE_ORDER")},
 		},
 	}
 }

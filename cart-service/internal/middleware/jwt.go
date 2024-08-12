@@ -3,14 +3,14 @@ package middleware
 import (
 	"cart-service/internal/constants"
 	"cart-service/internal/dto"
+	"cart-service/pkg/config"
 	"errors"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
 
-// var jwtSecret = []byte(os.Getenv("JWT_SECRET"))
-var jwtSecret = []byte("vVarX3ETLuR35pAe8LLVSEieaIxvBrz6X2B0eiN1HY4cdf3jYwBUKISJhDDXD60gsZiL9HLTYPoVwrSGa628XGmjJkGF04J3f4On")
+var jwtSecret = []byte(config.Jwt.Secret)
 
 type CustomClaims struct {
 	ID    string `json:"_id"`
@@ -19,8 +19,8 @@ type CustomClaims struct {
 }
 
 func JWTMiddleware() gin.HandlerFunc {
+	jwtSecret = []byte(config.Jwt.Secret)
 	return func(c *gin.Context) {
-
 		tokenString, err := JWTGetToken(c)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusUnauthorized,
@@ -39,6 +39,20 @@ func JWTMiddleware() gin.HandlerFunc {
 
 		c.Next()
 	}
+}
+
+func JWTGetTokenAndCustomer(c *gin.Context) (string, *CustomClaims, error) {
+	token, err := JWTGetToken(c)
+	if err != nil {
+		return "", nil, err
+	}
+
+	customer, err := JWTGetCustomer(c)
+	if err != nil {
+		return "", nil, err
+	}
+	return token, customer, nil
+
 }
 
 func JWTGetToken(c *gin.Context) (string, error) {
@@ -74,12 +88,12 @@ func JWTDecodeToken(tokenString string) (*CustomClaims, error) {
 	return nil, errors.New(constants.JWT_PARSE_CLAIMS)
 }
 
-func JWTGetCustomerID(c *gin.Context) (string, error) {
+func JWTGetCustomer(c *gin.Context) (*CustomClaims, error) {
 	token, _ := JWTGetToken(c)
 	decodeToken, err := JWTDecodeToken(token)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	return decodeToken.ID, nil
+	return decodeToken, nil
 }

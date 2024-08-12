@@ -4,9 +4,13 @@ import (
 	"cart-service/internal/constants"
 	"cart-service/internal/controller/microservices"
 	"cart-service/internal/dto"
+	"cart-service/internal/kafka"
 	"cart-service/internal/middleware"
+	"encoding/json"
+	"github.com/IBM/sarama"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strconv"
 )
 
 type Handler struct {
@@ -22,57 +26,62 @@ func (h *Handler) AddProductToCart(c *gin.Context) {
 	err := c.ShouldBindJSON(&cartRequest)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest,
-			dto.BuildResponseError(err.Error(), constants.STATUS_BADREQUEST, http.StatusBadRequest))
+			dto.BuildResponseError(err.Error(), constants.STATUS_BAD_REQUEST, http.StatusBadRequest))
 		return
 	}
 
-	token, err := middleware.JWTGetToken(c)
+	customer, err := middleware.JWTGetCustomer(c)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusUnauthorized,
 			dto.BuildResponseError(err.Error(), constants.STATUS_UNAUTHORIZED, http.StatusUnauthorized))
 	}
 
-	customerId, err := middleware.JWTGetCustomerID(c)
+	newQuantity, err := h.cartService.addProductToCart(customer.ID, cartRequest.ProductId, cartRequest.Quantity)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest,
+			dto.BuildResponseError(err.Error(), constants.STATUS_BAD_REQUEST, http.StatusBadRequest))
+		return
+	}
+
+	c.JSON(http.StatusCreated, dto.BuildResponseObject(constants.CREATE_SUCCESS, http.StatusCreated, newQuantity))
+
+}
+
+func (h *Handler) GetCart(c *gin.Context) {
+
+	token, customer, err := middleware.JWTGetTokenAndCustomer(c)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusUnauthorized,
 			dto.BuildResponseError(err.Error(), constants.STATUS_UNAUTHORIZED, http.StatusUnauthorized))
+		return
 	}
 
-	productId := cartRequest.ProductId
-	productResponse, err := microservices.CallGetProduct(productId, token)
+	cartsRedis, err := h.cartService.getCart(customer.ID)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError,
 			dto.BuildResponseError(err.Error(), constants.STATUS_INTERNAL_ERROR, http.StatusInternalServerError))
 		return
 	}
 
-	err = h.cartService.addProductToCart(customerId, productResponse, cartRequest.Quantity)
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusUnprocessableEntity,
-			dto.BuildResponseError(err.Error(), constants.STATUS_UNPROCESSABLEENTITY, http.StatusUnprocessableEntity))
-		return
+	var products []*dto.ProductResponse
+	for key, value := range cartsRedis {
+		product, err := microservices.CallGetProduct(key, token)
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusInternalServerError,
+				dto.BuildResponseError(err.Error(), constants.STATUS_INTERNAL_ERROR, http.StatusInternalServerError))
+			return
+		}
+		atoi, err := strconv.Atoi(value)
+		product.Quantity = int64(atoi)
+		products = append(products, product)
 	}
 
-	c.JSON(http.StatusCreated, dto.BuildResponseObject(constants.CREATE_SUCCESS, http.StatusCreated, nil))
-
-}
-
-func (h *Handler) GetCart(c *gin.Context) {
-
-	customerId, err := middleware.JWTGetCustomerID(c)
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusUnauthorized,
-			dto.BuildResponseError(err.Error(), constants.STATUS_UNAUTHORIZED, http.StatusUnauthorized))
+	var carts []dto.CartDto
+	for _, product := range products {
+		carts = append(carts, dto.ToCartDto(product, customer.ID))
 	}
 
-	carts, err := h.cartService.getCart(customerId)
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusNotFound,
-			dto.BuildResponseError(err.Error(), constants.STATUS_NOT_FOUND, http.StatusNotFound))
-		return
-	}
-
-	c.JSON(http.StatusOK, dto.BuildResponseObject(constants.GET_SUCCESS, http.StatusOK, dto.ToListCartDto(carts)))
+	c.JSON(http.StatusOK, dto.BuildResponseObject(constants.GET_SUCCESS, http.StatusOK, carts))
 
 }
 
@@ -81,21 +90,34 @@ func (h *Handler) DeleteCart(c *gin.Context) {
 
 	if productId == "" {
 		c.JSON(http.StatusBadRequest,
-			dto.BuildResponseError("productId is required", constants.STATUS_BADREQUEST, http.StatusBadRequest))
+			dto.BuildResponseError("productId is required", constants.STATUS_BAD_REQUEST, http.StatusBadRequest))
 		return
 	}
 
-	customerId, err := middleware.JWTGetCustomerID(c)
+	customer, err := middleware.JWTGetCustomer(c)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusUnauthorized,
 			dto.BuildResponseError(err.Error(), constants.STATUS_UNAUTHORIZED, http.StatusUnauthorized))
 		return
 	}
 
-	err = h.cartService.deleteCart(customerId, productId)
+	cart, err := h.cartService.checkProductInCart(customer.ID, productId)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusUnprocessableEntity,
-			dto.BuildResponseError(err.Error(), constants.STATUS_UNPROCESSABLEENTITY, http.StatusUnprocessableEntity))
+		c.AbortWithStatusJSON(http.StatusInternalServerError,
+			dto.BuildResponseError(err.Error(), constants.STATUS_INTERNAL_ERROR, http.StatusInternalServerError))
+		return
+	}
+
+	if !cart {
+		c.AbortWithStatusJSON(http.StatusNotFound,
+			dto.BuildResponseError(constants.DB_NOT_FOUND, constants.STATUS_NOT_FOUND, http.StatusNotFound))
+		return
+	}
+
+	err = h.cartService.deleteCart(customer.ID, productId)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError,
+			dto.BuildResponseError(err.Error(), constants.STATUS_INTERNAL_ERROR, http.StatusInternalServerError))
 		return
 	}
 
@@ -103,21 +125,118 @@ func (h *Handler) DeleteCart(c *gin.Context) {
 }
 
 func (h *Handler) Checkout(c *gin.Context) {
-
-	customerId, err := middleware.JWTGetCustomerID(c)
+	token, customer, err := middleware.JWTGetTokenAndCustomer(c)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusUnauthorized,
 			dto.BuildResponseError(err.Error(), constants.STATUS_UNAUTHORIZED, http.StatusUnauthorized))
-	}
-
-	carts, err := h.cartService.getCart(customerId)
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusNotFound,
-			dto.BuildResponseError(err.Error(), constants.STATUS_NOT_FOUND, http.StatusNotFound))
 		return
 	}
 
-	checkOutInfo := h.cartService.checkOut(carts)
+	cartsRedis, err := h.cartService.getCart(customer.ID)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError,
+			dto.BuildResponseError(err.Error(), constants.STATUS_INTERNAL_ERROR, http.StatusInternalServerError))
+		return
+	}
+
+	var products []*dto.ProductResponse
+	for key, value := range cartsRedis {
+		product, err := microservices.CallGetProduct(key, token)
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusInternalServerError,
+				dto.BuildResponseError(err.Error(), constants.STATUS_INTERNAL_ERROR, http.StatusInternalServerError))
+			return
+		}
+		atoi, err := strconv.Atoi(value)
+		product.Quantity = int64(atoi)
+		products = append(products, product)
+	}
+
+	var carts []dto.CartDto
+	for _, product := range products {
+		carts = append(carts, dto.ToCartDto(product, customer.ID))
+	}
+
+	if len(carts) == 0 {
+		c.AbortWithStatusJSON(http.StatusNotFound,
+			dto.BuildResponseError(constants.DB_NOT_FOUND, constants.STATUS_NOT_FOUND, http.StatusNotFound))
+		return
+	}
+
+	checkOutInfo := h.cartService.checkout(carts, customer.Email)
 	c.JSON(http.StatusOK, dto.BuildResponseObject(constants.CHECKOUT_SUCCESS, http.StatusOK, checkOutInfo))
 
+}
+
+func (h *Handler) PlaceOrder(c *gin.Context) {
+	checkoutRequest := &dto.CheckoutRequest{}
+	err := c.ShouldBindJSON(&checkoutRequest)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest,
+			dto.BuildResponseError(err.Error(), constants.STATUS_BAD_REQUEST, http.StatusBadRequest))
+		return
+	}
+
+	token, customer, err := middleware.JWTGetTokenAndCustomer(c)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusUnauthorized,
+			dto.BuildResponseError(err.Error(), constants.STATUS_UNAUTHORIZED, http.StatusUnauthorized))
+		return
+	}
+
+	cartsRedis, err := h.cartService.getCart(customer.ID)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError,
+			dto.BuildResponseError(err.Error(), constants.STATUS_BAD_REQUEST, http.StatusInternalServerError))
+		return
+	}
+
+	var products []*dto.ProductResponse
+	for key, value := range cartsRedis {
+		product, err := microservices.CallGetProduct(key, token)
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusInternalServerError,
+				dto.BuildResponseError(err.Error(), constants.STATUS_INTERNAL_ERROR, http.StatusInternalServerError))
+			return
+		}
+		atoi, err := strconv.Atoi(value)
+		product.Quantity = int64(atoi)
+		products = append(products, product)
+	}
+
+	var carts []dto.CartDto
+	for _, product := range products {
+		carts = append(carts, dto.ToCartDto(product, customer.ID))
+	}
+
+	if len(carts) == 0 {
+		c.AbortWithStatusJSON(http.StatusNotFound,
+			dto.BuildResponseError(constants.DB_NOT_FOUND, constants.STATUS_NOT_FOUND, http.StatusNotFound))
+		return
+	}
+
+	checkOutInfo := h.cartService.checkout(carts, customer.Email)
+	checkOutInfo.Address = checkoutRequest.Address
+	checkOutInfo.PaymentMethod = checkoutRequest.PaymentMethod
+	jsonValue, err := json.Marshal(checkOutInfo)
+
+	message := &sarama.ProducerMessage{
+		Topic: constants.KAFKA_TOPIC_PLACE_ORDER,
+		Value: sarama.ByteEncoder(jsonValue),
+	}
+	err = kafka.Produce(message)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError,
+			dto.BuildResponseError(err.Error(), constants.STATUS_INTERNAL_ERROR, http.StatusInternalServerError))
+		return
+	}
+
+	err = h.cartService.deleteAllCart(customer.ID)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError,
+			dto.BuildResponseError(err.Error(), constants.STATUS_INTERNAL_ERROR, http.StatusInternalServerError))
+		return
+	}
+
+	c.JSON(http.StatusOK, dto.BuildResponseObject(constants.PLACE_ORDER_SUCCESS, http.StatusOK, nil))
 }

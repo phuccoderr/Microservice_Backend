@@ -5,17 +5,14 @@ import (
 	"cart-service/internal/controller/cart"
 	"cart-service/internal/middleware"
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 )
 
 type Routes struct {
-	Db *gorm.DB
 }
 
 func (r Routes) CartRoute(router *gin.Engine) {
 
-	repository := cart.NewRepository(r.Db)
-	service := cart.NewCartService(repository)
+	service := cart.NewCartService()
 	handler := cart.NewHandler(service)
 
 	private := router.Group(constants.API_CART)
@@ -25,6 +22,7 @@ func (r Routes) CartRoute(router *gin.Engine) {
 		private.GET("", handler.GetCart)
 		private.DELETE("/product/:id", handler.DeleteCart)
 		private.GET("/checkout", handler.Checkout)
+		private.POST("/place_order", handler.PlaceOrder)
 	}
 
 }

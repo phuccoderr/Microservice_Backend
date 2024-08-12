@@ -84,9 +84,10 @@ services:
       
   redis:
     container_name: redis-container
-    image: redis:7.0-alpine
+    image: redis:7.4.0-alpine
     ports:
       - "6379:6379"
+    command: ["redis-server", "--appendonly", "yes"]
     volumes:
       - ./db-data/redis/:/data
     networks:
@@ -228,6 +229,7 @@ services:
       KAFKA_BROKERS: kafka:29092
       KAFKA_TOPIC_VERIFY_ACCOUNT: customer-verify-events-topics
       KAFKA_TOPIC_VERIFY_PASSWORD: customer-password-events-topics
+      KAFKA_TOPIC_PLACE_ORDER: place-order-events-topics
 
 
 networks:

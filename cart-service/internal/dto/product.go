@@ -6,7 +6,7 @@ type ProductResponse struct {
 	Alias       string  `json:"alias"`
 	Description string  `json:"description"`
 	Status      bool    `json:"status"`
-	Stock       int     `json:"stock"`
+	Stock       int64   `json:"stock"`
 	Cost        float64 `json:"cost"`
 	Price       float64 `json:"price"`
 	Sale        float64 `json:"sale"`
@@ -17,4 +17,6 @@ type ProductResponse struct {
 	CategoryID  string        `json:"category_id"`
 	CreatedAt   string        `json:"created_at"`
 	UpdatedAt   string        `json:"updated_at"`
+
+	Quantity int64 `json:"quantity"`
 }

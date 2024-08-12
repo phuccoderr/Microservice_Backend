@@ -1,88 +1,85 @@
 package cart
 
 import (
+	"cart-service/internal/cache"
 	"cart-service/internal/constants"
 	"cart-service/internal/dto"
-	"cart-service/internal/models"
 	"errors"
-	"github.com/google/uuid"
-	"strconv"
 	"time"
 )
 
 type ICartService interface {
-	addProductToCart(customerId string, product *dto.ProductResponse, quantity int) error
-	getCart(customerId string) ([]models.Cart, error)
+	addProductToCart(customerId string, productId string, quantity int64) (int64, error)
+	getCart(customerId string) (map[string]string, error)
 	deleteCart(customerId string, productId string) error
-	checkOut(carts []models.Cart) *dto.Checkout
+	checkout(carts []dto.CartDto, email string) *dto.CheckoutDto
+	deleteAllCart(customerId string) error
+	checkProductInCart(customerId string, productId string) (bool, error)
 }
 
 type cartService struct {
-	Repository *CartRepository
 }
 
-func NewCartService(repository *CartRepository) ICartService {
-	return &cartService{
-		Repository: repository,
-	}
+func NewCartService() ICartService {
+	return &cartService{}
 }
+func (s cartService) addProductToCart(customerId string, productId string, quantity int64) (int64, error) {
 
-func (s cartService) addProductToCart(customerId string, product *dto.ProductResponse, quantity int) error {
-	cart, err := s.Repository.findByCustomerAndProduct(customerId, product.Id)
+	result, err := cache.Rdb.HIncrBy(cache.Ctx, cache.CartKey(customerId), productId, quantity).Result()
 	if err != nil {
-		return err
+		return 0, err
 	}
 
-	updateQuantity := quantity
-
-	if cart != nil {
-		updateQuantity = cart.Quantity + updateQuantity
-		if quantity > product.Stock {
-			return errors.New("product stock is greater then stock:" + strconv.Itoa(product.Stock))
-		}
-	} else {
-		cart = &models.Cart{}
-		cart.Id = uuid.New().String()
-		cart.CustomerId = customerId
-		cart.ProductId = product.Id
-		cart.Price = product.Price
-		cart.ProductImage = product.URL
-		cart.Cost = product.Cost
+	if result < 0 {
+		cache.Rdb.HDel(cache.Ctx, cache.CartKey(customerId), productId)
+		return 0, errors.New("quantity cannot less than 0!")
 	}
-
-	cart.Quantity = updateQuantity
-	cart.Total = cart.Price * float64(cart.Quantity)
-	s.Repository.Db.Save(cart)
-	return nil
+	return result, nil
 }
 
-func (s cartService) getCart(customerId string) ([]models.Cart, error) {
-	carts, err := s.Repository.findByCustomer(customerId)
-	if err != nil || carts == nil {
+func (s cartService) getCart(customerId string) (map[string]string, error) {
+	result, err := cache.Rdb.HGetAll(cache.Ctx, cache.CartKey(customerId)).Result()
+	if err != nil {
 		return nil, errors.New(constants.DB_NOT_FOUND)
 	}
 
-	return carts, nil
+	return result, nil
 }
 
 func (s cartService) deleteCart(customerId string, productId string) error {
-	err := s.Repository.deleteByCustomerAndProduct(customerId, productId)
+	err := cache.Rdb.HDel(cache.Ctx, cache.CartKey(customerId), productId).Err()
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (s cartService) checkOut(carts []models.Cart) *dto.Checkout {
-	checkout := &dto.Checkout{}
+func (s cartService) checkout(carts []dto.CartDto, email string) *dto.CheckoutDto {
+	checkout := &dto.CheckoutDto{}
 	for _, item := range carts {
 		checkout.ProductTotal += item.Total
-		checkout.ProductCost += item.Cost
+		checkout.ProductCost = item.Cost * float64(item.Quantity)
 	}
 
 	checkout.DeliverDays = time.Now().AddDate(0, 0, 7)
 	checkout.ShippingCost = 30.000
 	checkout.ProductTotal += checkout.ShippingCost
-
+	checkout.CustomerEmail = email
 	return checkout
+}
+
+func (s cartService) deleteAllCart(customerId string) error {
+	err := cache.Rdb.Del(cache.Ctx, cache.CartKey(customerId)).Err()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s cartService) checkProductInCart(customerId string, productId string) (bool, error) {
+	exists, err := cache.Rdb.HExists(cache.Ctx, cache.CartKey(customerId), productId).Result()
+	if err != nil {
+		return false, err
+	}
+	return exists, nil
 }
