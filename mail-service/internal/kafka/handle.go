@@ -29,12 +29,24 @@ type VerifyCustomerMessage struct {
 }
 
 type PlaceOrderMessage struct {
+	CustomerId    string        `json:"customer_id"`
+	CustomerEmail string        `json:"customer_email"`
+	Items         []CartRequest `json:"items"`
+	Address       string        `json:"address"`
+	PaymentMethod string        `json:"payment_method"`
+	CheckOut      CheckoutDto   `json:"check_out"`
+}
+
+type CartRequest struct {
+	ProductId string `json:"product_id"`
+	Quantity  int64  `json:"quantity"`
+}
+
+type CheckoutDto struct {
 	ProductTotal  float64   `json:"product_total"`
 	ProductCost   float64   `json:"product_cost"`
 	ShippingCost  float64   `json:"shipping_cost"`
-	Address       string    `json:"address"`
 	DeliverDays   time.Time `json:"deliver_days"`
-	PaymentMethod string    `json:"payment_method"`
 	CustomerEmail string    `json:"customer_email"`
 }
 

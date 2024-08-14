@@ -5,12 +5,14 @@ import (
 	"cart-service/internal/constants"
 	"cart-service/internal/dto"
 	"errors"
+	"fmt"
+	"strconv"
 	"time"
 )
 
 type ICartService interface {
 	addProductToCart(customerId string, productId string, quantity int64) (int64, error)
-	getCart(customerId string) (map[string]string, error)
+	getCart(customerId string) ([]dto.CartRequest, error)
 	deleteCart(customerId string, productId string) error
 	checkout(carts []dto.CartDto, email string) *dto.CheckoutDto
 	deleteAllCart(customerId string) error
@@ -37,13 +39,26 @@ func (s cartService) addProductToCart(customerId string, productId string, quant
 	return result, nil
 }
 
-func (s cartService) getCart(customerId string) (map[string]string, error) {
+func (s cartService) getCart(customerId string) ([]dto.CartRequest, error) {
 	result, err := cache.Rdb.HGetAll(cache.Ctx, cache.CartKey(customerId)).Result()
 	if err != nil {
 		return nil, errors.New(constants.DB_NOT_FOUND)
 	}
 
-	return result, nil
+	carts := make([]dto.CartRequest, 0, len(result))
+	for key, value := range result {
+		quantity, err := strconv.Atoi(value)
+		if err != nil {
+			return nil, fmt.Errorf("invalid quantity for product %s: %v", key, err)
+		}
+
+		cart := dto.CartRequest{
+			ProductId: key,
+			Quantity:  int64(quantity),
+		}
+		carts = append(carts, cart)
+	}
+	return carts, nil
 }
 
 func (s cartService) deleteCart(customerId string, productId string) error {

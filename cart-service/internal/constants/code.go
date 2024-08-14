@@ -17,10 +17,11 @@ const (
 	MICROSERVICE_FAIL      = "Failed to call request!"
 	MICROSERVICE_READ_RESP = "Failed to read microservice response!"
 
-	STATUS_BAD_REQUEST    = "Bad request!"
-	STATUS_UNAUTHORIZED   = "Unauthorized!"
-	STATUS_NOT_FOUND      = "Not found!"
-	STATUS_INTERNAL_ERROR = "Internal server error!"
+	STATUS_BAD_REQUEST                 = "Bad request!"
+	STATUS_UNAUTHORIZED                = "Unauthorized!"
+	STATUS_NOT_FOUND                   = "Not found!"
+	STATUS_INTERNAL_ERROR              = "Internal server error!"
+	STATUS_STATUS_UNPROCESSABLEENTITTY = "Status unprocessable entity!"
 
 	DB_NOT_FOUND = "Data not found!"
 

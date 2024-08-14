@@ -1,4 +1,4 @@
-package dto
+package response
 
 type ResponseObject struct {
 	Message string      `json:"message"`

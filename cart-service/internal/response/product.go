@@ -1,4 +1,4 @@
-package dto
+package response
 
 type ProductResponse struct {
 	Id          string  `json:"id"`
@@ -17,6 +17,4 @@ type ProductResponse struct {
 	CategoryID  string        `json:"category_id"`
 	CreatedAt   string        `json:"created_at"`
 	UpdatedAt   string        `json:"updated_at"`
-
-	Quantity int64 `json:"quantity"`
 }
