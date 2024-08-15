@@ -6,9 +6,9 @@ import (
 	"cart-service/pkg/config"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"log"
-	"strconv"
 )
+
+const webPort = 9160
 
 func main() {
 	config.LoadConfig()
@@ -22,9 +22,5 @@ func main() {
 	routes := &routes.Routes{}
 	routes.CartRoute(server)
 
-	port, err := strconv.Atoi(config.Server.Port)
-	if err != nil {
-		log.Println(err)
-	}
-	server.Run(fmt.Sprintf(":%d", port))
+	server.Run(fmt.Sprintf(":%d", webPort))
 }

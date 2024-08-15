@@ -11,7 +11,7 @@ import (
 )
 
 func CallGetProduct(productId, token string) (*response.ProductResponse, error) {
-	url := fmt.Sprintf("http://localhost:9140/api/v1/products/%s", productId)
+	url := fmt.Sprintf("http://product-service:9140/api/v1/products/%s", productId)
 	responseObject := &response.ResponseObject{}
 
 	req, err := http.NewRequest(http.MethodGet, url, nil)

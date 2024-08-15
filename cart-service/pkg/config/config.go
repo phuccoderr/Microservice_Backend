@@ -2,18 +2,16 @@ package config
 
 import (
 	"fmt"
-	"github.com/joho/godotenv"
 	"log"
 	"os"
 	"strconv"
 )
 
 var (
-	DB     DBConfig
-	Kafka  KafkaConfig
-	Redis  RedisConfig
-	Server ServerConfig
-	Jwt    JwtConfig
+	DB    DBConfig
+	Kafka KafkaConfig
+	Redis RedisConfig
+	Jwt   JwtConfig
 )
 
 type JwtConfig struct {
@@ -39,15 +37,11 @@ type RedisConfig struct {
 	Port string
 }
 
-type ServerConfig struct {
-	Port string
-}
-
 func LoadConfig() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
+	//err := godotenv.Load()
+	//if err != nil {
+	//	log.Fatal("Error loading .env file")
+	//}
 	DB = DBConfig{
 		Host:     os.Getenv("POSTGRES_HOST"),
 		Port:     os.Getenv("POSTGRES_PORT"),
@@ -72,11 +66,6 @@ func LoadConfig() {
 		Secret:      os.Getenv("JWT_SECRET"),
 		ExpiredTime: expired,
 	}
-
-	Server = ServerConfig{
-		Port: os.Getenv("SERVER_PORT"),
-	}
-
 }
 
 func GetPostgresURL() string {

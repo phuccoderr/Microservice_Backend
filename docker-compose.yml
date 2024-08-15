@@ -230,6 +230,30 @@ services:
       KAFKA_TOPIC_VERIFY_ACCOUNT: customer-verify-events-topics
       KAFKA_TOPIC_VERIFY_PASSWORD: customer-password-events-topics
       KAFKA_TOPIC_PLACE_ORDER: place-order-events-topics
+    networks:
+      - default
+  
+  cart-service:
+    container_name: cart-service-container
+    build: 
+      context: ./cart-service
+      dockerfile: Dockerfile
+    restart: always
+    depends_on:
+      - redis
+      - kafka
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - KAFKA_BROKERS=kafka:29092
+      - KAFKA_TOPIC_PLACE_ORDER=place-order-events-topics
+      - SERVER_PORT=9160
+      - JWT_SECRET=vVarX3ETLuR35pAe8LLVSEieaIxvBrz6X2B0eiN1HY4cdf3jYwBUKISJhDDXD60gsZiL9HLTYPoVwrSGa628XGmjJkGF04J3f4On
+      - JWT_EXPIRATION=60
+    ports:
+      - "9160:9160"
+    networks:
+      - default
 
 
 networks:
