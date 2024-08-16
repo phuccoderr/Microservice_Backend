@@ -18,11 +18,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -155,6 +158,38 @@ public class ProductService implements IProductService {
                 throw new RuntimeException(e);
             }
         });
+    }
+
+    public Page<Product> getAllProductsByCategory(
+            List<String> listCategoryIds,
+            Integer page,
+            Integer limit,
+            String sort,
+            String sortField,
+            String keyword
+    ) throws ParamValidateException {
+        Utility.checkSortIsAscOrDesc(sort);
+
+        Specification<Product> spec = Specification.where(null);
+        spec = spec.and(ProductSpecifications.withCategory(listCategoryIds));
+
+        if (!keyword.isEmpty()) {
+            spec = spec.and(ProductSpecifications.withKeyword(keyword));
+        }
+
+        Map<String, String> sortFields = new HashMap<>();
+        sortFields.put("price", "price");
+        sortFields.put("date", "createdAt");
+
+        String sortFieldDB = sortFields.getOrDefault(sortField, "name");
+
+        Pageable pageable = PageRequest.of(page - 1,limit, Sort.by(
+                sort.equals("asc") ? Sort.Direction.ASC : Sort.Direction.DESC,
+                sortFieldDB
+        ));
+
+        return proRepository.findAll(spec,pageable);
+
     }
 
     private void setMainImage(MultipartFile mainFile,Product product)

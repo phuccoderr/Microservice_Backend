@@ -13,7 +13,9 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.internal.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -23,9 +25,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Component
 @RequiredArgsConstructor
@@ -40,6 +40,10 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             HttpServletResponse response,
             FilterChain filterChain) throws ServletException, IOException {
 
+        if (isBypassToken(request)) {
+            filterChain.doFilter(request,response);
+            return;
+        }
 
         String authHeader = request.getHeader("Authorization");
         String email = null;
@@ -89,6 +93,26 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         String jsonResponse = objectMapper.writeValueAsString(errorResponse);
         response.getWriter().write(jsonResponse);
         response.getWriter().flush();
+    }
+
+    private boolean isBypassToken(@NonNull HttpServletRequest request) {
+        final List<Pair<String,String>> bypassToken = Arrays.asList(
+                Pair.of(String.format("%s/c/[^/]+",Constants.API_PRODUCTS), "GET")
+        );
+
+        String requestUri = request.getRequestURI();
+        String requestMethod = request.getMethod();
+
+        for (Pair<String, String> pair : bypassToken) {
+            String uriPattern = pair.getLeft();
+            String method = pair.getRight();
+
+            if (requestUri.matches(uriPattern) && requestMethod.equalsIgnoreCase(method)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
 }

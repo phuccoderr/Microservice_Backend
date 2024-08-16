@@ -117,4 +117,15 @@ public class CategoryController {
                 .data(Collections.emptyList()).build(), HttpStatus.OK);
 
     }
+
+    @GetMapping("/parent/{id}")
+    public ResponseEntity<ResponseObject> getCategoryById(@PathVariable String id) throws DataNotFoundException {
+        List<String> children = categoryService.getChildren(id);
+
+        return new ResponseEntity<>(ResponseObject.builder()
+                .status(HttpStatus.OK.value())
+                .message(Constants.GET_ALL_SUCCESS)
+                .data(children).build(), HttpStatus.OK);
+
+    }
 }

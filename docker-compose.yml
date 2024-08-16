@@ -205,6 +205,7 @@ services:
       POSTGRES_PASSWORD: password
       REDIS_HOST: redis
       REDIS_PORT: 6379
+      KAFKA_BROKERS: kafka:29092
     ports:
       - "9140:9140"
     networks:

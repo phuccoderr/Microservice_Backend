@@ -43,11 +43,10 @@ type CartRequest struct {
 }
 
 type CheckoutDto struct {
-	ProductTotal  float64   `json:"product_total"`
-	ProductCost   float64   `json:"product_cost"`
-	ShippingCost  float64   `json:"shipping_cost"`
-	DeliverDays   time.Time `json:"deliver_days"`
-	CustomerEmail string    `json:"customer_email"`
+	ProductTotal float64   `json:"product_total"`
+	ProductCost  float64   `json:"product_cost"`
+	ShippingCost float64   `json:"shipping_cost"`
+	DeliverDays  time.Time `json:"deliver_days"`
 }
 
 func (c *ConsumerGroupHandler) ConsumeClaim(sess sarama.ConsumerGroupSession, claim sarama.ConsumerGroupClaim) error {

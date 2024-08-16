@@ -184,4 +184,28 @@ public class ProductController {
                 .data("").build(), HttpStatus.OK);
     }
 
+    @GetMapping("/c/{cateId}")
+    public ResponseEntity<ResponseObject> viewCategoryListByPage(
+            @PathVariable(name = "cateId") String cateId,
+            @RequestParam(value = "page", defaultValue = "1") Integer page,
+            @RequestParam(value = "limit", defaultValue = "10") Integer limit,
+            @RequestParam(value = "sort", defaultValue = "asc") String sort,
+            @RequestParam(value = "sort_field") String sortField,
+            @RequestParam(value = "keyword", defaultValue = "") String keyword,
+            HttpServletRequest request
+    ) throws ParamValidateException {
+
+        List<String> listCategoriesIds = categoryService.getChildrenCateId(cateId, request);
+        Page<Product> pages = productService.getAllProductsByCategory(listCategoriesIds, page, limit, sort, sortField, keyword);
+
+        List<ProductDto> listDtos = Utility.toListDtos(pages.getContent());
+
+        PaginationDto paginationDto = new PaginationDto(pages,listDtos);
+
+        return new ResponseEntity<>(ResponseObject.builder()
+                .status(HttpStatus.OK.value())
+                .message(Constants.GET_ALL_SUCCESS)
+                .data(paginationDto).build(), HttpStatus.OK);
+    }
+
 }

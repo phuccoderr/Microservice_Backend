@@ -8,7 +8,9 @@ import com.phuc.categoryservice.response.ResponseError;
 import com.phuc.categoryservice.util.JwtTokenUtil;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.internal.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -37,6 +39,12 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
+
+        if (isBypassToken(request)) {
+            filterChain.doFilter(request,response);
+            return;
+        }
+
         String authHeader = request.getHeader("Authorization");
         String email = null;
         Set<String> roles = new HashSet<>();
@@ -85,6 +93,26 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         String jsonResponse = objectMapper.writeValueAsString(errorResponse);
         response.getWriter().write(jsonResponse);
         response.getWriter().flush();
+    }
+
+    private boolean isBypassToken(@NonNull HttpServletRequest request) {
+        final List<Pair<String,String>> bypassToken = Arrays.asList(
+                Pair.of(String.format("%s/parent/[^/]+",Constants.API_CATEGORIES), "GET")
+        );
+
+        String requestUri = request.getRequestURI();
+        String requestMethod = request.getMethod();
+
+        for (Pair<String, String> pair : bypassToken) {
+            String uriPattern = pair.getLeft();
+            String method = pair.getRight();
+
+            if (requestUri.matches(uriPattern) && requestMethod.equalsIgnoreCase(method)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
 }

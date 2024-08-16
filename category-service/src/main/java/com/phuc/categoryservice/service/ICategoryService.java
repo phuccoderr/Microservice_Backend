@@ -17,4 +17,5 @@ public interface ICategoryService {
     Category getCategory(String id) throws DataNotFoundException;
     Category updateCategory(String id, RequestUpdateCategory reqUpdateCategory) throws DataNotFoundException, DataErrorException;
     void deleteCategory(String id) throws DataNotFoundException, DataErrorException;
+    List<String> getChildren(String id) throws DataNotFoundException;
 }

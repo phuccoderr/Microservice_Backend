@@ -79,7 +79,6 @@ func (s cartService) checkout(carts []dto.CartDto, email string) *dto.CheckoutDt
 	checkout.DeliverDays = time.Now().AddDate(0, 0, 7)
 	checkout.ShippingCost = 30.000
 	checkout.ProductTotal += checkout.ShippingCost
-	checkout.CustomerEmail = email
 	return checkout
 }
 

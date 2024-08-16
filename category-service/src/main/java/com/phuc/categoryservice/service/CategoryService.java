@@ -14,6 +14,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 @Service
 @RequiredArgsConstructor
@@ -90,6 +93,27 @@ public class CategoryService implements ICategoryService {
         }
 
         repository.deleteById(category.getId());
+    }
+
+    @Override
+    public List<String> getChildren(String id) throws DataNotFoundException {
+        List<String> categories = new ArrayList<>();
+
+        Category category = getCategory(id);
+
+        categories.add(category.getId());
+        hierarchical(category,categories);
+
+        return categories;
+    }
+
+    private void hierarchical(Category category, List<String> categories) {
+        if (!category.getChildren().isEmpty()) {
+            category.getChildren().forEach(child -> {
+                categories.add(child.getId());
+                hierarchical(child, categories);
+            });
+        }
     }
 
 
