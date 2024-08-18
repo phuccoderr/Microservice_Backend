@@ -1,17 +1,15 @@
 FROM golang:1.22.5-alpine AS builder
 
-WORKDIR /app
+WORKDIR /build
 
 COPY . .
 
 RUN go mod download
 
-RUN go build -o main ./cmd/server/
+RUN go build -o cartService ./cmd/server/
 
-FROM alpine:latest
+FROM scratch
 
-WORKDIR /root/
+COPY --from=builder /build/cartService /
 
-COPY --from=builder /app/main .
-
-CMD ["./main"]
+ENTRYPOINT ["./cartService"]
