@@ -1,6 +1,6 @@
 package dto
 
-import "cart-service/internal/response"
+import "cart-service/pkg/response"
 
 type CartRequest struct {
 	ProductId string `json:"product_id"`
@@ -8,7 +8,6 @@ type CartRequest struct {
 }
 
 type CartDto struct {
-	CustomerId   string  `json:"customer_id"`
 	ProductId    string  `json:"product_id"`
 	ProductImage string  `json:"product_image"`
 	Cost         float64 `json:"cost"`
@@ -19,10 +18,9 @@ type CartDto struct {
 
 func ToCartDto(product *response.ProductResponse, customerId string, quantity int64) CartDto {
 	return CartDto{
-		CustomerId:   customerId,
 		ProductId:    product.Id,
 		ProductImage: product.URL,
-		Cost:         product.Cost,
+		Cost:         product.Cost * float64(quantity),
 		Price:        product.Price,
 		Quantity:     quantity,
 		Total:        product.Price * float64(quantity),

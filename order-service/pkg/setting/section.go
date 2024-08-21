@@ -5,6 +5,7 @@ type Config struct {
 	Logger   LogSetting      `mapstructure:"logger"`
 	Server   ServerSetting   `mapstructure:"server"`
 	Kafka    KafkaSetting    `mapstructure:"kafka"`
+	Jwt      JwtSetting      `mapstructure:"jwt"`
 }
 
 type ServerSetting struct {
@@ -33,4 +34,9 @@ type LogSetting struct {
 type KafkaSetting struct {
 	Brokers string `mapstructure:"brokers"`
 	Topic   string `mapstructure:"topic"`
+}
+
+type JwtSetting struct {
+	Secret string `mapstructure:"secret"`
+	Expire int    `mapstructure:"expire"`
 }

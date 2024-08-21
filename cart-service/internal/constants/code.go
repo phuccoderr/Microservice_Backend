@@ -1,7 +1,7 @@
 package constants
 
 const (
-	API_CART = "/api/v1/cart"
+	API_ENPOINT = "/api/v1"
 
 	JWT_NOT_FOUND     = "Authorization header is empty!"
 	JWT_TOKEN_INVALID = "Token is invalid!"

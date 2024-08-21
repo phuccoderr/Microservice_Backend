@@ -9,5 +9,5 @@ func IniteKafka() {
 
 	client := kafka.NewKafkaClient(global.Config.Kafka)
 	global.Producer = client.Writer
-
+	global.Consumer = client.Reader
 }

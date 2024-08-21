@@ -10,6 +10,8 @@ RUN go build -o cartService ./cmd/server/
 
 FROM scratch
 
+COPY ./config /config
+
 COPY --from=builder /build/cartService /
 
-ENTRYPOINT ["./cartService"]
+ENTRYPOINT ["./cartService", "config/local.yaml"]

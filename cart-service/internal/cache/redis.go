@@ -1,21 +1,17 @@
 package cache
 
 import (
-	"cart-service/pkg/config"
+	"cart-service/pkg/setting"
 	"context"
+	"fmt"
 	"github.com/redis/go-redis/v9"
 	"log"
 	"time"
 )
 
-var (
-	Ctx = context.Background()
-	Rdb *redis.Client
-)
-
-func ConnectRedis() {
-	Rdb = redis.NewClient(&redis.Options{
-		Addr:             config.GetRedisAddr(),
+func NewRedisClient(config setting.RedisSetting) *redis.Client {
+	redisClient := redis.NewClient(&redis.Options{
+		Addr:             fmt.Sprintf("%s:%s", config.Host, config.Port),
 		Password:         "",
 		DB:               0,
 		DisableIndentity: true,
@@ -24,12 +20,14 @@ func ConnectRedis() {
 		WriteTimeout:     100 * time.Millisecond,
 	})
 
-	err := Rdb.Ping(Ctx).Err()
+	err := redisClient.Ping(context.Background()).Err()
 	if err != nil {
 		log.Fatalf("Could not connect to Redis: %v", err)
 	} else {
 		log.Println("Connected to Redis")
 	}
+
+	return redisClient
 }
 
 func CartKey(customerId string) string {

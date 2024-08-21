@@ -1,39 +1,35 @@
 package middleware
 
 import (
+	"cart-service/global"
 	"cart-service/internal/constants"
-	"cart-service/internal/response"
-	"cart-service/pkg/config"
+	"cart-service/pkg/response"
 	"errors"
-	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v5"
+	"go.uber.org/zap"
 	"net/http"
 )
-
-var jwtSecret = []byte(config.Jwt.Secret)
 
 type CustomClaims struct {
 	ID    string `json:"_id"`
 	Email string `json:"email"`
-	jwt.StandardClaims
+	jwt.RegisteredClaims
 }
 
 func JWTMiddleware() gin.HandlerFunc {
-	jwtSecret = []byte(config.Jwt.Secret)
 	return func(c *gin.Context) {
 		tokenString, err := JWTGetToken(c)
 		if err != nil {
-			c.AbortWithStatusJSON(http.StatusUnauthorized,
-				response.BuildResponseError(constants.JWT_NOT_FOUND, "Unauthorized", http.StatusUnauthorized))
+			global.Logger.Error("Jwt get token", zap.Error(err))
+			response.ErrorResponse(c, constants.JWT_NOT_FOUND, "Unauthorized", http.StatusUnauthorized)
 			return
 		}
-		token, err := jwt.ParseWithClaims(tokenString, &CustomClaims{}, func(token *jwt.Token) (interface{}, error) {
-			return jwtSecret, nil
-		})
 
-		if err != nil || !token.Valid {
-			c.AbortWithStatusJSON(http.StatusUnauthorized,
-				response.BuildResponseError(constants.JWT_TOKEN_INVALID, "Unauthorized", http.StatusUnauthorized))
+		_, err = JWTDecodeToken(tokenString)
+		if err != nil {
+			global.Logger.Error("Jwt token invalid", zap.Error(err))
+			response.ErrorResponse(c, constants.JWT_NOT_FOUND, "Unauthorized", http.StatusUnauthorized)
 			return
 		}
 
@@ -47,7 +43,7 @@ func JWTGetTokenAndCustomer(c *gin.Context) (string, *CustomClaims, error) {
 		return "", nil, err
 	}
 
-	customer, err := JWTGetCustomer(c)
+	customer, err := JWTDecodeToken(token)
 	if err != nil {
 		return "", nil, err
 	}
@@ -68,9 +64,10 @@ func JWTDecodeToken(tokenString string) (*CustomClaims, error) {
 	token, err := jwt.ParseWithClaims(tokenString, &CustomClaims{}, func(token *jwt.Token) (interface{}, error) {
 		_, ok := token.Method.(*jwt.SigningMethodHMAC)
 		if !ok {
+			global.Logger.Error("decode token!")
 			return nil, errors.New(constants.JWT_SIGNING_KEY)
 		}
-		return jwtSecret, nil
+		return []byte(global.Config.Jwt.Secret), nil
 	})
 
 	if err != nil {
@@ -78,6 +75,7 @@ func JWTDecodeToken(tokenString string) (*CustomClaims, error) {
 	}
 
 	if !token.Valid {
+		global.Logger.Error("Jwt token invalid", zap.Error(err))
 		return nil, errors.New(constants.JWT_TOKEN_INVALID)
 	}
 
@@ -85,15 +83,7 @@ func JWTDecodeToken(tokenString string) (*CustomClaims, error) {
 	if ok {
 		return claims, nil
 	}
+
+	global.Logger.Error("Jwt parse customer error", zap.Error(errors.New(constants.JWT_PARSE_CLAIMS)))
 	return nil, errors.New(constants.JWT_PARSE_CLAIMS)
-}
-
-func JWTGetCustomer(c *gin.Context) (*CustomClaims, error) {
-	token, _ := JWTGetToken(c)
-	decodeToken, err := JWTDecodeToken(token)
-	if err != nil {
-		return nil, err
-	}
-
-	return decodeToken, nil
 }

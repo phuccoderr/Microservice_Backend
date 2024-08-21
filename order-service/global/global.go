@@ -12,4 +12,5 @@ var (
 	Logger   *logger.LoggerZap
 	Mdb      *gorm.DB
 	Producer *kafka.Writer
+	Consumer *kafka.Reader
 )

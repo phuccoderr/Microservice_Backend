@@ -10,7 +10,7 @@ type Order struct {
 	CustomerId   uuid.UUID      `gorm:"column:customer_id; not null;"`
 	Address      string         `gorm:"column:address; not null"`
 	PhoneNumber  string         `gorm:"column:phone_number; not null"`
-	DeliveryDays int64          `gorm:"column:delivery_days; not null"`
+	DeliveryDays time.Time      `gorm:"column:delivery_days; not null"`
 	OrderDetails []OrderDetails `gorm:"foreignKey:OrderID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	Payment      string         `gorm:"column:payment; not null"`
 	Total        float64        `gorm:"column:total; not null"`
