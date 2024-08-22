@@ -7,8 +7,11 @@ import (
 	"cart-service/internal/middleware"
 	"cart-service/internal/service"
 	"cart-service/pkg/response"
+	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/segmentio/kafka-go"
 	"go.uber.org/zap"
 	"net/http"
 )
@@ -146,8 +149,8 @@ func (cc *CartController) Checkout(c *gin.Context) {
 			return
 		}
 		if cart.Quantity > product.Stock {
-			global.Logger.Info(fmt.Sprintf("quantity less than %v", product.Stock))
-			response.ErrorResponse(c, fmt.Sprintf("quantity less than %v", product.Stock),
+			global.Logger.Info(fmt.Sprintf("quantity %s less than %v", product.Name, product.Stock))
+			response.ErrorResponse(c, fmt.Sprintf("quantity %s less than %v", product.Name, product.Stock),
 				constants.STATUS_STATUS_UNPROCESSABLEENTITTY,
 				http.StatusUnprocessableEntity)
 			return
@@ -198,8 +201,8 @@ func (cc *CartController) PlaceOrder(c *gin.Context) {
 			return
 		}
 		if cart.Quantity > product.Stock {
-			global.Logger.Info(fmt.Sprintf("quantity less than %v", product.Stock))
-			response.ErrorResponse(c, fmt.Sprintf("quantity less than %v", product.Stock),
+			global.Logger.Info(fmt.Sprintf("quantity %s less than %v", product.Name, product.Stock))
+			response.ErrorResponse(c, fmt.Sprintf("quantity %s less than %v", product.Name, product.Stock),
 				constants.STATUS_STATUS_UNPROCESSABLEENTITTY,
 				http.StatusUnprocessableEntity)
 			return
@@ -222,6 +225,23 @@ func (cc *CartController) PlaceOrder(c *gin.Context) {
 	orderMessage.Address = placeOrder.Address
 	orderMessage.PaymentMethod = placeOrder.PaymentMethod
 	orderMessage.PhoneNumber = placeOrder.PhoneNumber
+
+	marshal, err := json.Marshal(orderMessage)
+	if err != nil {
+		global.Logger.Error("Json Marshal Error", zap.Error(err))
+		response.ErrorResponse(c, err.Error(), constants.STATUS_INTERNAL_ERROR, http.StatusInternalServerError)
+	}
+
+	message := kafka.Message{
+		Value: marshal,
+	}
+	global.Produce.WriteMessages(context.Background(), message)
+
+	err = cc.cartService.DeleteAllCart(customer.ID)
+	if err != nil {
+		global.Logger.Error("Delete Cart Error", zap.Error(err))
+		response.ErrorResponse(c, err.Error(), constants.STATUS_INTERNAL_ERROR, http.StatusInternalServerError)
+	}
 
 	response.SuccessResponse(c, http.StatusOK, constants.PLACE_ORDER_SUCCESS, orderMessage)
 }

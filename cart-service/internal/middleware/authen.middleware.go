@@ -29,7 +29,7 @@ func JWTMiddleware() gin.HandlerFunc {
 		_, err = JWTDecodeToken(tokenString)
 		if err != nil {
 			global.Logger.Error("Jwt token invalid", zap.Error(err))
-			response.ErrorResponse(c, constants.JWT_NOT_FOUND, "Unauthorized", http.StatusUnauthorized)
+			response.ErrorResponse(c, constants.JWT_TOKEN_INVALID, "Unauthorized", http.StatusUnauthorized)
 			return
 		}
 
