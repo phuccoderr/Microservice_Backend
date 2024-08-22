@@ -1,14 +1,21 @@
 package mail
 
 import (
+	"fmt"
 	mail "github.com/xhit/go-simple-mail/v2"
-	"log"
-	"mail-service/config"
+	"go.uber.org/zap"
+	"mail-service/global"
+	"mail-service/pkg/setting"
 	"time"
 )
 
-type Mailer struct {
-	Config *config.Config
+type Mail struct {
+	Domain     string
+	Host       string
+	Port       int
+	Username   string
+	Password   string
+	Encryption string
 }
 
 type Message struct {
@@ -19,32 +26,39 @@ type Message struct {
 	HTMLBody string
 }
 
-func (m *Mailer) SendSMTPMessage(msg Message) error {
-
+func NewMailer(config setting.MailhogSetting) *mail.SMTPClient {
+	configsup := global.Config
+	fmt.Println(configsup)
 	server := mail.NewSMTPClient()
-	server.Host = m.Config.Mailer.Host
-	server.Port = m.Config.Mailer.Port
-	server.Username = m.Config.Mailer.Username
-	server.Password = m.Config.Mailer.Password
-	server.Encryption = getEncryption(m.Config.Mailer.Encryption)
+	server.Host = config.MailHost
+	server.Port = config.MailPort
+	server.Username = config.MailUsername
+	server.Password = config.MailPassword
+	server.Encryption = getEncryption("none")
 	server.KeepAlive = false
 	server.ConnectTimeout = 10 * time.Second
 	server.SendTimeout = 10 * time.Second
 
 	smtpClient, err := server.Connect()
 	if err != nil {
-		log.Println(err)
-		return err
+		global.Logger.Error("smtpClient connect error", zap.Error(err))
+		panic(err)
 	}
+
+	return smtpClient
+}
+
+func SendSMTPMessage(msg Message) error {
+	smtpClient := global.Mailer
 
 	email := mail.NewMSG()
 	email.SetFrom(msg.From).AddTo(msg.To).SetSubject(msg.Subject)
 	email.SetBody(mail.TextPlain, msg.Body)
 	email.AddAlternative(mail.TextHTML, msg.HTMLBody)
 
-	err = email.Send(smtpClient)
+	err := email.Send(smtpClient)
 	if err != nil {
-		log.Println(err)
+		global.Logger.Error("send email error", zap.Error(err))
 		return err
 	}
 

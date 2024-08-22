@@ -1,17 +1,17 @@
 FROM golang:1.22.5-alpine AS builder
 
-WORKDIR /app
+WORKDIR /build
 
 COPY . .
 
 RUN go mod download
 
-RUN go build -o main ./cmd/server/
+RUN go build -o mailService ./cmd/server/
 
-FROM alpine:latest
+FROM scratch
 
-WORKDIR /root/
+COPY ./config /config
 
-COPY --from=builder /app/main .
+COPY --from=builder /build/mailService /
 
-CMD ["./main"]
+ENTRYPOINT ["./mailService", "config/local.yaml"]

@@ -1,0 +1,23 @@
+server:
+  port: 9155
+logger:
+  log_level: debug
+  file_log_name: "./storages/logs/dev.001.log"
+  max_size: 500
+  max_backups: 3
+  max_age: 28
+  compress: true
+mailhog:
+  mail_domain: mailhog
+  mail_host: mailhog
+  mail_port: 1025
+  mail_username:
+  mail_password:
+  mail_encryption: none
+kafka:
+  brokers: kafka:29092
+  topics:
+    - customer-verify-events-topics
+    - customer-password-events-topics
+    - place-order-events-topics
+  group: mail-group

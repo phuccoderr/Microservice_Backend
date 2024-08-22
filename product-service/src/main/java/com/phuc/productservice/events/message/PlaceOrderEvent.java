@@ -17,19 +17,20 @@ public class PlaceOrderEvent {
     @JsonProperty("customer_email")
     private String customerEmail;
 
-    @JsonProperty("items")
-    private List<Item> items;
-
     @JsonProperty("address")
     private String address;
 
     @JsonProperty("payment_method")
     private String paymentMethod;
 
+    @JsonProperty("phone_number")
+    private String phoneNumber;
+
     @JsonProperty("check_out")
     private CheckOut checkOut;
 
-    // Getters and setters...
+    @JsonProperty("items")
+    private List<Item> items;
 
     @Setter
     @Getter
@@ -37,8 +38,20 @@ public class PlaceOrderEvent {
         @JsonProperty("product_id")
         private String productId;
 
+        @JsonProperty("product_image")
+        private String productImage;
+
         @JsonProperty("quantity")
         private int quantity;
+
+        @JsonProperty("cost")
+        private float cost;
+
+        @JsonProperty("price")
+        private float price;
+
+        @JsonProperty("total")
+        private float total;
     }
 
 

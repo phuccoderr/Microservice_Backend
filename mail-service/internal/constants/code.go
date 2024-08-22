@@ -1,6 +1,7 @@
 package constants
 
 const (
+	API_ENPOINT       = "/api/v1"
 	EMAIL_FROM        = "phuctapcode@gmail.com"
 	BODY              = "Chẳng có gì cả"
 	CHANGE_PASSWORD   = "Thay đổi mật khẩu"

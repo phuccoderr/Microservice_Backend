@@ -1,55 +1,106 @@
 package kafka
 
 import (
-	"context"
+	"encoding/json"
 	"fmt"
-	"github.com/IBM/sarama"
-	"log"
-	"mail-service/config"
-	"os"
-	"os/signal"
-	"syscall"
+	"github.com/segmentio/kafka-go"
+	"go.uber.org/zap"
+	"mail-service/global"
+	"mail-service/internal/constants"
+	"mail-service/internal/mail"
 )
 
-type Consumer struct {
-	Config *config.Config
+func HandleVerifyCustomer(message *kafka.Message) error {
+	var verify VerifyCustomerMessage
+	err := json.Unmarshal(message.Value, &verify)
+	if err != nil {
+		global.Logger.Error("Unmarshal json failed", zap.Error(err))
+		return err
+	}
+
+	formMail := mail.Message{
+		From:    constants.EMAIL_FROM,
+		To:      verify.Email,
+		Subject: constants.VERIFY_ACCOUNT,
+		Body:    constants.BODY,
+		HTMLBody: fmt.Sprintf(`<h3>%s</h3>
+      				<a href="%s">
+			<button
+			  style="
+				padding: 20px;
+				background-color: gray;
+				border-radius: 10px;
+				color: white;
+			  "
+			>
+			  Verify customer
+			</button>
+      </a>`, constants.TITLE_VERIFY_ACCOUNT, verify.UrlVerify),
+	}
+
+	err = mail.SendSMTPMessage(formMail)
+	if err != nil {
+		global.Logger.Error("Send mail failed", zap.Error(err))
+		return err
+	}
+	return nil
 }
 
-func (c *Consumer) ConsumeKafka() {
-	cfgKafka := sarama.NewConfig()
-	cfgKafka.Consumer.Return.Errors = true
-	cfgKafka.Consumer.Offsets.Initial = sarama.OffsetOldest
-
-	fmt.Println(c.Config.Kafka)
-
-	consumer, err := sarama.NewConsumerGroup(c.Config.Kafka.Brokers, "my-group", cfgKafka)
+func HandleVerifyPassword(message *kafka.Message) error {
+	var verify VerifyCustomerMessage
+	err := json.Unmarshal(message.Value, &verify)
 	if err != nil {
-		log.Fatalf("Error creating consumer group: %v", err)
+		global.Logger.Error("Unmarshal json failed", zap.Error(err))
+		return err
+	}
+	formMail := mail.Message{
+		From:    constants.EMAIL_FROM,
+		To:      verify.Email,
+		Subject: constants.CHANGE_PASSWORD,
+		Body:    constants.BODY,
+		HTMLBody: fmt.Sprintf(`<h3>%s</h3>
+      				<a href="%s">
+			<button
+			  style="
+				padding: 20px;
+				background-color: gray;
+				border-radius: 10px;
+				color: white;
+			  "
+			>
+			  Change Password
+			</button>
+      </a>`, constants.TITLE_RESET_PASSWORD, verify.UrlVerify),
 	}
 
-	handler := &ConsumerGroupHandler{
-		Config: c.Config,
+	err = mail.SendSMTPMessage(formMail)
+	if err != nil {
+		global.Logger.Error("Send mail failed", zap.Error(err))
+		return err
+	}
+	return nil
+}
+
+func HandlePlaceOrderCustomer(message *kafka.Message) error {
+	var placeOrder PlaceOrderMessage
+	err := json.Unmarshal(message.Value, &placeOrder)
+	if err != nil {
+		global.Logger.Error("Unmarshal json failed", zap.Error(err))
+		return err
 	}
 
-	if handler.Config == nil {
-		log.Fatalf("ConsumerGroupHandler config is nil")
+	formMail := mail.Message{
+		From:     constants.EMAIL_FROM,
+		To:       placeOrder.CustomerEmail,
+		Subject:  constants.VERIFY_PLACEORDER,
+		Body:     constants.BODY,
+		HTMLBody: fmt.Sprintf(`<h3>%s</h3>`, constants.TITLE_PLACE_ORDER),
 	}
 
-	go func() {
-		for {
-			ctx := context.Background()
-			if err := consumer.Consume(ctx, c.Config.Kafka.Topics, handler); err != nil {
-				log.Fatalf("Error consuming messages: %v", err)
-			}
-		}
-	}()
-
-	sigchan := make(chan os.Signal, 1)
-	signal.Notify(sigchan, syscall.SIGINT, syscall.SIGTERM)
-	<-sigchan
-
-	if err := consumer.Close(); err != nil {
-		log.Fatalf("Error closing consumer: %v", err)
+	err = mail.SendSMTPMessage(formMail)
+	if err != nil {
+		global.Logger.Error("Send mail failed", zap.Error(err))
+		return err
 	}
-
+	return nil
 }
