@@ -3,6 +3,7 @@ package initialize
 import (
 	"github.com/gin-gonic/gin"
 	"order-service/global"
+	"order-service/internal/constants"
 	"order-service/internal/routers"
 )
 
@@ -18,19 +19,16 @@ func InitRouter() *gin.Engine {
 		r = gin.New()
 	}
 
-	r.Use() //logging
-	r.Use() //cross
-	r.Use() //limiter global
+	r.Use(gin.Logger()) //logging
 
-	//manage := routers.RouterGroupApp.Manage
-	userRouter := routers.RouterGroupApp.User
+	manage := routers.RouterGroupApp.Manage
 
-	MainGroup := r.Group("api/v1")
+	MainGroup := r.Group(constants.API_ENPOINT)
 	{
 		MainGroup.GET("/checkStatus")
 	}
 	{
-		userRouter.InitOrderRouter(MainGroup)
+		manage.InitOrderRouter(MainGroup)
 	}
 	return r
 }

@@ -11,6 +11,7 @@ import (
 
 func NewRouter(r *gin.Engine) {
 	for {
+		defer global.Consume.Close()
 		message, err := global.Consume.ReadMessage(context.Background())
 		if err != nil {
 			global.Logger.Error("Error reading message", zap.Error(err))
@@ -26,11 +27,6 @@ func NewRouter(r *gin.Engine) {
 		default:
 			global.Logger.Info("unknown topic", zap.String("topic", message.Topic))
 		}
-	}
-
-	r.Group(constants.API_ENPOINT + "/mail")
-	{
-		r.GET("/checkStatus")
 	}
 
 }

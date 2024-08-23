@@ -5,31 +5,32 @@ import (
 	"cart-service/internal/constants"
 	"cart-service/pkg/response"
 	"errors"
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"go.uber.org/zap"
-	"net/http"
 )
 
 type CustomClaims struct {
-	ID    string `json:"_id"`
-	Email string `json:"email"`
+	ID    string   `json:"_id"`
+	Email string   `json:"email"`
+	Name  string   `json:"name"`
+	Roles []string `json:"roles"`
 	jwt.RegisteredClaims
 }
 
-func JWTMiddleware() gin.HandlerFunc {
+func JWTMiddleware(requiredRoles ...string) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		tokenString, err := JWTGetToken(c)
+		_, customer, err := JWTGetTokenAndCustomer(c)
 		if err != nil {
-			global.Logger.Error("Jwt get token", zap.Error(err))
-			response.ErrorResponse(c, constants.JWT_NOT_FOUND, "Unauthorized", http.StatusUnauthorized)
+			response.ErrorResponse(c, err.Error(), "Unauthorized", http.StatusUnauthorized)
 			return
 		}
 
-		_, err = JWTDecodeToken(tokenString)
-		if err != nil {
-			global.Logger.Error("Jwt token invalid", zap.Error(err))
-			response.ErrorResponse(c, constants.JWT_TOKEN_INVALID, "Unauthorized", http.StatusUnauthorized)
+		// Role-based authorization
+		if !hasRequiredRoles(customer.Roles, requiredRoles...) {
+			response.ErrorResponse(c, "forbidden", constants.STATUS_FORBIDDEN, http.StatusForbidden)
 			return
 		}
 
@@ -86,4 +87,17 @@ func JWTDecodeToken(tokenString string) (*CustomClaims, error) {
 
 	global.Logger.Error("Jwt parse customer error", zap.Error(errors.New(constants.JWT_PARSE_CLAIMS)))
 	return nil, errors.New(constants.JWT_PARSE_CLAIMS)
+}
+
+func hasRequiredRoles(userRoles []string, requiredRoles ...string) bool {
+	roleMap := make(map[string]bool)
+	for _, role := range requiredRoles {
+		roleMap[role] = true
+	}
+	for _, role := range userRoles {
+		if !roleMap[role] {
+			return false
+		}
+	}
+	return true
 }

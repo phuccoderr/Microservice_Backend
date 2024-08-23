@@ -1,17 +1,26 @@
 package service
 
-import "order-service/internal/repository"
+import (
+	"order-service/internal/models"
+	"order-service/internal/repository"
+)
 
 type OrderService struct {
-	orderRepo *repository.OrderRepo
+	repo *repository.OrderRepo
 }
 
-func NewOrderService() *OrderService {
+func NewOrderService(repo *repository.OrderRepo) *OrderService {
 	return &OrderService{
-		orderRepo: repository.NewOrderRepo(),
+		repo: repo,
 	}
 }
 
-func (us *OrderService) GetALL() string {
-	return us.orderRepo.FindById()
+func (os *OrderService) ListByPage(page, limit int, sort, keyword string) ([]models.Order, error) {
+
+	all, err := os.repo.FindAll(page, limit, sort, keyword)
+	if err != nil {
+		return nil, err
+	}
+
+	return all, nil
 }

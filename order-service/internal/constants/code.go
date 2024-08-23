@@ -1,8 +1,7 @@
 package constants
 
 const (
-	API_ENPOINT = "/api/v1"
-
+	API_ENPOINT       = "/api/v1"
 	JWT_NOT_FOUND     = "Authorization header is empty!"
 	JWT_TOKEN_INVALID = "Token is invalid!"
 	JWT_PARSE_CLAIMS  = "Cannot parse claims!"
@@ -25,6 +24,4 @@ const (
 	STATUS_FORBIDDEN                   = "Forbidden!"
 
 	DB_NOT_FOUND = "Data not found!"
-
-	KAFKA_TOPIC_PLACE_ORDER = "place-order-events-topics"
 )

@@ -5,8 +5,8 @@ func Run() {
 	InitLogger()
 	InitPostgres()
 	IniteKafka()
-	//InitRedis()
-	//r := InitRouter()
-	//
-	//r.Run(":9170")
+	InitRedis()
+	r := InitRouter()
+
+	r.Run(":9170")
 }

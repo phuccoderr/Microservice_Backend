@@ -47,6 +47,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
         String authHeader = request.getHeader("Authorization");
         String email = null;
+        String name = null;
         Set<String> roles = new HashSet<>();
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
@@ -54,6 +55,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             try {
                 Claims claims = jwtTokenUtil.extractToken(token);
                 email = claims.get("email").toString();
+                name = claims.get("name").toString();
                 List<String> rolesList = (List<String>) claims.get("roles");
 
                 roles = new HashSet<>(rolesList);
@@ -66,11 +68,14 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             handleException(response, Constants.TOKEN_INVALID);
         }
 
+        Map<String, String> principal = new HashMap<>();
+        principal.put("email",email);
+        principal.put("name", name);
 
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UsernamePasswordAuthenticationToken authToken  =
                     new UsernamePasswordAuthenticationToken(
-                            email,
+                            principal,
                             null,
                             roles.stream().map(SimpleGrantedAuthority::new).toList());
 

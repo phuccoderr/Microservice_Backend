@@ -9,6 +9,7 @@ type PlaceOrderRequest struct {
 type PlaceOrderMessage struct {
 	CustomerId    string       `json:"customer_id"`
 	CustomerEmail string       `json:"customer_email"`
+	CustomerName  string       `json:"customer_name"`
 	Address       string       `json:"address"`
 	PaymentMethod string       `json:"payment_method"`
 	PhoneNumber   string       `json:"phone_number"`

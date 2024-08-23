@@ -7,28 +7,9 @@ import (
 	"log"
 	"order-service/global"
 	"order-service/internal/models"
-	"time"
 )
 
-type PlaceOrderMessage struct {
-	CustomerId    string `json:"customer_id"`
-	CustomerEmail string `json:"customer_email"`
-	Items         []struct {
-		ProductId string `json:"product_id"`
-		Quantity  int64  `json:"quantity"`
-	} `json:"items"`
-	Address       string `json:"address"`
-	PaymentMethod string `json:"payment_method"`
-	CheckOut      struct {
-		ProductTotal float64   `json:"product_total"`
-		ProductCost  float64   `json:"product_cost"`
-		ShippingCost float64   `json:"shipping_cost"`
-		DeliverDays  time.Time `json:"deliver_days"`
-	} `json:"check_out"`
-}
-
 func ConsumeOrder() {
-	defer global.Consumer.Close()
 
 	message, err := global.Consumer.ReadMessage(context.Background())
 	if err != nil {
@@ -42,11 +23,27 @@ func ConsumeOrder() {
 		log.Fatalln(err)
 	}
 
-	order := models.Order{}
-	order.Address = placeOrderMessage.Address
-	order.PhoneNumber = "0123"
-	order.DeliveryDays = placeOrderMessage.CheckOut.DeliverDays
-	order.Payment = placeOrderMessage.PaymentMethod
-	order.Total = placeOrderMessage.CheckOut.ProductTotal
-	global.Mdb.Create(&order)
+	newOrder := models.Order{
+		Name:         placeOrderMessage.CustomerName,
+		Address:      placeOrderMessage.Address,
+		PhoneNumber:  placeOrderMessage.PhoneNumber,
+		CustomerId:   placeOrderMessage.CustomerId,
+		Payment:      placeOrderMessage.PaymentMethod,
+		ProductCost:  placeOrderMessage.CheckOut.ProductCost,
+		ShippingCost: placeOrderMessage.CheckOut.ShippingCost,
+		Total:        placeOrderMessage.CheckOut.ProductTotal,
+		DeliveryDays: placeOrderMessage.CheckOut.DeliverDays,
+		Status:       models.StatusPending,
+	}
+
+	for _, item := range placeOrderMessage.Items {
+		detail := models.OrderDetails{
+			ProductCost: item.Cost,
+			Total:       item.Total,
+			Quantity:    item.Quantity,
+			ProductID:   item.ProductId,
+		}
+		newOrder.OrderDetails = append(newOrder.OrderDetails, detail)
+	}
+	global.Mdb.Create(&newOrder)
 }

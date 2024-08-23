@@ -221,6 +221,7 @@ func (cc *CartController) PlaceOrder(c *gin.Context) {
 	orderMessage.CheckOut = checkOutInfo
 	orderMessage.CustomerId = customer.ID
 	orderMessage.CustomerEmail = customer.Email
+	orderMessage.CustomerName = customer.Name
 	orderMessage.Items = carts
 	orderMessage.Address = placeOrder.Address
 	orderMessage.PaymentMethod = placeOrder.PaymentMethod

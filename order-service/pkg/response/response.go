@@ -2,7 +2,6 @@ package response
 
 import (
 	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
 type ResponseData struct {
@@ -18,7 +17,7 @@ type ResponseError struct {
 }
 
 func SuccessResponse(c *gin.Context, code int, data interface{}) {
-	c.JSON(http.StatusOK, ResponseData{
+	c.JSON(code, ResponseData{
 		Code:    code,
 		Message: msg[code],
 		Data:    data,
@@ -26,7 +25,7 @@ func SuccessResponse(c *gin.Context, code int, data interface{}) {
 }
 
 func ErrorResponse(c *gin.Context, message, error string, status int) {
-	c.JSON(http.StatusOK, ResponseError{
+	c.AbortWithStatusJSON(status, ResponseError{
 		Message: []string{message},
 		Error:   error,
 		Status:  status,

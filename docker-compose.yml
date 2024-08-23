@@ -221,6 +221,8 @@ services:
       - redis
       - postgresql
       - kafka
+    ports:
+      - "9155:9155"
     networks:
       - default
 

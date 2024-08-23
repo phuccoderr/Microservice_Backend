@@ -21,7 +21,7 @@ export class Customer extends AbstractDocument {
   })
   avatar?: string;
 
-  @Prop({ unique: true })
+  @Prop()
   image_id?: string;
 
   @Prop({ default: false })

@@ -13,7 +13,7 @@ func (pr *OrderRouter) InitOrderRouter(Router *gin.RouterGroup) {
 		kafka.ConsumeOrder()
 	}
 	//public
-	routerPublic := Router.Group("/api/v1/order")
+	routerPublic := Router.Group("/order")
 	{
 		routerPublic.GET("")
 	}

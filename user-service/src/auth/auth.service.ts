@@ -32,6 +32,7 @@ export class AuthService {
     const tokenPayload: TokenPayLoad = {
       email: user.email,
       _id: user._id.toHexString(),
+      name: user.name,
       roles: user.roles,
     };
 
@@ -68,6 +69,7 @@ export class AuthService {
     const tokenPayload: TokenPayLoad = {
       email: refreshToken.userId,
       _id: refreshToken.userId,
+      name: user.name,
       roles: user.roles,
     };
 

@@ -40,7 +40,7 @@ func HandleVerifyCustomer(message *kafka.Message) error {
 
 	err = mail.SendSMTPMessage(formMail)
 	if err != nil {
-		global.Logger.Error("Send mail failed", zap.Error(err))
+		global.Logger.Error(fmt.Sprintf("Send mail %s failed", message.Topic), zap.Error(err))
 		return err
 	}
 	return nil
@@ -75,7 +75,7 @@ func HandleVerifyPassword(message *kafka.Message) error {
 
 	err = mail.SendSMTPMessage(formMail)
 	if err != nil {
-		global.Logger.Error("Send mail failed", zap.Error(err))
+		global.Logger.Error(fmt.Sprintf("Send mail %s failed", message.Topic), zap.Error(err))
 		return err
 	}
 	return nil
@@ -99,7 +99,7 @@ func HandlePlaceOrderCustomer(message *kafka.Message) error {
 
 	err = mail.SendSMTPMessage(formMail)
 	if err != nil {
-		global.Logger.Error("Send mail failed", zap.Error(err))
+		global.Logger.Error(fmt.Sprintf("Send mail %s failed", message.Topic), zap.Error(err))
 		return err
 	}
 	return nil

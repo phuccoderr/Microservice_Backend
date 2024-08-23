@@ -8,7 +8,6 @@ import (
 func Run() {
 	LoadConfig()
 	InitLogger()
-	InitMailhog()
 	InitKafka()
 	router := InitRouter()
 

@@ -17,6 +17,9 @@ public class PlaceOrderEvent {
     @JsonProperty("customer_email")
     private String customerEmail;
 
+    @JsonProperty("customer_name")
+    private String customerName;
+
     @JsonProperty("address")
     private String address;
 

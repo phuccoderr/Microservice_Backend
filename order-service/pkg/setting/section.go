@@ -5,6 +5,7 @@ type Config struct {
 	Logger   LogSetting      `mapstructure:"logger"`
 	Server   ServerSetting   `mapstructure:"server"`
 	Kafka    KafkaSetting    `mapstructure:"kafka"`
+	Redis    RedisSetting    `mapstructure:"redis"`
 	Jwt      JwtSetting      `mapstructure:"jwt"`
 }
 
@@ -29,6 +30,11 @@ type LogSetting struct {
 	MaxBackups  int    `mapstructure:"max_backups"`
 	MaxAge      int    `mapstructure:"max_age"`
 	Compress    bool   `mapstructure:"compress"`
+}
+
+type RedisSetting struct {
+	Host string `mapstructure:"host"`
+	Port string `mapstructure:"port"`
 }
 
 type KafkaSetting struct {

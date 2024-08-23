@@ -45,6 +45,7 @@ export class AuthService {
     const tokenPayload: TokenPayload = {
       _id: customer._id.toHexString(),
       email: customer.email,
+      name: `${customer.first_name} ${customer.last_name}`,
       roles: customer.roles
     }
 
@@ -104,6 +105,7 @@ export class AuthService {
     const tokenPayload: TokenPayload = {
       _id: customer._id.toHexString(),
       email: customer.email,
+      name: `${customer.first_name} ${customer.last_name}`,
       roles: customer.roles
     }
 

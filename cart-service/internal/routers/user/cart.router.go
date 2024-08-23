@@ -14,15 +14,15 @@ type CartRouter struct {
 func (cr *CartRouter) InitCartRouter(router *gin.RouterGroup) {
 	productService := service.NewProductService()
 	cartService := service.NewCartService(global.Rdb)
-	controller := controller.NewCartController(cartService, productService)
+	cartController := controller.NewCartController(cartService, productService)
 
 	private := router.Group("/cart")
-	private.Use(middleware.JWTMiddleware())
+	private.Use(middleware.JWTMiddleware("CUSTOMER"))
 	{
-		private.POST("/add", controller.AddProductToCart)
-		private.GET("", controller.GetCart)
-		private.DELETE("/product/:id", controller.DeleteCart)
-		private.GET("/checkout", controller.Checkout)
-		private.POST("/place_order", controller.PlaceOrder)
+		private.POST("/add", cartController.AddProductToCart)
+		private.GET("", cartController.GetCart)
+		private.DELETE("/product/:id", cartController.DeleteCart)
+		private.GET("/checkout", cartController.Checkout)
+		private.POST("/place_order", cartController.PlaceOrder)
 	}
 }

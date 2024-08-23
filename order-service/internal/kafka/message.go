@@ -2,11 +2,6 @@ package kafka
 
 import "time"
 
-type VerifyCustomerMessage struct {
-	Email     string `json:"email"`
-	UrlVerify string `json:"url"`
-}
-
 type PlaceOrderMessage struct {
 	CustomerId    string `json:"customer_id"`
 	CustomerEmail string `json:"customer_email"`
