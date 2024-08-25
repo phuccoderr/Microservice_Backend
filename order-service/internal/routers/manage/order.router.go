@@ -22,11 +22,14 @@ func (or *OrderRouter) InitOrderRouter(router *gin.RouterGroup) {
 
 	orderRepository := repository.NewOrderRepo(global.Mdb)
 	orderService := service.NewOrderService(orderRepository)
-	orderController := controller.NewOrderController(orderService)
+	redisService := service.NewOrderRedisService(global.Rdb)
+	orderController := controller.NewOrderController(orderService, redisService)
 
 	private := router.Group("/orders")
-	private.Use(middlewares.JWTMiddleware("ADMIN"))
+	private.Use(middlewares.JWTMiddleware("ADMIN", "SALE"))
 	{
-		private.GET("", orderController.GetAll)
+		private.GET("", orderController.GetAllOrders)
+		private.GET("/:id", orderController.GetOrder)
+		private.GET("/:id/status/:status", orderController.ChangeStatus)
 	}
 }

@@ -13,7 +13,7 @@ const (
 )
 
 type Order struct {
-	ID           uuid.UUID      `gorm:"column:id; primaryKey; not null; autoIncrement"`
+	ID           uuid.UUID      `gorm:"primaryKey;column:id; not null; autoIncrement"`
 	CustomerId   string         `gorm:"column:customer_id; not null;"`
 	Name         string         `gorm:"column:name; not null"`
 	Address      string         `gorm:"column:address; not null"`

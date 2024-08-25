@@ -31,6 +31,6 @@ func NewRedisClient(config setting.RedisSetting) *redis.Client {
 	return redisClient
 }
 
-func CartKey(customerId string) string {
-	return "carts:" + customerId
+func OrdersKey(page, limit int, sort string) string {
+	return fmt.Sprintf("all_orders:%d:%d:%s", page, limit, sort)
 }

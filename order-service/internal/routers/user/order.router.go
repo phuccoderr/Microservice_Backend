@@ -2,20 +2,17 @@ package user
 
 import (
 	"github.com/gin-gonic/gin"
-	"order-service/internal/kafka"
+	"order-service/internal/middlewares"
 )
 
 type OrderRouter struct {
 }
 
 func (pr *OrderRouter) InitOrderRouter(Router *gin.RouterGroup) {
-	for {
-		kafka.ConsumeOrder()
-	}
-	//public
-	routerPublic := Router.Group("/order")
+
+	private := Router.Group("/orders")
+	private.Use(middlewares.JWTMiddleware("CUSTOMER"))
 	{
-		routerPublic.GET("")
+		private.GET("/details")
 	}
-	//private
 }
