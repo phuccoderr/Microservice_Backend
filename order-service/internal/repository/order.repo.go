@@ -12,6 +12,7 @@ import (
 type IOrderRepo interface {
 	FindAll(page int, limit int, sort, keyword string) ([]models.Order, error)
 	FindById(id string) (*models.Order, error)
+	FindByCustomerId(customerId string) ([]models.Order, error)
 	Save(order *models.Order) error
 }
 
@@ -68,4 +69,15 @@ func (or *orderRepo) Save(order *models.Order) error {
 		return err
 	}
 	return nil
+}
+
+func (or *orderRepo) FindByCustomerId(customerId string) ([]models.Order, error) {
+	var orders []models.Order
+	err := or.db.Preload("OrderDetails").Find(&orders, "customer_id = ?", customerId).Error
+	if err != nil {
+		global.Logger.Error("Find ByCustomerId error", zap.Error(err))
+		return nil, err
+	}
+
+	return orders, nil
 }

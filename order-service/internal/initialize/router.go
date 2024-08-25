@@ -22,13 +22,12 @@ func InitRouter() *gin.Engine {
 	r.Use(gin.Logger()) //logging
 
 	manage := routers.RouterGroupApp.Manage
+	user := routers.RouterGroupApp.User
 
 	MainGroup := r.Group(constants.API_ENPOINT)
 	{
-		MainGroup.GET("/checkStatus")
-	}
-	{
 		manage.InitOrderRouter(MainGroup)
+		user.InitOrderRouter(MainGroup)
 	}
 	return r
 }

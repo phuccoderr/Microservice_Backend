@@ -1,6 +1,7 @@
 package service
 
 import (
+	"errors"
 	"order-service/internal/models"
 	"order-service/internal/repository"
 	"strings"
@@ -10,6 +11,7 @@ type IOrderService interface {
 	ListByPage(page, limit int, sort, keyword string) ([]models.Order, error)
 	FindOne(id string) (*models.Order, error)
 	UpdateStatus(id string, status string) error
+	FindByCustomer(customerId string) ([]models.Order, error)
 }
 
 type orderService struct {
@@ -57,11 +59,19 @@ func (os *orderService) UpdateStatus(id string, status string) error {
 	case models.StatusCanceled:
 		order.Status = normalizedStatus
 	default:
-		order.Status = models.StatusPending
+		return errors.New("invalid status ('pending', 'complete', 'cancel')")
 	}
 	err = os.repo.Save(order)
 	if err != nil {
 		return err
 	}
 	return nil
+}
+
+func (os *orderService) FindByCustomer(customerId string) ([]models.Order, error) {
+	orders, err := os.repo.FindByCustomerId(customerId)
+	if err != nil {
+		return nil, err
+	}
+	return orders, nil
 }

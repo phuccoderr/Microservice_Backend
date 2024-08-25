@@ -8,8 +8,8 @@ import (
 
 const (
 	StatusPending   = "pending"
-	StatusCompleted = "completed"
-	StatusCanceled  = "canceled"
+	StatusCompleted = "complete"
+	StatusCanceled  = "cancel"
 )
 
 type Order struct {

@@ -8,12 +8,11 @@ import (
 	"order-service/global"
 	"order-service/internal/cache"
 	"order-service/internal/dto"
-	"order-service/internal/models"
 	"time"
 )
 
 type IOrderRedisService interface {
-	GetAllOrder(page, limit int, sort string) ([]models.Order, error)
+	GetAllOrder(page, limit int, sort string) (*dto.PaginationDTO, error)
 	SetOrder(pagination dto.PaginationDTO, page, limit int, sort string) error
 }
 
@@ -25,9 +24,9 @@ func NewOrderRedisService(rdb *redis.Client) IOrderRedisService {
 	return &orderRedisService{rdb: rdb}
 }
 
-func (ors *orderRedisService) GetAllOrder(page, limit int, sort string) ([]models.Order, error) {
-	var orders []models.Order
-	err := ors.rdb.Get(context.Background(), cache.OrdersKey(page, limit, sort)).Scan(&orders)
+func (ors *orderRedisService) GetAllOrder(page, limit int, sort string) (*dto.PaginationDTO, error) {
+	var paginationOrders dto.PaginationDTO
+	result, err := ors.rdb.Get(context.Background(), cache.OrdersKey(page, limit, sort)).Result()
 	if err == redis.Nil {
 		global.Logger.Info("orders redis no content")
 		return nil, err
@@ -36,7 +35,13 @@ func (ors *orderRedisService) GetAllOrder(page, limit int, sort string) ([]model
 		return nil, err
 	}
 
-	return orders, nil
+	err = json.Unmarshal([]byte(result), &paginationOrders)
+	if err != nil {
+		global.Logger.Error("unmarshal err", zap.Error(err))
+		return nil, err
+	}
+
+	return &paginationOrders, nil
 }
 
 func (ors *orderRedisService) SetOrder(pagination dto.PaginationDTO, page, limit int, sort string) error {

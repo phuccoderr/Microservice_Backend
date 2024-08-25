@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"order-service/internal/constants"
 	"order-service/internal/dto"
+	"order-service/internal/middlewares"
 	"order-service/internal/service"
 	"order-service/pkg/response"
 	"strconv"
@@ -70,4 +71,21 @@ func (oc *OrderController) ChangeStatus(c *gin.Context) {
 	}
 
 	response.SuccessResponse(c, http.StatusOK, "")
+}
+
+func (oc *OrderController) GetOrderByCustomer(c *gin.Context) {
+	_, customer, err := middlewares.JWTGetTokenAndCustomer(c)
+	if err != nil {
+		response.ErrorResponse(c, err.Error(), constants.STATUS_UNAUTHORIZED, http.StatusUnauthorized)
+		return
+	}
+
+	orders, err := oc.orderService.FindByCustomer(customer.ID)
+	if err != nil {
+		response.ErrorResponse(c, err.Error(), constants.STATUS_NOT_FOUND, http.StatusNotFound)
+		return
+	}
+
+	ordersDto := dto.ListEntityToDto(orders)
+	response.SuccessResponse(c, http.StatusOK, ordersDto)
 }
