@@ -7,9 +7,10 @@ import (
 	"log"
 	"order-service/global"
 	"order-service/internal/models"
+	"order-service/internal/service"
 )
 
-func ConsumeOrder() {
+func ConsumeOrder(service service.IOrderRedisService) {
 
 	message, err := global.Consumer.ReadMessage(context.Background())
 	if err != nil {
@@ -45,5 +46,6 @@ func ConsumeOrder() {
 		}
 		newOrder.OrderDetails = append(newOrder.OrderDetails, detail)
 	}
+	service.Clear("all_orders:*")
 	global.Mdb.Create(&newOrder)
 }

@@ -3,6 +3,7 @@ package controller
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"order-service/internal/cache"
 	"order-service/internal/constants"
 	"order-service/internal/dto"
 	"order-service/internal/middlewares"
@@ -29,7 +30,7 @@ func (oc *OrderController) GetAllOrders(c *gin.Context) {
 	sort := c.DefaultQuery("sort", "asc")
 	keyword := c.DefaultQuery("keyword", "")
 
-	ordersRedis, err := oc.orderRedisService.GetAllOrder(page, limit, sort)
+	ordersRedis, err := oc.orderRedisService.GetAllOrder(cache.OrdersKey(page, limit, sort))
 	if err == nil {
 		response.SuccessResponse(c, http.StatusOK, ordersRedis)
 		return
@@ -42,7 +43,7 @@ func (oc *OrderController) GetAllOrders(c *gin.Context) {
 	}
 
 	paginationDto := dto.BuildPaginationDto(orders, page, limit)
-	oc.orderRedisService.SetOrder(paginationDto, page, limit, sort)
+	oc.orderRedisService.SetOrder(paginationDto, cache.OrdersKey(page, limit, sort))
 
 	response.SuccessResponse(c, http.StatusOK, paginationDto)
 }
@@ -70,6 +71,7 @@ func (oc *OrderController) ChangeStatus(c *gin.Context) {
 		return
 	}
 
+	oc.orderRedisService.Clear("all_orders:*")
 	response.SuccessResponse(c, http.StatusOK, "")
 }
 
@@ -87,5 +89,7 @@ func (oc *OrderController) GetOrderByCustomer(c *gin.Context) {
 	}
 
 	ordersDto := dto.ListEntityToDto(orders)
+	oc.orderRedisService.SetOrder(ordersDto, cache.OrdersByCustomerKey(customer.ID))
+
 	response.SuccessResponse(c, http.StatusOK, ordersDto)
 }

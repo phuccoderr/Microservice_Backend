@@ -1,15 +1,22 @@
-import { Injectable, NotFoundException, OnModuleInit, UnprocessableEntityException } from "@nestjs/common";
-import { CreateUserDto } from "./dto/create-user.dto";
-import { UsersRepository } from "./users.repository";
-import * as bcrypt from "bcrypt";
-import { UpdateUserDto } from "./dto/update-user.dto";
-import { User } from "./models/user.schema";
-import { RequestPaginationDto } from "./dto/request-pagination.dto";
-import { DATABASE_CONST } from "@src/constants/db-constants";
-import { ROLE } from "@src/auth/decorators/role.enum";
+import {
+  Injectable,
+  Logger,
+  NotFoundException,
+  OnModuleInit,
+  UnprocessableEntityException,
+} from '@nestjs/common';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UsersRepository } from './repository/users.repository';
+import * as bcrypt from 'bcrypt';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { User } from './models/user.schema';
+import { RequestPaginationDto } from './dto/request-pagination.dto';
+import { DATABASE_CONST } from '@src/constants/db-constants';
+import { ROLE } from '@src/auth/decorators/role.enum';
 
 @Injectable()
 export class UsersService implements OnModuleInit {
+  private logger = new Logger(UsersService.name);
   constructor(private readonly usersRepository: UsersRepository) {}
 
   async createUser(createUserDto: CreateUserDto): Promise<User> {
@@ -19,6 +26,7 @@ export class UsersService implements OnModuleInit {
         password: await bcrypt.hash(createUserDto.password, 10),
       });
     } catch (error) {
+      this.logger.error(error);
       throw new UnprocessableEntityException(error.message);
     }
   }
@@ -38,6 +46,7 @@ export class UsersService implements OnModuleInit {
     try {
       return await this.usersRepository.findOne({ _id }, '-password');
     } catch (error) {
+      this.logger.warn('User does not exist with id ' + _id);
       throw new NotFoundException(DATABASE_CONST.NOTFOUND);
     }
   }
@@ -49,6 +58,7 @@ export class UsersService implements OnModuleInit {
         updateUserDto,
       );
     } catch (error) {
+      this.logger.warn('User does not exist with id ' + _id);
       throw new NotFoundException(DATABASE_CONST.NOTFOUND);
     }
   }
@@ -57,24 +67,28 @@ export class UsersService implements OnModuleInit {
     try {
       await this.usersRepository.findOneAndDelete({ _id });
     } catch (error) {
+      this.logger.warn('User does not exist with id ' + _id);
       throw new NotFoundException(DATABASE_CONST.NOTFOUND);
     }
   }
 
   async onModuleInit(): Promise<void> {
     const createUserAdmin: CreateUserDto = {
-      email: "phuc@gmail.com",
-      name: "phuc",
-      password: "123456Phuc!",
+      email: 'phuc@gmail.com',
+      name: 'phuc',
+      password: '123456Phuc!',
       status: true,
-      roles: [ROLE.ADMIN]
-    }
-    const initInDB = await this.usersRepository.findOne({email: createUserAdmin.email},"")
+      roles: [ROLE.ADMIN],
+    };
+    const initInDB = await this.usersRepository.findOne(
+      { email: createUserAdmin.email },
+      '',
+    );
     if (!initInDB) {
       await this.usersRepository.create({
         ...createUserAdmin,
         password: await bcrypt.hash(createUserAdmin.password, 10),
-      })
+      });
     }
   }
 }

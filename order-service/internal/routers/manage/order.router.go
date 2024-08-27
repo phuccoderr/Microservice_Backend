@@ -14,16 +14,16 @@ type OrderRouter struct{}
 
 func (or *OrderRouter) InitOrderRouter(router *gin.RouterGroup) {
 
-	go func() {
-		for {
-			kafka.ConsumeOrder()
-		}
-	}()
-
 	orderRepository := repository.NewOrderRepo(global.Mdb)
 	orderService := service.NewOrderService(orderRepository)
 	redisService := service.NewOrderRedisService(global.Rdb)
 	orderController := controller.NewOrderController(orderService, redisService)
+
+	go func() {
+		for {
+			kafka.ConsumeOrder(redisService)
+		}
+	}()
 
 	private := router.Group("/orders")
 	private.Use(middlewares.JWTMiddleware("ADMIN", "SALE"))

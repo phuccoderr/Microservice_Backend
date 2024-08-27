@@ -1,8 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model } from 'mongoose';
-import { AbstractRepository } from '../database/abstract.repository';
-import { User } from './models/user.schema';
+import { AbstractRepository } from '../../database/abstract.repository';
+import { User } from '../models/user.schema';
 
 @Injectable()
 export class UsersRepository extends AbstractRepository<User> {

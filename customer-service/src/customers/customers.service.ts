@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, LoggerService, NotFoundException } from '@nestjs/common';
 import { Customer } from './models/customer.schema';
 import { CustomersRepository } from './customers.repository';
 import { UpdateAccountDto } from './dto/update-account.dto';
@@ -8,12 +8,14 @@ import { DATABASE_CONST } from '../constants/db-constants';
 @Injectable()
 export class CustomersService {
 
-  constructor(private readonly customersRepository: CustomersRepository) {}
+  constructor(private readonly loggerService: LoggerService,
+              private readonly customersRepository: CustomersRepository) {}
 
   async findByCustomerId(customerId: string): Promise<Customer> {
       try {
         return await this.customersRepository.findOne({_id: customerId}, "-password");
       } catch (error) {
+        this.loggerService.warn("customer not found!");
         throw new NotFoundException(DATABASE_CONST.NOTFOUND);
       }
   }
@@ -21,6 +23,7 @@ export class CustomersService {
   async updateCustomer(customerId: string, updateAccountDto: UpdateAccountDto): Promise<Customer> {
     const customer = await this.customersRepository.findOneAndUpdate({_id: customerId}, updateAccountDto);
     if (!customer) {
+      this.loggerService.warn("customer not found!");
       throw new NotFoundException(DATABASE_CONST.NOTFOUND);
     }
 
@@ -42,6 +45,7 @@ export class CustomersService {
     try {
       await this.customersRepository.findOneAndUpdate({_id}, { avatar, image_id});
     } catch (error) {
+      this.loggerService.warn("customer not found!");
       throw new NotFoundException(DATABASE_CONST.NOTFOUND);
     }
   }

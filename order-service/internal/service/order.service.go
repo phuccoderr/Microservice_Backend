@@ -61,7 +61,7 @@ func (os *orderService) UpdateStatus(id string, status string) error {
 	default:
 		return errors.New("invalid status ('pending', 'complete', 'cancel')")
 	}
-	err = os.repo.Save(order)
+	err = os.repo.UpdateStatus(order)
 	if err != nil {
 		return err
 	}

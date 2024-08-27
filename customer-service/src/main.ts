@@ -11,6 +11,12 @@ async function bootstrap() {
   const config = app.get(ConfigService);
   app.useLogger(app.get(Logger));
 
+  app.enableCors({
+    origin: 'http://localhost:3000', // Replace with your frontend URL
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    allowedHeaders: 'Content-Type, Accept',
+  });
+
   await app.listen(config.get('PORT'));
 }
 

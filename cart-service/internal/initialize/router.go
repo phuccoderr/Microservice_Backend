@@ -3,6 +3,7 @@ package initialize
 import (
 	"cart-service/global"
 	"cart-service/internal/constants"
+	"cart-service/internal/middleware"
 	"cart-service/internal/routers"
 	"github.com/gin-gonic/gin"
 )
@@ -20,13 +21,11 @@ func InitRouter() *gin.Engine {
 	}
 
 	r.Use(gin.Logger())
+	r.Use(middleware.CorsMiddleware())
 
 	userRouter := routers.RouterGroupApp.User
 
 	MainGroup := r.Group(constants.API_ENPOINT)
-	{
-		MainGroup.GET("/checkStatus")
-	}
 	{
 		userRouter.InitCartRouter(MainGroup)
 	}

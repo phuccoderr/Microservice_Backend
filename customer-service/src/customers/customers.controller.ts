@@ -1,7 +1,8 @@
 import {
   Body,
   Controller,
-  Get, HttpCode,
+  Get,
+  HttpCode,
   HttpStatus,
   Param,
   Patch,
@@ -9,7 +10,8 @@ import {
   Query,
   Request,
   UploadedFile,
-  UseGuards, UseInterceptors,
+  UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { CustomersService } from './customers.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -23,6 +25,9 @@ import { RequestPaginationDto } from './dto/request-pagination.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
 import { CUSTOMER_CONSTANTS } from '../constants/customer-constants';
+import { RolesAuthGuard } from '@src/auth/guards/roles-auth.guard';
+import { ROLE } from '@src/auth/decorators/role.enum';
+import { Roles } from '@src/auth/decorators/roles.decorator';
 
 @Controller('/api/v1/customers')
 export class CustomersController {
@@ -30,8 +35,9 @@ export class CustomersController {
               private readonly redisCacheService: RedisCacheService,
               private readonly cloudinaryService: CloudinaryService,) {}
 
-  @UseGuards(JwtAuthGuard)
   @Get('account')
+  @UseGuards(JwtAuthGuard, RolesAuthGuard)
+  @Roles(ROLE.CUSTOMER)
   async getAccount(@Request() req): Promise<ResponseObject> {
     const { _id } = req.user;
 
@@ -53,8 +59,9 @@ export class CustomersController {
     };
   }
 
-  @UseGuards(JwtAuthGuard)
   @Patch('account')
+  @UseGuards(JwtAuthGuard, RolesAuthGuard)
+  @Roles(ROLE.CUSTOMER)
   @HttpCode(HttpStatus.OK)
   async updateAccount(@Request() req,@Body() updateAccountDto: UpdateAccountDto): Promise<ResponseObject> {
     const { _id } = req.user;
@@ -70,8 +77,9 @@ export class CustomersController {
     };
   }
 
-  @UseGuards(JwtAuthGuard)
   @Get()
+  @UseGuards(JwtAuthGuard, RolesAuthGuard)
+  @Roles(ROLE.ADMIN,ROLE.USER)
   async getAllCustomers(@Query() pagination: RequestPaginationDto): Promise<ResponseObject> {
     const { keyword, page, limit, sort } = pagination;
 
@@ -100,8 +108,9 @@ export class CustomersController {
     };
   }
 
-  @UseGuards(JwtAuthGuard)
   @Get(':id')
+  @UseGuards(JwtAuthGuard, RolesAuthGuard)
+  @Roles(ROLE.ADMIN,ROLE.USER)
   async getUser(@Param('id') _id: string): Promise<ResponseObject> {
     const customer = await this.customersService.findByCustomerId(_id);
 
@@ -112,9 +121,10 @@ export class CustomersController {
     };
   }
 
-  @UseGuards(JwtAuthGuard)
-  @UseInterceptors(FileInterceptor('file'))
   @Post('upload')
+  @UseInterceptors(FileInterceptor('file'))
+  @UseGuards(JwtAuthGuard, RolesAuthGuard)
+  @Roles(ROLE.CUSTOMER)
   @HttpCode(HttpStatus.OK)
   async uploadImage(@UploadedFile() file: Express.Multer.File,@Request() req): Promise<ResponseObject> {
     const { _id } = req.user;

@@ -6,7 +6,7 @@ import (
 )
 
 type OrderDetails struct {
-	ID          uuid.UUID `gorm:"column:id; primaryKey; not null; autoIncrement"`
+	ID          uuid.UUID `gorm:"column:id; primaryKey; not null;"`
 	ProductCost float64   `gorm:"column:product_cost; not null;"`
 	ProductID   string    `gorm:"column:product_id; not null"`
 	Quantity    int64     `gorm:"column:quantity; not null"`
@@ -15,7 +15,9 @@ type OrderDetails struct {
 }
 
 func (o *OrderDetails) BeforeCreate(tx *gorm.DB) (err error) {
-	o.ID = uuid.New()
+	if o.ID == uuid.Nil {
+		o.ID = uuid.New()
+	}
 	return
 }
 

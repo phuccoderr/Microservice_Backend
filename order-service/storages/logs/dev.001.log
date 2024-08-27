@@ -206,3 +206,79 @@
 {"level":"INFO","timestamp":"2024-08-25T22:53:04.884+0700","caller":"service/orderredis.service.go:31","msg":"orders redis no content"}
 {"level":"INFO","timestamp":"2024-08-25T22:53:15.567+0700","caller":"initialize/postgres.go:28","msg":"InitPostgres success"}
 {"level":"INFO","timestamp":"2024-08-25T22:53:15.642+0700","caller":"cache/redis.go:28","msg":"Connected to Redis"}
+{"level":"INFO","timestamp":"2024-08-26T14:11:05.094+0700","caller":"initialize/postgres.go:28","msg":"InitPostgres success"}
+{"level":"INFO","timestamp":"2024-08-26T14:11:05.295+0700","caller":"cache/redis.go:28","msg":"Connected to Redis"}
+{"level":"INFO","timestamp":"2024-08-26T14:12:45.371+0700","caller":"service/orderredis.service.go:31","msg":"orders redis no content"}
+{"level":"INFO","timestamp":"2024-08-26T14:19:51.138+0700","caller":"initialize/postgres.go:28","msg":"InitPostgres success"}
+{"level":"INFO","timestamp":"2024-08-26T14:19:51.213+0700","caller":"cache/redis.go:28","msg":"Connected to Redis"}
+{"level":"WARN","timestamp":"2024-08-26T14:20:10.609+0700","caller":"repository/order.repo.go:56","msg":"Order not found","id":"937d55b4-ecee-4d52-82ae-6e23240a9a80"}
+{"level":"INFO","timestamp":"2024-08-26T14:20:54.345+0700","caller":"service/orderredis.service.go:32","msg":"orders redis no content"}
+{"level":"INFO","timestamp":"2024-08-26T14:21:26.336+0700","caller":"initialize/postgres.go:28","msg":"InitPostgres success"}
+{"level":"INFO","timestamp":"2024-08-26T14:21:26.408+0700","caller":"cache/redis.go:28","msg":"Connected to Redis"}
+{"level":"INFO","timestamp":"2024-08-26T14:21:45.788+0700","caller":"initialize/postgres.go:28","msg":"InitPostgres success"}
+{"level":"INFO","timestamp":"2024-08-26T14:21:45.878+0700","caller":"cache/redis.go:28","msg":"Connected to Redis"}
+{"level":"INFO","timestamp":"2024-08-26T14:22:09.325+0700","caller":"initialize/postgres.go:28","msg":"InitPostgres success"}
+{"level":"INFO","timestamp":"2024-08-26T14:22:09.409+0700","caller":"cache/redis.go:28","msg":"Connected to Redis"}
+{"level":"INFO","timestamp":"2024-08-26T14:23:32.169+0700","caller":"initialize/postgres.go:28","msg":"InitPostgres success"}
+{"level":"INFO","timestamp":"2024-08-26T14:23:32.247+0700","caller":"cache/redis.go:28","msg":"Connected to Redis"}
+{"level":"INFO","timestamp":"2024-08-26T14:23:45.415+0700","caller":"service/orderredis.service.go:32","msg":"orders redis no content"}
+{"level":"INFO","timestamp":"2024-08-26T14:27:57.577+0700","caller":"initialize/postgres.go:28","msg":"InitPostgres success"}
+{"level":"INFO","timestamp":"2024-08-26T14:27:57.658+0700","caller":"cache/redis.go:28","msg":"Connected to Redis"}
+{"level":"INFO","timestamp":"2024-08-26T14:28:01.821+0700","caller":"initialize/postgres.go:28","msg":"InitPostgres success"}
+{"level":"INFO","timestamp":"2024-08-26T14:28:01.902+0700","caller":"cache/redis.go:28","msg":"Connected to Redis"}
+{"level":"INFO","timestamp":"2024-08-26T14:28:24.514+0700","caller":"service/orderredis.service.go:32","msg":"orders redis no content"}
+{"level":"INFO","timestamp":"2024-08-26T14:28:33.156+0700","caller":"initialize/postgres.go:28","msg":"InitPostgres success"}
+{"level":"INFO","timestamp":"2024-08-26T14:28:33.244+0700","caller":"cache/redis.go:28","msg":"Connected to Redis"}
+{"level":"INFO","timestamp":"2024-08-26T14:33:23.878+0700","caller":"initialize/postgres.go:28","msg":"InitPostgres success"}
+{"level":"INFO","timestamp":"2024-08-26T14:33:23.968+0700","caller":"cache/redis.go:28","msg":"Connected to Redis"}
+{"level":"INFO","timestamp":"2024-08-26T14:33:28.305+0700","caller":"service/orderredis.service.go:31","msg":"orders redis no content"}
+{"level":"WARN","timestamp":"2024-08-26T14:34:20.860+0700","caller":"repository/order.repo.go:56","msg":"Order not found","id":"937d55b4-ecee-4d52-82ae-6e23240a9a80"}
+{"level":"INFO","timestamp":"2024-08-26T14:35:36.504+0700","caller":"initialize/postgres.go:28","msg":"InitPostgres success"}
+{"level":"INFO","timestamp":"2024-08-26T14:35:36.579+0700","caller":"cache/redis.go:28","msg":"Connected to Redis"}
+{"level":"INFO","timestamp":"2024-08-26T14:36:42.807+0700","caller":"initialize/postgres.go:28","msg":"InitPostgres success"}
+{"level":"INFO","timestamp":"2024-08-26T14:36:42.890+0700","caller":"cache/redis.go:28","msg":"Connected to Redis"}
+{"level":"INFO","timestamp":"2024-08-26T14:37:56.962+0700","caller":"initialize/postgres.go:28","msg":"InitPostgres success"}
+{"level":"INFO","timestamp":"2024-08-26T14:37:57.054+0700","caller":"cache/redis.go:28","msg":"Connected to Redis"}
+{"level":"INFO","timestamp":"2024-08-26T14:40:37.056+0700","caller":"initialize/postgres.go:28","msg":"InitPostgres success"}
+{"level":"INFO","timestamp":"2024-08-26T14:40:37.137+0700","caller":"cache/redis.go:28","msg":"Connected to Redis"}
+{"level":"INFO","timestamp":"2024-08-26T14:41:04.255+0700","caller":"initialize/postgres.go:28","msg":"InitPostgres success"}
+{"level":"INFO","timestamp":"2024-08-26T14:41:04.355+0700","caller":"cache/redis.go:28","msg":"Connected to Redis"}
+{"level":"INFO","timestamp":"2024-08-26T14:47:28.824+0700","caller":"initialize/postgres.go:28","msg":"InitPostgres success"}
+{"level":"INFO","timestamp":"2024-08-26T14:47:28.906+0700","caller":"cache/redis.go:28","msg":"Connected to Redis"}
+{"level":"INFO","timestamp":"2024-08-26T14:52:18.694+0700","caller":"initialize/postgres.go:28","msg":"InitPostgres success"}
+{"level":"INFO","timestamp":"2024-08-26T14:52:18.770+0700","caller":"cache/redis.go:28","msg":"Connected to Redis"}
+{"level":"INFO","timestamp":"2024-08-26T14:53:20.327+0700","caller":"initialize/postgres.go:28","msg":"InitPostgres success"}
+{"level":"INFO","timestamp":"2024-08-26T14:53:20.405+0700","caller":"cache/redis.go:28","msg":"Connected to Redis"}
+{"level":"INFO","timestamp":"2024-08-26T14:58:07.701+0700","caller":"initialize/postgres.go:28","msg":"InitPostgres success"}
+{"level":"INFO","timestamp":"2024-08-26T14:58:07.824+0700","caller":"cache/redis.go:28","msg":"Connected to Redis"}
+{"level":"INFO","timestamp":"2024-08-26T15:03:46.345+0700","caller":"initialize/postgres.go:28","msg":"InitPostgres success"}
+{"level":"INFO","timestamp":"2024-08-26T15:03:46.422+0700","caller":"cache/redis.go:28","msg":"Connected to Redis"}
+{"level":"INFO","timestamp":"2024-08-26T15:06:17.887+0700","caller":"initialize/postgres.go:28","msg":"InitPostgres success"}
+{"level":"INFO","timestamp":"2024-08-26T15:06:17.963+0700","caller":"cache/redis.go:28","msg":"Connected to Redis"}
+{"level":"INFO","timestamp":"2024-08-26T15:13:21.230+0700","caller":"initialize/postgres.go:28","msg":"InitPostgres success"}
+{"level":"INFO","timestamp":"2024-08-26T15:13:21.309+0700","caller":"cache/redis.go:28","msg":"Connected to Redis"}
+{"level":"INFO","timestamp":"2024-08-26T15:13:49.187+0700","caller":"initialize/postgres.go:28","msg":"InitPostgres success"}
+{"level":"INFO","timestamp":"2024-08-26T15:13:49.262+0700","caller":"cache/redis.go:28","msg":"Connected to Redis"}
+{"level":"INFO","timestamp":"2024-08-26T15:18:07.862+0700","caller":"initialize/postgres.go:28","msg":"InitPostgres success"}
+{"level":"INFO","timestamp":"2024-08-26T15:18:07.933+0700","caller":"cache/redis.go:28","msg":"Connected to Redis"}
+{"level":"INFO","timestamp":"2024-08-26T15:20:01.457+0700","caller":"initialize/postgres.go:28","msg":"InitPostgres success"}
+{"level":"INFO","timestamp":"2024-08-26T15:20:01.548+0700","caller":"cache/redis.go:28","msg":"Connected to Redis"}
+{"level":"INFO","timestamp":"2024-08-26T15:24:50.524+0700","caller":"initialize/postgres.go:28","msg":"InitPostgres success"}
+{"level":"INFO","timestamp":"2024-08-26T15:24:50.634+0700","caller":"cache/redis.go:28","msg":"Connected to Redis"}
+{"level":"WARN","timestamp":"2024-08-26T15:26:18.212+0700","caller":"repository/order.repo.go:56","msg":"Order not found","id":"eab5744b-671b-4e14-973c-b6bed8d6c2a1"}
+{"level":"INFO","timestamp":"2024-08-26T15:26:45.913+0700","caller":"initialize/postgres.go:28","msg":"InitPostgres success"}
+{"level":"INFO","timestamp":"2024-08-26T15:26:45.990+0700","caller":"cache/redis.go:28","msg":"Connected to Redis"}
+{"level":"INFO","timestamp":"2024-08-26T15:29:27.008+0700","caller":"initialize/postgres.go:28","msg":"InitPostgres success"}
+{"level":"INFO","timestamp":"2024-08-26T15:29:27.089+0700","caller":"cache/redis.go:28","msg":"Connected to Redis"}
+{"level":"INFO","timestamp":"2024-08-26T15:35:00.218+0700","caller":"initialize/postgres.go:28","msg":"InitPostgres success"}
+{"level":"INFO","timestamp":"2024-08-26T15:35:00.297+0700","caller":"cache/redis.go:28","msg":"Connected to Redis"}
+{"level":"INFO","timestamp":"2024-08-26T15:35:56.843+0700","caller":"initialize/postgres.go:28","msg":"InitPostgres success"}
+{"level":"INFO","timestamp":"2024-08-26T15:35:56.926+0700","caller":"cache/redis.go:28","msg":"Connected to Redis"}
+{"level":"INFO","timestamp":"2024-08-26T15:36:09.023+0700","caller":"initialize/postgres.go:28","msg":"InitPostgres success"}
+{"level":"INFO","timestamp":"2024-08-26T15:36:09.111+0700","caller":"cache/redis.go:28","msg":"Connected to Redis"}
+{"level":"INFO","timestamp":"2024-08-26T15:36:43.272+0700","caller":"initialize/postgres.go:28","msg":"InitPostgres success"}
+{"level":"INFO","timestamp":"2024-08-26T15:36:43.350+0700","caller":"cache/redis.go:28","msg":"Connected to Redis"}
+{"level":"WARN","timestamp":"2024-08-26T15:37:09.760+0700","caller":"repository/order.repo.go:56","msg":"Order not found","id":"66c8635d6574863c5889b39e"}
+{"level":"WARN","timestamp":"2024-08-26T15:37:30.024+0700","caller":"repository/order.repo.go:56","msg":"Order not found","id":"66c8635d6574863c5889b39e"}
+{"level":"INFO","timestamp":"2024-08-26T15:39:41.894+0700","caller":"initialize/postgres.go:28","msg":"InitPostgres success"}
+{"level":"INFO","timestamp":"2024-08-26T15:39:41.948+0700","caller":"cache/redis.go:28","msg":"Connected to Redis"}

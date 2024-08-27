@@ -13,7 +13,7 @@ type IOrderRepo interface {
 	FindAll(page int, limit int, sort, keyword string) ([]models.Order, error)
 	FindById(id string) (*models.Order, error)
 	FindByCustomerId(customerId string) ([]models.Order, error)
-	Save(order *models.Order) error
+	UpdateStatus(order *models.Order) error
 }
 
 type orderRepo struct {
@@ -63,11 +63,17 @@ func (or *orderRepo) FindById(id string) (*models.Order, error) {
 	return &order, nil
 }
 
-func (or *orderRepo) Save(order *models.Order) error {
-	if err := or.db.Save(order).Error; err != nil {
-		global.Logger.Error("Save error", zap.Error(err))
+func (or *orderRepo) UpdateStatus(order *models.Order) error {
+	err := or.db.Model(order).Session(&gorm.Session{FullSaveAssociations: true}).Where("id = ?", order.ID).Update("status", order.Status).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			global.Logger.Info("Record not found")
+			return err
+		}
+		global.Logger.Error("UpdateStatus error", zap.Error(err))
 		return err
 	}
+
 	return nil
 }
 

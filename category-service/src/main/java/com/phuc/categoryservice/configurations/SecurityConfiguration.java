@@ -30,8 +30,8 @@ public class SecurityConfiguration {
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests( authz ->
                 authz
-                        .requestMatchers(HttpMethod.GET, Constants.API_CATEGORIES).authenticated()
-                        .requestMatchers(HttpMethod.GET, Constants.API_CATEGORIES + "/*").authenticated()
+                        .requestMatchers(HttpMethod.GET, Constants.API_CATEGORIES).hasAnyAuthority("ADMIN","USER")
+                        .requestMatchers(HttpMethod.GET, Constants.API_CATEGORIES + "/*").hasAnyAuthority("ADMIN","USER")
                         .requestMatchers(HttpMethod.POST, Constants.API_CATEGORIES).hasAnyAuthority("ADMIN")
                         .requestMatchers(HttpMethod.PATCH, Constants.API_CATEGORIES + "/*").hasAnyAuthority("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, Constants.API_CATEGORIES + "/*").hasAnyAuthority("ADMIN")
@@ -48,7 +48,7 @@ public class SecurityConfiguration {
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration cc = new CorsConfiguration();
         cc.setAllowCredentials(true);
-        cc.setAllowedOrigins(List.of("*"));
+        cc.setAllowedOrigins(List.of("http://localhost:3000"));
         cc.setAllowedHeaders(List.of("*"));
         cc.setAllowedMethods(List.of("*"));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

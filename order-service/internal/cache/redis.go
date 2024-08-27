@@ -34,3 +34,7 @@ func NewRedisClient(config setting.RedisSetting) *redis.Client {
 func OrdersKey(page, limit int, sort string) string {
 	return fmt.Sprintf("all_orders:%d:%d:%s", page, limit, sort)
 }
+
+func OrdersByCustomerKey(customerKey string) string {
+	return fmt.Sprintf("order:%s", customerKey)
+}

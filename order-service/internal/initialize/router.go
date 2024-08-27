@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"order-service/global"
 	"order-service/internal/constants"
+	"order-service/internal/middlewares"
 	"order-service/internal/routers"
 )
 
@@ -20,6 +21,7 @@ func InitRouter() *gin.Engine {
 	}
 
 	r.Use(gin.Logger()) //logging
+	r.Use(middlewares.CorsMiddleware())
 
 	manage := routers.RouterGroupApp.Manage
 	user := routers.RouterGroupApp.User

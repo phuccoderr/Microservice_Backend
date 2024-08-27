@@ -1,6 +1,6 @@
 import {
   ForbiddenException,
-  Injectable,
+  Injectable, LoggerService,
   NotFoundException,
   UnauthorizedException,
   UnprocessableEntityException,
@@ -22,7 +22,8 @@ import { AUTH_CONSTANTS } from '../constants/auth-constants';
 @Injectable()
 export class AuthService {
 
-  constructor(private readonly customersRepository: CustomersRepository,
+  constructor(private readonly loggerService: LoggerService,
+              private readonly customersRepository: CustomersRepository,
               private readonly refreshTokenRepository: RefreshTokenRepository,
               private readonly jwtService: JwtService) {
   }
@@ -30,15 +31,18 @@ export class AuthService {
   async login(customerLoginDto: LoginCustomerDto): Promise<JwtPayload> {
     const customer = await this.customersRepository.findOne({email: customerLoginDto.email}, "");
     if (!customer) {
+      this.loggerService.warn("customer Not Found");
       throw new NotFoundException(DATABASE_CONST.NOTFOUND);
     }
 
     if (!customer.status) {
+      this.loggerService.warn("customer status is false!");
       throw new ForbiddenException(AUTH_CONSTANTS.VERIFY_ACCOUNT);
     }
 
     const isMatch = await bcrypt.compare(customerLoginDto.password, customer.password);
     if (!isMatch) {
+      this.loggerService.warn("customer password doesn't match");
       throw new UnauthorizedException(AUTH_CONSTANTS.PASSWORD_NOT_MATCH);
     }
 
@@ -76,6 +80,7 @@ export class AuthService {
         password: await bcrypt.hash(createCustomerDto.password, 10)
       })
     } catch (error) {
+      this.loggerService.error("register customer fail!")
       throw new UnprocessableEntityException(DATABASE_CONST.ALREADY);
     }
   }
@@ -84,6 +89,7 @@ export class AuthService {
 
     const customer = await this.customersRepository.findByVerificationCode(code);
     if (!customer || customer.status) {
+      this.loggerService.warn("customer status is true!");
       throw new UnauthorizedException(AUTH_CONSTANTS.VERIFY_FAIL);
     }
 
@@ -95,6 +101,7 @@ export class AuthService {
   async refreshToken (token: string): Promise<JwtPayload> {
     const customerRefreshToken  = await this.refreshTokenRepository.findOne({token}, "");
     if (!customerRefreshToken) {
+      this.loggerService.warn("customer refresh token not found!");
       throw new NotFoundException(DATABASE_CONST.NOTFOUND + token);
     }
 
