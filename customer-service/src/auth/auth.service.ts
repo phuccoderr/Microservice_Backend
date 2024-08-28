@@ -1,13 +1,17 @@
 import {
   ForbiddenException,
-  Injectable, LoggerService,
+  Injectable,
+  Logger,
   NotFoundException,
   UnauthorizedException,
   UnprocessableEntityException,
 } from '@nestjs/common';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import * as bcrypt from 'bcrypt';
-import { AuthenticationType, Customer } from '../customers/models/customer.schema';
+import {
+  AuthenticationType,
+  Customer,
+} from '../customers/models/customer.schema';
 import { CustomersRepository } from '../customers/customers.repository';
 import { v4 as uuidv4 } from 'uuid';
 import { LoginCustomerDto } from './dto/login-customer.dto';
@@ -21,28 +25,34 @@ import { AUTH_CONSTANTS } from '../constants/auth-constants';
 
 @Injectable()
 export class AuthService {
-
-  constructor(private readonly loggerService: LoggerService,
-              private readonly customersRepository: CustomersRepository,
-              private readonly refreshTokenRepository: RefreshTokenRepository,
-              private readonly jwtService: JwtService) {
-  }
+  private logger = new Logger(AuthService.name);
+  constructor(
+    private readonly customersRepository: CustomersRepository,
+    private readonly refreshTokenRepository: RefreshTokenRepository,
+    private readonly jwtService: JwtService,
+  ) {}
 
   async login(customerLoginDto: LoginCustomerDto): Promise<JwtPayload> {
-    const customer = await this.customersRepository.findOne({email: customerLoginDto.email}, "");
+    const customer = await this.customersRepository.findOne(
+      { email: customerLoginDto.email },
+      '',
+    );
     if (!customer) {
-      this.loggerService.warn("customer Not Found");
+      this.logger.warn('customer Not Found');
       throw new NotFoundException(DATABASE_CONST.NOTFOUND);
     }
 
     if (!customer.status) {
-      this.loggerService.warn("customer status is false!");
+      this.logger.warn('customer status is false!');
       throw new ForbiddenException(AUTH_CONSTANTS.VERIFY_ACCOUNT);
     }
 
-    const isMatch = await bcrypt.compare(customerLoginDto.password, customer.password);
+    const isMatch = await bcrypt.compare(
+      customerLoginDto.password,
+      customer.password,
+    );
     if (!isMatch) {
-      this.loggerService.warn("customer password doesn't match");
+      this.logger.warn("customer password doesn't match");
       throw new UnauthorizedException(AUTH_CONSTANTS.PASSWORD_NOT_MATCH);
     }
 
@@ -50,15 +60,17 @@ export class AuthService {
       _id: customer._id.toHexString(),
       email: customer.email,
       name: `${customer.first_name} ${customer.last_name}`,
-      roles: customer.roles
-    }
+      roles: customer.roles,
+    };
 
-    await this.refreshTokenRepository.findOneAndDelete(
-      {customerId: customer._id.toHexString(),}
+    await this.refreshTokenRepository.findOneAndDelete({
+      customerId: customer._id.toHexString(),
+    });
+
+    const accessToken = this.jwtService.sign(tokenPayload);
+    const refreshToken = await this.refreshTokenRepository.generateRefreshToken(
+      customer._id.toHexString(),
     );
-
-    const accessToken = this.jwtService.sign(tokenPayload)
-    const refreshToken = await this.refreshTokenRepository.generateRefreshToken(customer._id.toHexString());
 
     return {
       access_token: accessToken,
@@ -67,7 +79,7 @@ export class AuthService {
   }
 
   async logout(token: string): Promise<void> {
-    await this.refreshTokenRepository.findOneAndDelete({token: token})
+    await this.refreshTokenRepository.findOneAndDelete({ token: token });
   }
 
   async register(createCustomerDto: CreateCustomerDto): Promise<Customer> {
@@ -77,58 +89,66 @@ export class AuthService {
         status: false,
         verification_code: uuidv4(),
         ...createCustomerDto,
-        password: await bcrypt.hash(createCustomerDto.password, 10)
-      })
+        password: await bcrypt.hash(createCustomerDto.password, 10),
+      });
     } catch (error) {
-      this.loggerService.error("register customer fail!")
+      this.logger.error('register customer fail!');
       throw new UnprocessableEntityException(DATABASE_CONST.ALREADY);
     }
   }
 
-  async verify (code: string): Promise<void> {
-
-    const customer = await this.customersRepository.findByVerificationCode(code);
+  async verify(code: string): Promise<void> {
+    const customer =
+      await this.customersRepository.findByVerificationCode(code);
     if (!customer || customer.status) {
-      this.loggerService.warn("customer status is true!");
+      this.logger.warn('customer status is true!');
       throw new UnauthorizedException(AUTH_CONSTANTS.VERIFY_FAIL);
     }
 
     await this.customersRepository.findOneAndUpdate(
-      {_id: customer._id},
-      {verification_code: '', status: true});
+      { _id: customer._id },
+      { verification_code: '', status: true },
+    );
   }
 
-  async refreshToken (token: string): Promise<JwtPayload> {
-    const customerRefreshToken  = await this.refreshTokenRepository.findOne({token}, "");
+  async refreshToken(token: string): Promise<JwtPayload> {
+    const customerRefreshToken = await this.refreshTokenRepository.findOne(
+      { token },
+      '',
+    );
     if (!customerRefreshToken) {
-      this.loggerService.warn("customer refresh token not found!");
+      this.logger.warn('customer refresh token not found!');
       throw new NotFoundException(DATABASE_CONST.NOTFOUND + token);
     }
 
-    const customer = await this.customersRepository.findOne({_id: customerRefreshToken.customerId},"-password");
+    const customer = await this.customersRepository.findOne(
+      { _id: customerRefreshToken.customerId },
+      '-password',
+    );
 
-    await this.verifyToken(customerRefreshToken)
+    await this.verifyToken(customerRefreshToken);
 
     const tokenPayload: TokenPayload = {
       _id: customer._id.toHexString(),
       email: customer.email,
       name: `${customer.first_name} ${customer.last_name}`,
-      roles: customer.roles
-    }
+      roles: customer.roles,
+    };
 
     const accessToken = this.jwtService.sign(tokenPayload);
 
     return {
       access_token: accessToken,
       refresh_token: customerRefreshToken.token,
-    }
-
+    };
   }
-  private async verifyToken(refreshToken: CustomerRefreshToken): Promise<string> {
+  private async verifyToken(
+    refreshToken: CustomerRefreshToken,
+  ): Promise<string> {
     const { token, expiresAt } = refreshToken;
 
     if (new Date() > expiresAt) {
-      await this.refreshTokenRepository.findOneAndDelete({token});
+      await this.refreshTokenRepository.findOneAndDelete({ token });
       throw new UnauthorizedException(AUTH_CONSTANTS.TOKEN_EXPIRED);
     }
 
@@ -138,13 +158,14 @@ export class AuthService {
   async forgotPassword(email: string): Promise<Customer> {
     return await this.customersRepository.findOneAndUpdate(
       { email },
-      { reset_password_token: uuidv4() });
-
+      { reset_password_token: uuidv4() },
+    );
   }
 
-  async resetPassword(token: string,password: string): Promise<void> {
-     await this.customersRepository.findOneAndUpdate(
-      {reset_password_token: token},
-      {reset_password_token: "", password: await bcrypt.hash(password, 10) });
+  async resetPassword(token: string, password: string): Promise<void> {
+    await this.customersRepository.findOneAndUpdate(
+      { reset_password_token: token },
+      { reset_password_token: '', password: await bcrypt.hash(password, 10) },
+    );
   }
 }

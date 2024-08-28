@@ -2,13 +2,14 @@ package initialize
 
 import (
 	"fmt"
-	"github.com/spf13/viper"
 	"order-service/global"
+
+	"github.com/spf13/viper"
 )
 
 func LoadConfig() {
 	v := viper.New()
-	v.AddConfigPath("./configs/")
+	v.AddConfigPath("./config/")
 	v.SetConfigName("local")
 	v.SetConfigType("yaml")
 

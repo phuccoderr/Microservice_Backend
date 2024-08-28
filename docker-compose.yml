@@ -240,6 +240,21 @@ services:
     networks:
       - default
 
+  order-service:
+    container_name: order-service-container
+    build:
+      context: ./order-service
+      dockerfile: Dockerfile
+    restart: always
+    depends_on:
+      - redis
+      - kafka
+      - postgresql
+    ports:
+      - "9170:9170"
+    networks:
+      - default
+
 networks:
   default:
     driver: bridge
