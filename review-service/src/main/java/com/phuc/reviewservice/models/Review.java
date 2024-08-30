@@ -3,13 +3,15 @@ package com.phuc.reviewservice.models;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
 @Setter
 @Getter
 @Table(name = "reviews")
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Review extends BaseEntity {
     private String headline;
     private String comment;

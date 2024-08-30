@@ -1,4 +1,4 @@
-package com.phuc.productservice.configuations;
+package com.phuc.reviewservice.configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
@@ -16,6 +16,7 @@ import java.time.format.DateTimeFormatter;
 
 @Configuration
 public class RedisConfiguration {
+
     @Bean
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory) {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();

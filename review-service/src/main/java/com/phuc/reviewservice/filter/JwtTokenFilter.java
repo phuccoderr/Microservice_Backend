@@ -30,7 +30,6 @@ import java.util.*;
 public class JwtTokenFilter extends OncePerRequestFilter {
 
     private final JwtTokenUtil jwtTokenUtil;
-
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
@@ -46,12 +45,14 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         String authHeader = request.getHeader("Authorization");
         String email = null;
         String name = null;
+        String _id = null;
         Set<String> roles = new HashSet<>();
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
             try {
                 Claims claims = jwtTokenUtil.extractToken(token);
+                _id = claims.get("_id").toString();
                 email = claims.get("email").toString();
                 name = claims.get("name").toString();
                 List<String> rolesList = (List<String>) claims.get("roles");
@@ -67,6 +68,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         }
 
         Map<String, String> principal = new HashMap<>();
+        principal.put("_id", _id);
         principal.put("email",email);
         principal.put("name", name);
 
@@ -100,7 +102,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
     private boolean isBypassToken(@NonNull HttpServletRequest request) {
         final List<Pair<String,String>> bypassToken = Arrays.asList(
-                Pair.of(String.format("%s/parent/[^/]+",Constants.API_CATEGORIES), "GET")
+                Pair.of(String.format("%s/ratings/[^/]+",Constants.API_REVIEWS), "GET")
         );
 
         String requestUri = request.getRequestURI();

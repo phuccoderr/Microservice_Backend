@@ -1,10 +1,12 @@
 package com.phuc.reviewservice.configuration;
 
 
+import com.phuc.reviewservice.constants.Constants;
 import com.phuc.reviewservice.filter.JwtTokenFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -29,6 +31,8 @@ public class SecurityConfiguration {
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests( authz ->
                         authz
+                                .requestMatchers(HttpMethod.GET,Constants.API_REVIEWS).hasAnyAuthority("ADMIN", "USER")
+                                .requestMatchers(HttpMethod.POST, Constants.API_REVIEWS + "/post_review/*").hasAnyAuthority("CUSTOMER")
                                 .anyRequest().permitAll())
                 .sessionManagement(
                         session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)

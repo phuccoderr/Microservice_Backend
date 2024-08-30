@@ -57,7 +57,7 @@ func (cc *CartController) AddProductToCart(c *gin.Context) {
 
 func (cc *CartController) GetCart(c *gin.Context) {
 
-	token, customer, err := middleware.JWTGetTokenAndCustomer(c)
+	_, customer, err := middleware.JWTGetTokenAndCustomer(c)
 	if err != nil {
 		global.Logger.Error("Get Token Error", zap.Error(err))
 		response.ErrorResponse(c, err.Error(), constants.STATUS_UNAUTHORIZED, http.StatusUnauthorized)
@@ -73,7 +73,7 @@ func (cc *CartController) GetCart(c *gin.Context) {
 
 	var carts []dto.CartDto
 	for _, cart := range cartsRedis {
-		product, err := cc.productService.GetProductById(cart.ProductId, token)
+		product, err := cc.productService.GetProductById(cart.ProductId)
 		if err != nil {
 			global.Logger.Error("Get Product Error", zap.Error(err))
 			response.ErrorResponse(c, err.Error(), constants.STATUS_INTERNAL_ERROR, http.StatusInternalServerError)
@@ -126,7 +126,7 @@ func (cc *CartController) DeleteCart(c *gin.Context) {
 }
 
 func (cc *CartController) Checkout(c *gin.Context) {
-	token, customer, err := middleware.JWTGetTokenAndCustomer(c)
+	_, customer, err := middleware.JWTGetTokenAndCustomer(c)
 	if err != nil {
 		global.Logger.Error("Get Token Error", zap.Error(err))
 		response.ErrorResponse(c, err.Error(), constants.STATUS_UNAUTHORIZED, http.StatusUnauthorized)
@@ -142,7 +142,7 @@ func (cc *CartController) Checkout(c *gin.Context) {
 
 	var carts []dto.CartDto
 	for _, cart := range cartsRedis {
-		product, err := cc.productService.GetProductById(cart.ProductId, token)
+		product, err := cc.productService.GetProductById(cart.ProductId)
 		if err != nil {
 			global.Logger.Error("Get Product Error", zap.Error(err))
 			response.ErrorResponse(c, err.Error(), constants.STATUS_INTERNAL_ERROR, http.StatusInternalServerError)
@@ -176,7 +176,7 @@ func (cc *CartController) PlaceOrder(c *gin.Context) {
 		return
 	}
 
-	token, customer, err := middleware.JWTGetTokenAndCustomer(c)
+	_, customer, err := middleware.JWTGetTokenAndCustomer(c)
 	if err != nil {
 		global.Logger.Error("Get Token Error", zap.Error(err))
 		response.ErrorResponse(c, err.Error(), constants.STATUS_UNAUTHORIZED, http.StatusUnauthorized)
@@ -194,7 +194,7 @@ func (cc *CartController) PlaceOrder(c *gin.Context) {
 
 	var carts []dto.CartDto
 	for _, cart := range cartsRedis {
-		product, err := cc.productService.GetProductById(cart.ProductId, token)
+		product, err := cc.productService.GetProductById(cart.ProductId)
 		if err != nil {
 			global.Logger.Error("Get Product Error", zap.Error(err))
 			response.ErrorResponse(c, err.Error(), constants.STATUS_INTERNAL_ERROR, http.StatusInternalServerError)

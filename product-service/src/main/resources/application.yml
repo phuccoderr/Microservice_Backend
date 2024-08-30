@@ -19,8 +19,16 @@ spring:
       timeout: 60
 
   kafka:
+    producer:
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
     consumer:
       bootstrap-servers: ${KAFKA_BROKERS:localhost:9092}
+      value-deserializer: org.apache.kafka.common.serialization.ByteArrayDeserializer
+      "[spring.json.type.mapping]": com.phuc.reviewservice.events.message.AvgRatingEvent:com.phuc.productservice.events.message.AvgRatingEvent
+
+
+
+
 
 server:
   port: 9140

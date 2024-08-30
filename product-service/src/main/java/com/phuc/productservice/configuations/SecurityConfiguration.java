@@ -31,12 +31,12 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests( authz ->
                         authz
                                 .requestMatchers(HttpMethod.GET, Constants.API_PRODUCTS).hasAnyAuthority("ADMIN","USER")
-                                .requestMatchers(HttpMethod.GET, Constants.API_PRODUCTS + "/*").hasAnyAuthority("ADMIN","USER")
                                 .requestMatchers(HttpMethod.POST, Constants.API_PRODUCTS).hasAnyAuthority("ADMIN")
                                 .requestMatchers(HttpMethod.PATCH, Constants.API_PRODUCTS + "/*").hasAnyAuthority("ADMIN")
                                 .requestMatchers(HttpMethod.DELETE, Constants.API_PRODUCTS + "/*").hasAnyAuthority("ADMIN")
                                 .requestMatchers(HttpMethod.PATCH, Constants.API_PRODUCTS + "/add_files/*").hasAnyAuthority("ADMIN")
                                 .requestMatchers(HttpMethod.DELETE, Constants.API_PRODUCTS + "/delete_files/*").hasAnyAuthority("ADMIN")
+                                .requestMatchers(HttpMethod.GET, Constants.API_PRODUCTS + "/*").permitAll()
                                 .anyRequest().permitAll())
                 .sessionManagement(
                         session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)

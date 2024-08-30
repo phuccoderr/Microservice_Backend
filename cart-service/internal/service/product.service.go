@@ -12,7 +12,7 @@ import (
 )
 
 type IProductService interface {
-	GetProductById(productId, token string) (*response.ProductResponse, error)
+	GetProductById(productId string) (*response.ProductResponse, error)
 }
 
 type ProductService struct {
@@ -22,7 +22,7 @@ func NewProductService() IProductService {
 	return &ProductService{}
 }
 
-func (p ProductService) GetProductById(productId, token string) (*response.ProductResponse, error) {
+func (p ProductService) GetProductById(productId string) (*response.ProductResponse, error) {
 	url := fmt.Sprintf("http://product-service:9140/api/v1/products/%s", productId)
 	responseObject := &response.ResponseData{}
 
@@ -31,8 +31,6 @@ func (p ProductService) GetProductById(productId, token string) (*response.Produ
 		global.Logger.Error("Http Request product:", zap.Error(err))
 		return nil, errors.New(constants.MICROSERVICE_FAIL)
 	}
-
-	req.Header.Add("Authorization", "Bearer "+token)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)

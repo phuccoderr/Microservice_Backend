@@ -40,6 +40,12 @@ public class Product extends BaseEntity{
     @Column(name = "category_id")
     private String categoryId;
 
+    @Column(name = "average_rating")
+    private Float averageRating;
+
+    @Column(name = "review_count")
+    private Integer reviewCount;
+
     public void addImage(CloudinaryDto cloudinaryDto) {
         if (extraImages == null) {
             extraImages = new HashSet<>();
