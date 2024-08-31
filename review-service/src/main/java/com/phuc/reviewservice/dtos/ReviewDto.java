@@ -5,9 +5,15 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Setter
 @Getter
 public class ReviewDto {
+
+    @JsonProperty("id")
+    private String id;
+
     @JsonProperty("headline")
     private String headline;
 
@@ -22,5 +28,11 @@ public class ReviewDto {
 
     @JsonProperty("customer_id")
     private String customerId;
+
+    @JsonProperty("created_at")
+    private LocalDateTime createdAt;
+
+    @JsonProperty("updated_at")
+    private LocalDateTime updatedAt;
 }
 

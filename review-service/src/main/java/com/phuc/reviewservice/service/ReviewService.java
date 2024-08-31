@@ -2,6 +2,7 @@ package com.phuc.reviewservice.service;
 
 import com.phuc.reviewservice.constants.Constants;
 import com.phuc.reviewservice.events.message.AvgRatingEvent;
+import com.phuc.reviewservice.exeptions.DataErrorException;
 import com.phuc.reviewservice.exeptions.ParamValidateException;
 import com.phuc.reviewservice.models.Review;
 import com.phuc.reviewservice.repository.ReviewRepository;
@@ -15,12 +16,23 @@ import org.springframework.data.domain.Sort;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
+
 @Service
 @RequiredArgsConstructor
 public class ReviewService implements IReviewService{
 
     private final ReviewRepository reviewRepository;
     private final KafkaTemplate<String, Object> kafkaTemplate;
+
+    public Review deleteReview(String reviewId) throws DataErrorException {
+        Review review = reviewRepository.findById(reviewId).orElseThrow(() ->
+                new DataErrorException(Constants.DB_NOT_FOUND)
+        );
+
+        reviewRepository.delete(review);
+
+        return review;
+    }
     public void postReview(String customerId,String proId, RequestReview reqReview) {
 
         Review review = Review.builder()

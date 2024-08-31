@@ -59,12 +59,30 @@ public class ReviewController {
         List<ReviewDto> listDtos = Utility.toListDtos(pages.getContent());
 
         PaginationDto paginationDto = new PaginationDto(pages,listDtos);
-        reviewRedisService.saveAllReviews(paginationDto,page, limit, sort);
+
+        if (keyword.isEmpty()) {
+            reviewRedisService.saveAllReviews(paginationDto,page, limit, sort);
+        }
 
         return new ResponseEntity<>(ResponseObject.builder()
                 .status(HttpStatus.OK.value())
                 .message(Constants.GET_ALL_SUCCESS)
                 .data(paginationDto).build(), HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ResponseObject> deleteReview(
+            @PathVariable("id") String reviewId
+    ) throws DataErrorException {
+        Review review = reviewService.deleteReview(reviewId);
+
+        reviewRedisService.clearAllReviews();
+        reviewRedisService.clearAllReviewsByProduct(review.getProductId());
+
+        return new ResponseEntity<>(ResponseObject.builder()
+                .status(HttpStatus.OK.value())
+                .message(Constants.DELETE_SUCCESS)
+                .data(null).build(), HttpStatus.OK);
     }
 
     @GetMapping("/ratings/{proId}")
@@ -107,6 +125,9 @@ public class ReviewController {
         String customerId = jwtTokenUtil.getCustomerId(SecurityContextHolder.getContext().getAuthentication());
 
         reviewService.postReview(customerId,proId,review);
+        reviewRedisService.clearAllReviews();
+        reviewRedisService.clearAllReviewsByProduct(proId);
+
         return ResponseEntity.ok(ResponseObject.builder()
                 .status(HttpStatus.OK.value())
                 .message("OK")

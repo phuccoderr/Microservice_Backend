@@ -8,6 +8,7 @@ public class Constants {
 
 
     public static final String GET_ALL_SUCCESS = "Get reviews successfully!";
+    public static final String DELETE_SUCCESS = "Delete review successfully!";
 
     public static final String DB_HAS_CHILDREN = "Category cannot be deleted because it has child categories!";
     public static final String DB_ALREADY_EXISTS = "Data already exists!";

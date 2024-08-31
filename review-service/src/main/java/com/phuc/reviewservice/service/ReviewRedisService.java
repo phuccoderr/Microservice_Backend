@@ -20,8 +20,17 @@ public class ReviewRedisService implements IReviewRedisService{
     private final RedisTemplate<String, Object> redisTemplate;
     private final ObjectMapper redisObjectMapper;
     @Override
-    public void clear() {
+    public void clearAllReviews() {
         String pattern = "all_reviews:*";
+        Set<String> keys = redisTemplate.keys(pattern);
+        if (keys != null && !keys.isEmpty()) {
+            redisTemplate.delete(keys);
+        }
+    }
+
+    @Override
+    public void clearAllReviewsByProduct(String proId) {
+        String pattern = String.format("all_product_ratings:%s:*",proId);
         Set<String> keys = redisTemplate.keys(pattern);
         if (keys != null && !keys.isEmpty()) {
             redisTemplate.delete(keys);
