@@ -1,0 +1,33 @@
+{
+  "name": "swagger-service",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon index.js",
+    "dev": "nodemon",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "swagger-ui-express": "^5.0.1",
+    "yaml": "^2.5.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
+  },
+  "nodemonConfig": {
+    "watch": [
+      "./"
+    ],
+    "ext": "js,json",
+    "ignore": [
+      "node_modules"
+    ],
+    "exec": "node index.js"
+  }
+}

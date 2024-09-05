@@ -64,9 +64,8 @@ export class UsersService implements OnModuleInit {
   }
 
   async deleteUser(_id: string): Promise<void> {
-    try {
-      await this.usersRepository.findOneAndDelete({ _id });
-    } catch (error) {
+    const user = await this.usersRepository.findOneAndDelete({ _id });
+    if (!user) {
       this.logger.warn('User does not exist with id ' + _id);
       throw new NotFoundException(DATABASE_CONST.NOTFOUND);
     }

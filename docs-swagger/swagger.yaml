@@ -1,0 +1,289 @@
+openapi: 3.0.0
+info:
+  title: Microservice PhucStore V1
+  description: |-
+    Đây là sản phẩm dự án tự học của mình, mọi thắc mắc có thể liên hệ mình qua.
+
+    Email: phuctapcode@gmail.com
+
+    Github: [phuccoderr](https://github.com/phuccoderr)
+  version: 1.0.0
+servers:
+  - url: http://localhost:9120/api/v1
+    description: User service
+  - url: http://localhost:9130/api/v1
+    description: Category service
+tags:
+  - name: user-service
+    description: Tài khoản quản trị
+  - name: cattegory-service
+    description: Xác thực quản trị
+paths:
+  /users/auth/logout:
+    post:
+      tags:
+        - user-service
+      summary: Đăng xuất quản trị
+      description: đăng xuất quản trị
+      parameters:
+        - name: token
+          in: query
+          description: refresh token của user
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Thành công
+        "400":
+          description: Lỗi đầu vào
+        "404":
+          description: Không tìm thấy refresh token
+      security:
+        - {}
+  /users/auth/refresh:
+    post:
+      tags:
+        - user-service
+      summary: Refresh Token
+      description: Refresh Token
+      parameters:
+        - name: token
+          in: query
+          description: refresh token của user
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Thành công
+        "400":
+          description: Lỗi đầu vào
+        "404":
+          description: Không tìm thấy refresh token
+      security:
+        - {}
+  /users/auth/login:
+    post:
+      tags:
+        - user-service
+      summary: Đăng nhập quản trị
+      description: Đăng nhập quản trị
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Login"
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+      security:
+        - {}
+  /users:
+    post:
+      tags:
+        - user-service
+      summary: Tạo người dùng quản trị
+      description: Tạo người dùng quản trị
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+      responses:
+        "200":
+          description: Thành công
+        "400":
+          description: Lỗi đầu vào
+        "401":
+          description: Yêu cầu đăng nhập
+        "403":
+          description: Quyền không được truy cập
+        "422":
+          description: Email đã được sử dụng
+    get:
+      tags:
+        - user-service
+      summary: Danh sách người dùng quản trị
+      description: Danh sách người dùng quản trị
+      parameters:
+        - name: sort
+          in: query
+          description: Sort order (asc or desc)
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+            default: asc
+        - name: page
+          in: query
+          description: Page number
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          description: Number of items per page
+          required: false
+          schema:
+            type: integer
+            default: 10
+        - name: keyword
+          in: query
+          description: Search with keyword
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Thành công
+        "400":
+          description: Lỗi đầu vào
+        "401":
+          description: Yêu cầu đăng nhập
+        "403":
+          description: Quyền không được truy cập
+  /users/{id}:
+    patch:
+      tags:
+        - user-service
+      summary: Cập nhật người dùng quản trị
+      description: Cập nhật người dùng quản trị
+      parameters:
+        - name: id
+          in: path
+          description: ID người dùng
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                name:
+                  type: string
+                  example: Phuc
+                roles:
+                  type: array
+                  items:
+                    type: string
+                    example: "ADMIN"
+                    enum:
+                      - USER
+                      - ADMIN
+      responses:
+        "200":
+          description: Thành công
+        "400":
+          description: Lỗi đầu vào
+        "401":
+          description: Yêu cầu đăng nhập
+        "403":
+          description: Quyền không được truy cập
+    delete:
+      tags:
+        - user-service
+      summary: Xóa người dùng quản trị
+      description: Xóa người dùng quản trị
+      parameters:
+        - name: id
+          in: path
+          description: ID người dùng
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Thành công
+        "400":
+          description: Lỗi đầu vào
+        "401":
+          description: Yêu cầu đăng nhập
+        "403":
+          description: Quyền không được truy cập
+        "404":
+          description: Không tìm thấy người dùng
+    get:
+      tags:
+        - user-service
+      summary: Chi tiết người dùng quản trị
+      description: Chi tiết người dùng quản trị
+      parameters:
+        - name: id
+          in: path
+          description: ID người dùng
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Thành công
+        "400":
+          description: Lỗi đầu vào
+        "401":
+          description: Yêu cầu đăng nhập
+        "403":
+          description: Quyền không được truy cập
+        "404":
+          description: Không tìm thấy người dùng
+components:
+  schemas:
+    User:
+      properties:
+        email:
+          type: string
+          example: phuc@gmail.com
+        password:
+          type: string
+          example: "123456Phuc!"
+        name:
+          type: string
+          example: Phuc
+        status:
+          type: boolean
+          example: true
+        roles:
+          type: array
+          items:
+            type: string
+            example: "USER"
+            enum:
+              - USER
+              - ADMIN
+    Login:
+      properties:
+        email:
+          type: string
+          example: phuc@gmail.com
+        password:
+          type: string
+          example: "123456Phuc!"
+    ApiResponse:
+      type: object
+      properties:
+        data:
+          type: object
+        status:
+          type: string
+          format: int32
+        message:
+          type: string
+      xml:
+        name: "##default"
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: "Enter JWT token in the format: Bearer {token}"
+security:
+  - BearerAuth: []

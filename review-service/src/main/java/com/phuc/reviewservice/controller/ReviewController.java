@@ -120,7 +120,7 @@ public class ReviewController {
 
     @PostMapping("/post_review/{id}")
     public ResponseEntity<ResponseObject> postReview(@PathVariable("id") String proId,
-                                                     @RequestBody @Valid RequestReview review ) throws IOException {
+                                                     @RequestBody @Valid RequestReview review ) {
 
         String customerId = jwtTokenUtil.getCustomerId(SecurityContextHolder.getContext().getAuthentication());
 

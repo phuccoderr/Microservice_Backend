@@ -13,8 +13,13 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Review extends BaseEntity {
+    @Column(name = "headline")
     private String headline;
+
+    @Column(name = "comment")
     private String comment;
+
+    @Column(name = "rating")
     private int rating;
 
     @Column(name = "product_id")

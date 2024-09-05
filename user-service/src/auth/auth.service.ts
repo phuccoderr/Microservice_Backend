@@ -63,7 +63,13 @@ export class AuthService {
   }
 
   async logout(token: string): Promise<void> {
-    await this.refreshTokenRepository.findOneAndDelete({ token });
+    const refreshToken = await this.refreshTokenRepository.findOneAndDelete({
+      token,
+    });
+    if (!refreshToken) {
+      this.logger.warn('Refresh token not found');
+      throw new NotFoundException(DATABASE_CONST.NOTFOUND);
+    }
   }
 
   async refreshToken(token: string): Promise<JwtPayload> {
