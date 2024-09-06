@@ -66,6 +66,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
         } else {
             handleException(response, Constants.TOKEN_INVALID);
+            return;
         }
 
         Map<String, String> principal = new HashMap<>();

@@ -31,7 +31,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(DataErrorException.class)
-    public ResponseEntity<ResponseError> handleDataNotFoundException(Exception ex) {
+    public ResponseEntity<ResponseError> handleDataErrorException(Exception ex) {
 
         return buildErrorResponse(ex, HttpStatus.UNPROCESSABLE_ENTITY);
     }
@@ -42,10 +42,16 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return buildErrorResponse(ex, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(DataNotFoundException.class)
+    public ResponseEntity<ResponseError> handleDataNotFoundException(Exception ex) {
+        return buildErrorResponse(ex, HttpStatus.NOT_FOUND);
+    }
+
     @ExceptionHandler(HttpClientErrorException.class)
     public ResponseEntity<ResponseError> handleHttpClientErrorException(Exception ex) {
         return buildErrorResponse(ex, HttpStatus.UNPROCESSABLE_ENTITY);
     }
+
 
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<ResponseError> handleBadRequestException(Exception ex) {

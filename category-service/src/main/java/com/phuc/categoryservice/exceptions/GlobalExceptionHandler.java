@@ -37,7 +37,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(DataNotFoundException.class)
     public ResponseEntity<ResponseError> handleDataNotFoundException(Exception ex) {
 
-        return buildErrorResponse(ex, HttpStatus.UNPROCESSABLE_ENTITY);
+        return buildErrorResponse(ex, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(ParamValidateException.class)

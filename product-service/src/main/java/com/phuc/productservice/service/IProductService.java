@@ -2,6 +2,7 @@ package com.phuc.productservice.service;
 
 import com.phuc.productservice.dtos.CategoryDto;
 import com.phuc.productservice.exceptions.DataErrorException;
+import com.phuc.productservice.exceptions.DataNotFoundException;
 import com.phuc.productservice.exceptions.FuncErrorException;
 import com.phuc.productservice.exceptions.ParamValidateException;
 import com.phuc.productservice.models.Product;
@@ -14,7 +15,7 @@ import java.util.List;
 
 public interface IProductService {
     Page<Product> getAllProducts(Integer page, Integer limit, String sort, String keyword) throws ParamValidateException;
-    Product getProduct(String proId) throws DataErrorException;
+    Product getProduct(String proId) throws DataErrorException, DataNotFoundException;
 
     Product createProduct(
             MultipartFile mainImage,
@@ -30,7 +31,7 @@ public interface IProductService {
             MultipartFile mainImage
     ) throws FuncErrorException, IOException;
 
-    void deleteProductById(String proId) throws DataErrorException;
+    void deleteProductById(String proId) throws DataErrorException, DataNotFoundException;
 
     void checkNameUnique(String oldName, String newName) throws DataErrorException;
 

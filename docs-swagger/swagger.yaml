@@ -13,6 +13,10 @@ servers:
     description: User service
   - url: http://localhost:9130/api/v1
     description: Category service
+  - url: http://localhost:9140/api/v1
+    description: Product service
+  - url: http://localhost:9150/api/v1
+    description: Customer service
 tags:
   - name: user-service
     description: Tài khoản quản trị
@@ -189,6 +193,8 @@ paths:
           description: Yêu cầu đăng nhập
         "403":
           description: Quyền không được truy cập
+        "404":
+          description: Không tìm thấy người dùng
     delete:
       tags:
         - user-service
@@ -241,15 +247,6 @@ paths:
         - category-service
       summary: Danh sách danh mục
       description: Danh sách dnah mục
-      responses:
-        "200":
-          description: Thành công
-        "400":
-          description: Lỗi đầu vào
-        "401":
-          description: Yêu cầu đăng nhập
-        "403":
-          description: Quyền không được truy cập
       parameters:
         - name: sort
           in: query
@@ -281,6 +278,15 @@ paths:
           required: false
           schema:
             type: string
+      responses:
+        "200":
+          description: Thành công
+        "400":
+          description: Lỗi đầu vào
+        "401":
+          description: Yêu cầu đăng nhập
+        "403":
+          description: Quyền không được truy cập
     post:
       tags:
         - category-service
@@ -331,6 +337,8 @@ paths:
           description: Yêu cầu đăng nhập
         "403":
           description: Quyền không được truy cập
+        "404":
+          description: Không tìm thấy danh mục
     get:
       tags:
         - category-service
@@ -352,6 +360,8 @@ paths:
           description: Yêu cầu đăng nhập
         "403":
           description: Quyền không được truy cập
+        "404":
+          description: Không tìm thấy danh mục
     delete:
       tags:
         - category-service
@@ -373,6 +383,8 @@ paths:
           description: Yêu cầu đăng nhập
         "403":
           description: Quyền không được truy cập
+        "404":
+          description: Không tìm thấy danh mục
   /categories/parent/{id}:
     get:
       tags:
@@ -395,9 +407,349 @@ paths:
           description: Yêu cầu đăng nhập
         "403":
           description: Quyền không được truy cập
+        "404":
+          description: Không tìm thấy danh mục
+      security:
+        - {}
+  /products:
+    get:
+      tags:
+        - product-service
+      summary: Danh sách sản phẩm
+      description: Danh sách sản phẩm
+      parameters:
+        - name: sort
+          in: query
+          description: Sort order (asc or desc)
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+            default: asc
+        - name: page
+          in: query
+          description: Page number
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          description: Number of items per page
+          required: false
+          schema:
+            type: integer
+            default: 10
+        - name: keyword
+          in: query
+          description: Search with keyword
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Thành công
+        "400":
+          description: Lỗi đầu vào
+        "401":
+          description: Yêu cầu đăng nhập
+        "403":
+          description: Quyền không được truy cập
+    post:
+      tags:
+        - product-service
+      summary: Tạo sản phẩm
+      description: Tạo sản phẩm
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                product:
+                  type: object
+                  $ref: "#/components/schemas/Product"
+                main_image:
+                  type: string
+                  format: binary
+                  description: Main image, form upload file
+                extra_images:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                  description: Additional images, form upload files
+            encoding:
+              product:
+                contentType: application/json
+      responses:
+        "201":
+          description: Thành công
+        "400":
+          description: Lỗi đầu vào
+        "401":
+          description: Yêu cầu đăng nhập
+        "403":
+          description: Quyền không được truy cập
+        "422":
+          description: Name đã được sử dụng
+  /products/{id}:
+    get:
+      tags:
+        - product-service
+      summary: Chi tiết sản phẩm
+      description: Chi tiết sản phẩm
+      parameters:
+        - name: id
+          in: path
+          description: ID sản phẩm
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Thành công
+        "400":
+          description: Lỗi đầu vào
+        "404":
+          description: Không tìm thấy sản phẩm
+      security:
+        - {}
+    patch:
+      tags:
+        - product-service
+      summary: Cập nhật sản phẩm
+      description: Cập nhật sản phẩm
+      parameters:
+        - name: id
+          in: path
+          description: ID sản phẩm
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                product:
+                  $ref: "#/components/schemas/Product"
+                main_image:
+                  type: string
+                  format: binary
+                  description: Main image, form upload file
+            encoding:
+              product:
+                contentType: application/json
+      responses:
+        "200":
+          description: Thành công
+        "400":
+          description: Lỗi đầu vào
+        "401":
+          description: Yêu cầu đăng nhập
+        "403":
+          description: Quyền không được truy cập
+        "404":
+          description: Không tìm thấy sản phẩm
+        "422":
+          description: Name đã được sử dụng
+    delete:
+      tags:
+        - product-service
+      summary: Xóa sản phẩm
+      description: Xóa sản phẩm
+      parameters:
+        - name: id
+          in: path
+          description: ID sản phẩm
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Thành công
+        "400":
+          description: Lỗi đầu vào
+        "401":
+          description: Yêu cầu đăng nhập
+        "403":
+          description: Quyền không được truy cập
+        "404":
+          description: Không tìm thấy sản phẩm
+  /products/add_files/{id}:
+    patch:
+      tags:
+        - product-service
+      summary: Thêm ảnh phụ cho sản phẩm
+      description: Thêm ảnh phụ cho sản phẩm
+      parameters:
+        - name: id
+          in: path
+          description: ID sản phẩm
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                extra_images:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                  description: Additional images, form upload files
+      responses:
+        "201":
+          description: Thành công
+        "400":
+          description: Lỗi đầu vào
+        "401":
+          description: Yêu cầu đăng nhập
+        "403":
+          description: Quyền không được truy cập
+        "404":
+          description: Không tìm thấy sản phẩm
+  /products/delete_files/{id}:
+    delete:
+      tags:
+        - product-service
+      summary: Xóa ảnh phụ sản phẩm
+      description: Xóa ảnh phụ sản phẩm bằng id image của sản phẩm
+      parameters:
+        - name: id
+          in: path
+          description: ID sản phẩm
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: string
+                example: id image
+              description: Delete images with id
+      responses:
+        "200":
+          description: Thành công
+        "400":
+          description: Lỗi đầu vào
+        "401":
+          description: Yêu cầu đăng nhập
+        "403":
+          description: Quyền không được truy cập
+  /products/c/{category_id}:
+    get:
+      tags:
+        - product-service
+      summary: Danh sách sản phẩm theo category
+      description: Danh sách sản phẩm theo category
+      parameters:
+        - name: category_id
+          in: path
+          description: ID category
+          required: true
+          schema:
+            type: string
+        - name: sort
+          in: query
+          description: Sort order (asc or desc)
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+            default: asc
+        - name: page
+          in: query
+          description: Page number
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          description: Number of items per page
+          required: false
+          schema:
+            type: integer
+            default: 10
+        - name: keyword
+          in: query
+          description: Search with keyword
+          required: false
+          schema:
+            type: string
+        - name: sort_field
+          in: query
+          description: Sort field
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Thành công
+        "400":
+          description: Lỗi đầu vào
+      security:
+        - {}
 
 components:
   schemas:
+    Customer:
+      properties:
+        email:
+          type: string
+          example: phuccustomer@gmail.com
+        password:
+          type: string
+          example: "123456Phuc!"
+        first_name:
+          type: string
+          example: Phuc
+        last_name:
+          type: string
+          example: Hoang
+    Product:
+      properties:
+        name:
+          type: string
+          example: Giay adidas
+        description:
+          type: string
+          example: Mô tả
+        status:
+          type: boolean
+          example: true
+        cost:
+          type: number
+          example: 100
+          description: giá thu vào
+        price:
+          type: number
+          example: 100
+          description: giá bán ra
+        sale:
+          type: number
+          example: 0
+          description: "% giảm giá"
+        stock:
+          type: number
+          example: 1
+          description: kho tồn
+        category_id:
+          type: string
+          example: id category
     Category:
       properties:
         name:

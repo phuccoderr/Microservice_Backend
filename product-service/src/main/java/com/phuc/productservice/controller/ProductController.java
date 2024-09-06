@@ -6,6 +6,7 @@ import com.phuc.productservice.dtos.CategoryDto;
 import com.phuc.productservice.dtos.PaginationDto;
 import com.phuc.productservice.dtos.ProductDto;
 import com.phuc.productservice.exceptions.DataErrorException;
+import com.phuc.productservice.exceptions.DataNotFoundException;
 import com.phuc.productservice.exceptions.FuncErrorException;
 import com.phuc.productservice.exceptions.ParamValidateException;
 import com.phuc.productservice.models.Product;
@@ -66,7 +67,7 @@ public class ProductController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ResponseObject> getProduct(@PathVariable("id") String id) throws DataErrorException {
+    public ResponseEntity<ResponseObject> getProduct(@PathVariable("id") String id) throws DataNotFoundException {
         Product product = productService.getProduct(id);
 
         ProductDto dto = Utility.toDto(product);
@@ -110,7 +111,7 @@ public class ProductController {
             @RequestPart("product") @Valid RequestProduct requestProduct,
             @RequestParam(value = "main_image", required = false)MultipartFile mainFile,
             HttpServletRequest request
-    ) throws DataErrorException, FuncErrorException{
+    ) throws DataErrorException, FuncErrorException, DataNotFoundException {
 
         Product productInDB = productService.getProduct(id);
 
@@ -136,10 +137,9 @@ public class ProductController {
 
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ResponseObject> deleteProduct(@PathVariable("id") String id) throws DataErrorException {
+    public ResponseEntity<ResponseObject> deleteProduct(@PathVariable("id") String id) throws DataNotFoundException {
 
         productService.deleteProductById(id);
-
         productRedisService.clear();
 
         return new ResponseEntity<>(ResponseObject.builder()
@@ -152,7 +152,7 @@ public class ProductController {
     public ResponseEntity<ResponseObject> addFilesProduct(
             @PathVariable("id") String id,
             @RequestParam(value = "extra_images", required = false) List<MultipartFile> extraFiles
-    ) throws DataErrorException, FuncErrorException {
+    ) throws FuncErrorException, DataNotFoundException {
         Product productInDB = productService.getProduct(id);
 
         Product productUpdated = productService.addFiles(extraFiles, productInDB);
@@ -171,7 +171,7 @@ public class ProductController {
     public ResponseEntity<ResponseObject> deleteFiles(
             @PathVariable("id") String id,
             @RequestBody List<String> listFiles
-    ) throws DataErrorException {
+    ) throws DataNotFoundException {
         Product productInDB = productService.getProduct(id);
 
         productService.deleteFiles(listFiles,productInDB);
@@ -190,7 +190,7 @@ public class ProductController {
             @RequestParam(value = "page", defaultValue = "1") Integer page,
             @RequestParam(value = "limit", defaultValue = "10") Integer limit,
             @RequestParam(value = "sort", defaultValue = "asc") String sort,
-            @RequestParam(value = "sort_field") String sortField,
+            @RequestParam(value = "sort_field", defaultValue = "name") String sortField,
             @RequestParam(value = "keyword", defaultValue = "") String keyword,
             HttpServletRequest request
     ) throws ParamValidateException {

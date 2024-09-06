@@ -4,6 +4,7 @@ import com.phuc.productservice.constants.Constants;
 import com.phuc.productservice.dtos.CategoryDto;
 import com.phuc.productservice.dtos.CloudinaryDto;
 import com.phuc.productservice.exceptions.DataErrorException;
+import com.phuc.productservice.exceptions.DataNotFoundException;
 import com.phuc.productservice.exceptions.FuncErrorException;
 import com.phuc.productservice.exceptions.ParamValidateException;
 import com.phuc.productservice.models.Product;
@@ -54,8 +55,8 @@ public class ProductService implements IProductService {
     }
 
     @Override
-    public Product getProduct(String proId) throws DataErrorException {
-        return proRepository.findById(proId).orElseThrow( () -> new DataErrorException(Constants.DB_NOT_FOUND) );
+    public Product getProduct(String proId) throws DataNotFoundException {
+        return proRepository.findById(proId).orElseThrow( () -> new DataNotFoundException(Constants.DB_NOT_FOUND) );
     }
 
 
@@ -110,9 +111,14 @@ public class ProductService implements IProductService {
     }
 
     @Override
-    public void deleteProductById(String proId) throws DataErrorException {
+    public void deleteProductById(String proId) throws DataNotFoundException {
         Product product = getProduct(proId);
         proRepository.delete(product);
+
+        cloudinaryService.deleteAsyncImage(product.getImageId());
+        product.getExtraImages().forEach( item -> {
+            cloudinaryService.deleteAsyncImage(item.getImageId());
+        });
     }
 
     @Override
@@ -148,15 +154,11 @@ public class ProductService implements IProductService {
     @Transactional
     public void deleteFiles(List<String> listFiles, Product product) {
         listFiles.forEach(fileId -> {
-            try {
-                ProductImage productImage = proImageRepository.findById(fileId).orElseThrow(
-                        () -> new DataErrorException(Constants.DB_NOT_FOUND)
-                );
-                cloudinaryService.deleteAsyncImage(productImage.getImageId());
-                proImageRepository.deleteByIdByProductId(productImage.getId(),product.getId());
-            } catch (DataErrorException e) {
-                throw new RuntimeException(e);
-            }
+            ProductImage productImage = proImageRepository.findById(fileId).orElseThrow(
+                    () -> new DataNotFoundException(Constants.DB_NOT_FOUND)
+            );
+            cloudinaryService.deleteAsyncImage(productImage.getImageId());
+            proImageRepository.deleteByIdByProductId(productImage.getId(),product.getId());
         });
     }
 
@@ -181,7 +183,7 @@ public class ProductService implements IProductService {
         sortFields.put("price", "price");
         sortFields.put("date", "createdAt");
 
-        String sortFieldDB = sortFields.getOrDefault(sortField, "name");
+        String sortFieldDB = sortFields.getOrDefault(sortField, sortField);
 
         Pageable pageable = PageRequest.of(page - 1,limit, Sort.by(
                 sort.equals("asc") ? Sort.Direction.ASC : Sort.Direction.DESC,
