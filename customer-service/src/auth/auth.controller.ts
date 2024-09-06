@@ -111,7 +111,7 @@ export class AuthController {
     }
   }
 
-  @Post('reset_password')
+  @Get('reset_password')
   @HttpCode(HttpStatus.OK)
   async resetPassword(@Query('token') token: string,
                       @Query('password') password: string): Promise<ResponseObject> {

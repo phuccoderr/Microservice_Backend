@@ -703,9 +703,296 @@ paths:
           description: Lỗi đầu vào
       security:
         - {}
+  /customers/auth/login:
+    post:
+      tags:
+        - customer-service
+      summary: Đăng nhập khách hàng
+      description: Đăng nhập khách hàng
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Login"
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+      security:
+        - {}
+  /customers/auth/logout:
+    post:
+      tags:
+        - customer-service
+      summary: Đăng xuất khách hàng
+      description: Đăng xuất khách hàng
+      parameters:
+        - name: token
+          in: query
+          description: refresh token của khách hàng
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Thành công
+        "400":
+          description: Lỗi đầu vào
+        "404":
+          description: Không tìm thấy refresh token
+      security:
+        - {}
+  /customers/auth/refresh:
+    post:
+      tags:
+        - customer-service
+      summary: Refresh Token
+      description: Refresh Token
+      parameters:
+        - name: token
+          in: query
+          description: refresh token của khách hàng
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Thành công
+        "400":
+          description: Lỗi đầu vào
+        "404":
+          description: Không tìm thấy refresh token
+      security:
+        - {}
+  /customers/auth/register:
+    post:
+      tags:
+        - customer-service
+      summary: Đăng ký khách hàng
+      description: Đăng ký khách hàng
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Customer"
+      responses:
+        "201":
+          description: Thành công
+        "400":
+          description: Lỗi đầu vào
+        "401":
+          description: Yêu cầu đăng nhập
+        "403":
+          description: Quyền không được truy cập
+        "422":
+          description: Email đã được sử dụng
+      security:
+        - {}
+  /customers/auth/verify:
+    get:
+      tags:
+        - customer-service
+      summary: Xác thực tài khoản ( từ email )
+      description: Xác thực tài khoản
+      parameters:
+        - name: token
+          in: query
+          description: refresh token của khách hàng
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Thành công
+        "404":
+          description: Không tìm thấy token
+      security:
+        - {}
+  /customers/auth/forgot_password:
+    post:
+      tags:
+        - customer-service
+      summary: Quên mật khẩu
+      description: Quên mật khẩu
+      parameters:
+        - name: email
+          in: query
+          description: Email của khách hàng
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Thành công
+        "404":
+          description: Không tìm thấy email
+      security:
+        - {}
+  /customers/auth/reset_password:
+    get:
+      tags:
+        - customer-service
+      summary: Thay đổi mật khẩu (từ email )
+      description: Thay đổi mật khẩu
+      parameters:
+        - name: token
+          in: query
+          description: token từ email
+          required: true
+          schema:
+            type: string
+        - name: password
+          in: query
+          description: mật khẩu mới
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Thành công
+        "404":
+          description: Không tìm thấy token
+
+  /customers/upload:
+    post:
+      tags:
+        - customer-service
+      summary: Thay ảnh đại diện khách hàng
+      description: Thay ảnh đại diện khách hàng
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        "200":
+          description: Thành công
+        "401":
+          description: Yêu cầu đăng nhập lại
+        "404":
+          description: Không tìm thấy token
+  /customers/account:
+    get:
+      tags:
+        - customer-service
+      summary: Tài khoản của tôi
+      description: Tài khoản của tôi
+      responses:
+        "200":
+          description: Thành công
+        "404":
+          description: Không tìm thấy token
+    patch:
+      tags:
+        - customer-service
+      summary: Cập nhật tài khoản của tôi
+      description: Cập nhật tài khoản của tôi
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CustomerUpdate"
+      responses:
+        "200":
+          description: Thành công
+        "401":
+          description: Yêu cầu đăng nhập lại
+        "404":
+          description: Không tìm thấy token
+  /customers:
+    get:
+      tags:
+        - customer-service
+      summary: Danh sách khách hàng
+      description: Danh sách khách hàng
+      parameters:
+        - name: sort
+          in: query
+          description: Sort order (asc or desc)
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+            default: asc
+        - name: page
+          in: query
+          description: Page number
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          description: Number of items per page
+          required: false
+          schema:
+            type: integer
+            default: 10
+        - name: keyword
+          in: query
+          description: Search with keyword
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Thành công
+        "400":
+          description: Lỗi đầu vào
+        "401":
+          description: Yêu cầu đăng nhập
+        "403":
+          description: Quyền không được truy cập
+  /customers/{id}:
+    get:
+      tags:
+        - customer-service
+      summary: Chi tiết khách hàng
+      description: Chi tiết khách hàng
+      parameters:
+        - name: id
+          in: path
+          description: ID khách hàng
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Thành công
+        "400":
+          description: Lỗi đầu vào
+        "401":
+          description: Yêu cầu đăng nhập
+        "403":
+          description: Quyền không được truy cập
 
 components:
   schemas:
+    CustomerUpdate:
+      properties:
+        first_name:
+          type: string
+          example: Phuc
+        last_name:
+          type: string
+          example: Hoang
+        phone_number:
+          type: string
+          example: 0123456789
+        address:
+          type: string
+          example: Ha Noi
     Customer:
       properties:
         email:
