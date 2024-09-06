@@ -48,7 +48,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         String authHeader = request.getHeader("Authorization");
         String email = null;
         String name = null;
-        Set<String> roles = new HashSet<>();
+        Set<String> roles;
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
@@ -66,6 +66,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
         } else {
             handleException(response, Constants.TOKEN_INVALID);
+            return;
         }
 
         Map<String, String> principal = new HashMap<>();
@@ -87,7 +88,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     }
 
     private void handleException(HttpServletResponse response, String message) throws IOException {
-        response.setContentType("application/json");
+        response.setContentType("application/json;charset=UTF-8");
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 
         ResponseError errorResponse = ResponseError.builder()

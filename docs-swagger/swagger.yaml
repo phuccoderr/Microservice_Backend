@@ -16,8 +16,8 @@ servers:
 tags:
   - name: user-service
     description: Tài khoản quản trị
-  - name: cattegory-service
-    description: Xác thực quản trị
+  - name: category-service
+    description: Danh mục
 paths:
   /users/auth/logout:
     post:
@@ -95,7 +95,7 @@ paths:
             schema:
               $ref: "#/components/schemas/User"
       responses:
-        "200":
+        "201":
           description: Thành công
         "400":
           description: Lỗi đầu vào
@@ -235,8 +235,180 @@ paths:
           description: Quyền không được truy cập
         "404":
           description: Không tìm thấy người dùng
+  /categories:
+    get:
+      tags:
+        - category-service
+      summary: Danh sách danh mục
+      description: Danh sách dnah mục
+      responses:
+        "200":
+          description: Thành công
+        "400":
+          description: Lỗi đầu vào
+        "401":
+          description: Yêu cầu đăng nhập
+        "403":
+          description: Quyền không được truy cập
+      parameters:
+        - name: sort
+          in: query
+          description: Sort order (asc or desc)
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+            default: asc
+        - name: page
+          in: query
+          description: Page number
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          description: Number of items per page
+          required: false
+          schema:
+            type: integer
+            default: 10
+        - name: keyword
+          in: query
+          description: Search with keyword
+          required: false
+          schema:
+            type: string
+    post:
+      tags:
+        - category-service
+      summary: Tạo danh mục
+      description: Tạo danh mục
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Category"
+      responses:
+        "201":
+          description: Thành công
+        "400":
+          description: Lỗi đầu vào
+        "401":
+          description: Yêu cầu đăng nhập
+        "403":
+          description: Quyền không được truy cập
+        "422":
+          description: name đã được sử dụng
+  /categories/{id}:
+    patch:
+      tags:
+        - category-service
+      summary: Cập nhật danh mục
+      description: Cập nhật danh mục
+      parameters:
+        - name: id
+          in: path
+          description: ID danh mục
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Category"
+      responses:
+        "200":
+          description: Thành công
+        "400":
+          description: Lỗi đầu vào
+        "401":
+          description: Yêu cầu đăng nhập
+        "403":
+          description: Quyền không được truy cập
+    get:
+      tags:
+        - category-service
+      summary: Chi tiết danh mục
+      description: Chi tiết danh mục
+      parameters:
+        - name: id
+          in: path
+          description: ID danh mục
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Thành công
+        "400":
+          description: Lỗi đầu vào
+        "401":
+          description: Yêu cầu đăng nhập
+        "403":
+          description: Quyền không được truy cập
+    delete:
+      tags:
+        - category-service
+      summary: Xóa danh mục
+      description: Xóa danh mục
+      parameters:
+        - name: id
+          in: path
+          description: ID danh mục
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Thành công
+        "400":
+          description: Lỗi đầu vào
+        "401":
+          description: Yêu cầu đăng nhập
+        "403":
+          description: Quyền không được truy cập
+  /categories/parent/{id}:
+    get:
+      tags:
+        - category-service
+      summary: Danh mục có mối quan hệ cha con
+      description: Chi tiết Danh mục có bao gồm mối quan hệ cha con
+      parameters:
+        - name: id
+          in: path
+          description: ID danh mục
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Thành công
+        "400":
+          description: Lỗi đầu vào
+        "401":
+          description: Yêu cầu đăng nhập
+        "403":
+          description: Quyền không được truy cập
+
 components:
   schemas:
+    Category:
+      properties:
+        name:
+          type: string
+          example: May Giat
+        status:
+          type: boolean
+          example: true
+        parent_id:
+          type: string
+          example: id category parent
     User:
       properties:
         email:
