@@ -1316,22 +1316,26 @@ paths:
           required: true
           schema:
             type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                page:
-                  type: number
-                  example: 1
-                limit:
-                  type: number
-                  example: 10
-                ratings:
-                  type: number
-                  example: 5
+        - name: page
+          in: query
+          description: Page number
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          description: Number of items per page
+          required: false
+          schema:
+            type: integer
+            default: 10
+        - name: ratings
+          in: query
+          description: Star rating
+          required: false
+          schema:
+            type: number
       responses:
         "200":
           description: Thành công
