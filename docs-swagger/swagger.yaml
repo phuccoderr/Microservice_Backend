@@ -17,17 +17,33 @@ servers:
     description: Product service
   - url: http://localhost:9150/api/v1
     description: Customer service
+  - url: http://localhost:9160/api/v1
+    description: Cart service
+  - url: http://localhost:9170/api/v1
+    description: Order service
+  - url: http://localhost:9180/api/v1
+    description: Review service
 tags:
   - name: user-service
     description: Tài khoản quản trị
   - name: category-service
     description: Danh mục
+  - name: product-service
+    description: Sản phẩm
+  - name: customer-service
+    description: Tài khoản khách hàng
+  - name: cart-service
+    description: Giỏ hàng
+  - name: order-service
+    description: Hoá đơn
+  - name: review-service
+    description: Đánh giá
 paths:
   /users/auth/logout:
     post:
       tags:
         - user-service
-      summary: Đăng xuất quản trị
+      summary: Đăng xuất quản trị ( Manage )
       description: đăng xuất quản trị
       parameters:
         - name: token
@@ -49,7 +65,7 @@ paths:
     post:
       tags:
         - user-service
-      summary: Refresh Token
+      summary: Refresh Token ( Manage )
       description: Refresh Token
       parameters:
         - name: token
@@ -71,7 +87,7 @@ paths:
     post:
       tags:
         - user-service
-      summary: Đăng nhập quản trị
+      summary: Đăng nhập quản trị ( Manage )
       description: Đăng nhập quản trị
       requestBody:
         required: true
@@ -90,7 +106,7 @@ paths:
     post:
       tags:
         - user-service
-      summary: Tạo người dùng quản trị
+      summary: Tạo người dùng quản trị ( Manage )
       description: Tạo người dùng quản trị
       requestBody:
         required: true
@@ -112,7 +128,7 @@ paths:
     get:
       tags:
         - user-service
-      summary: Danh sách người dùng quản trị
+      summary: Danh sách người dùng quản trị ( Manage )
       description: Danh sách người dùng quản trị
       parameters:
         - name: sort
@@ -158,7 +174,7 @@ paths:
     patch:
       tags:
         - user-service
-      summary: Cập nhật người dùng quản trị
+      summary: Cập nhật người dùng quản trị ( Manage )
       description: Cập nhật người dùng quản trị
       parameters:
         - name: id
@@ -198,8 +214,8 @@ paths:
     delete:
       tags:
         - user-service
-      summary: Xóa người dùng quản trị
-      description: Xóa người dùng quản trị
+      summary: Xóa người dùng quản trị ( Manage )
+      description: Xóa người dùng quản trị, chỉ có quyền admin mới xoá được!
       parameters:
         - name: id
           in: path
@@ -221,7 +237,7 @@ paths:
     get:
       tags:
         - user-service
-      summary: Chi tiết người dùng quản trị
+      summary: Chi tiết người dùng quản trị ( Manage )
       description: Chi tiết người dùng quản trị
       parameters:
         - name: id
@@ -245,7 +261,7 @@ paths:
     get:
       tags:
         - category-service
-      summary: Danh sách danh mục
+      summary: Danh sách danh mục ( Manage )
       description: Danh sách dnah mục
       parameters:
         - name: sort
@@ -290,7 +306,7 @@ paths:
     post:
       tags:
         - category-service
-      summary: Tạo danh mục
+      summary: Tạo danh mục ( Manage )
       description: Tạo danh mục
       requestBody:
         required: true
@@ -313,7 +329,7 @@ paths:
     patch:
       tags:
         - category-service
-      summary: Cập nhật danh mục
+      summary: Cập nhật danh mục ( Manage )
       description: Cập nhật danh mục
       parameters:
         - name: id
@@ -342,7 +358,7 @@ paths:
     get:
       tags:
         - category-service
-      summary: Chi tiết danh mục
+      summary: Chi tiết danh mục ( Manage )
       description: Chi tiết danh mục
       parameters:
         - name: id
@@ -365,8 +381,8 @@ paths:
     delete:
       tags:
         - category-service
-      summary: Xóa danh mục
-      description: Xóa danh mục
+      summary: Xóa danh mục ( Manage )
+      description: Xóa danh mục, chỉ có admin mới xoá được
       parameters:
         - name: id
           in: path
@@ -389,7 +405,7 @@ paths:
     get:
       tags:
         - category-service
-      summary: Danh mục có mối quan hệ cha con
+      summary: Danh mục có mối quan hệ cha con ( Any )
       description: Chi tiết Danh mục có bao gồm mối quan hệ cha con
       parameters:
         - name: id
@@ -415,7 +431,7 @@ paths:
     get:
       tags:
         - product-service
-      summary: Danh sách sản phẩm
+      summary: Danh sách sản phẩm ( Manage )
       description: Danh sách sản phẩm
       parameters:
         - name: sort
@@ -460,7 +476,7 @@ paths:
     post:
       tags:
         - product-service
-      summary: Tạo sản phẩm
+      summary: Tạo sản phẩm ( Manage )
       description: Tạo sản phẩm
       requestBody:
         content:
@@ -499,7 +515,7 @@ paths:
     get:
       tags:
         - product-service
-      summary: Chi tiết sản phẩm
+      summary: Chi tiết sản phẩm ( Any )
       description: Chi tiết sản phẩm
       parameters:
         - name: id
@@ -520,7 +536,7 @@ paths:
     patch:
       tags:
         - product-service
-      summary: Cập nhật sản phẩm
+      summary: Cập nhật sản phẩm ( Manage )
       description: Cập nhật sản phẩm
       parameters:
         - name: id
@@ -560,8 +576,8 @@ paths:
     delete:
       tags:
         - product-service
-      summary: Xóa sản phẩm
-      description: Xóa sản phẩm
+      summary: Xóa sản phẩm ( Manage )
+      description: Xóa sản phẩm, chỉ có quyền admin mới xoá được!
       parameters:
         - name: id
           in: path
@@ -584,7 +600,7 @@ paths:
     patch:
       tags:
         - product-service
-      summary: Thêm ảnh phụ cho sản phẩm
+      summary: Thêm ảnh phụ cho sản phẩm ( Manage )
       description: Thêm ảnh phụ cho sản phẩm
       parameters:
         - name: id
@@ -620,7 +636,7 @@ paths:
     delete:
       tags:
         - product-service
-      summary: Xóa ảnh phụ sản phẩm
+      summary: Xóa ảnh phụ sản phẩm ( Manage )
       description: Xóa ảnh phụ sản phẩm bằng id image của sản phẩm
       parameters:
         - name: id
@@ -651,7 +667,7 @@ paths:
     get:
       tags:
         - product-service
-      summary: Danh sách sản phẩm theo category
+      summary: Danh sách sản phẩm theo category ( Any )
       description: Danh sách sản phẩm theo category
       parameters:
         - name: category_id
@@ -707,7 +723,7 @@ paths:
     post:
       tags:
         - customer-service
-      summary: Đăng nhập khách hàng
+      summary: Đăng nhập khách hàng ( Customer )
       description: Đăng nhập khách hàng
       requestBody:
         required: true
@@ -726,7 +742,7 @@ paths:
     post:
       tags:
         - customer-service
-      summary: Đăng xuất khách hàng
+      summary: Đăng xuất khách hàng ( Customer )
       description: Đăng xuất khách hàng
       parameters:
         - name: token
@@ -748,7 +764,7 @@ paths:
     post:
       tags:
         - customer-service
-      summary: Refresh Token
+      summary: Refresh Token ( Customer )
       description: Refresh Token
       parameters:
         - name: token
@@ -770,7 +786,7 @@ paths:
     post:
       tags:
         - customer-service
-      summary: Đăng ký khách hàng
+      summary: Đăng ký khách hàng ( Customer )
       description: Đăng ký khách hàng
       requestBody:
         required: true
@@ -795,7 +811,7 @@ paths:
     get:
       tags:
         - customer-service
-      summary: Xác thực tài khoản ( từ email )
+      summary: Xác thực tài khoản ( Customer, từ email )
       description: Xác thực tài khoản
       parameters:
         - name: token
@@ -815,7 +831,7 @@ paths:
     post:
       tags:
         - customer-service
-      summary: Quên mật khẩu
+      summary: Quên mật khẩu ( Customer )
       description: Quên mật khẩu
       parameters:
         - name: email
@@ -835,7 +851,7 @@ paths:
     get:
       tags:
         - customer-service
-      summary: Thay đổi mật khẩu (từ email )
+      summary: Thay đổi mật khẩu ( Customer, từ email )
       description: Thay đổi mật khẩu
       parameters:
         - name: token
@@ -855,12 +871,11 @@ paths:
           description: Thành công
         "404":
           description: Không tìm thấy token
-
   /customers/upload:
     post:
       tags:
         - customer-service
-      summary: Thay ảnh đại diện khách hàng
+      summary: Thay ảnh đại diện khách hàng ( Customer )
       description: Thay ảnh đại diện khách hàng
       requestBody:
         required: true
@@ -883,7 +898,7 @@ paths:
     get:
       tags:
         - customer-service
-      summary: Tài khoản của tôi
+      summary: Tài khoản của tôi ( Customer )
       description: Tài khoản của tôi
       responses:
         "200":
@@ -893,7 +908,7 @@ paths:
     patch:
       tags:
         - customer-service
-      summary: Cập nhật tài khoản của tôi
+      summary: Cập nhật tài khoản của tôi ( Customer )
       description: Cập nhật tài khoản của tôi
       requestBody:
         required: true
@@ -912,7 +927,7 @@ paths:
     get:
       tags:
         - customer-service
-      summary: Danh sách khách hàng
+      summary: Danh sách khách hàng ( Manage )
       description: Danh sách khách hàng
       parameters:
         - name: sort
@@ -958,7 +973,7 @@ paths:
     get:
       tags:
         - customer-service
-      summary: Chi tiết khách hàng
+      summary: Chi tiết khách hàng ( Manage )
       description: Chi tiết khách hàng
       parameters:
         - name: id
@@ -976,9 +991,387 @@ paths:
           description: Yêu cầu đăng nhập
         "403":
           description: Quyền không được truy cập
-
+  /cart/add:
+    post:
+      tags:
+        - cart-service
+      summary: Thêm sản phẩm vào giỏ hàng ( Customer )
+      description: "Lưu ý: phải thêm đúng id vì api này sẽ không check id product để tối ưu trải nghiệm người dùng"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Cart"
+      responses:
+        "200":
+          description: Thành công
+        "400":
+          description: Lỗi đầu vào
+        "401":
+          description: Yêu cầu đăng nhập
+        "403":
+          description: Quyền không được truy cập
+        "404":
+          description: Không tìm thấy sản phẩm
+  /cart:
+    get:
+      tags:
+        - cart-service
+      summary: Danh sách giỏ hàng của khách hàng ( Customer )
+      description: Danh sách giỏ hàng của khách hàng
+      responses:
+        "200":
+          description: Thành công
+        "401":
+          description: Yêu cầu đăng nhập
+        "403":
+          description: Quyền không được truy cập
+  /cart/product/{id}:
+    delete:
+      tags:
+        - cart-service
+      summary: Xóa sản phẩm khỏi giỏ hàng ( Customer )
+      description: Xóa sản phẩm khỏi giỏ hàng
+      parameters:
+        - name: id
+          in: path
+          description: ID sản phẩm
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Thành công
+        "401":
+          description: Yêu cầu đăng nhập
+        "403":
+          description: Quyền không được truy cập
+        "404":
+          description: Không tìm thấy sản phẩm
+  /cart/checkout:
+    get:
+      tags:
+        - cart-service
+      summary: Kiểm tra trước khi thanh toán ( Customer )
+      description: Kiểm tra trước khi thanh toán
+      responses:
+        "200":
+          description: Thành công
+        "401":
+          description: Yêu cầu đăng nhập
+        "403":
+          description: Quyền không được truy cập
+  /cart/place_order:
+    post:
+      tags:
+        - cart-service
+      summary: Thanh toán ( Customer )
+      description: Thanh toán
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PlaceOrder"
+      responses:
+        "200":
+          description: Thành công
+        "400":
+          description: Lỗi đầu vào
+        "401":
+          description: Yêu cầu đăng nhập
+        "403":
+          description: Quyền không được truy cập
+        "404":
+          description: Không tìm thấy sản phẩm
+  /orders:
+    get:
+      tags:
+        - order-service
+      summary: Danh sách đơn hàng ( Manage )
+      description: Danh sách đơn hàng
+      parameters:
+        - name: sort
+          in: query
+          description: Sort order (asc or desc)
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+            default: asc
+        - name: page
+          in: query
+          description: Page number
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          description: Number of items per page
+          required: false
+          schema:
+            type: integer
+            default: 10
+        - name: keyword
+          in: query
+          description: Search with keyword
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Thành công
+        "400":
+          description: Lỗi đầu vào
+        "401":
+          description: Yêu cầu đăng nhập
+        "403":
+          description: Quyền không được truy cập
+  /orders/{id}:
+    get:
+      tags:
+        - order-service
+      summary: Chi tiết đơn hàng ( Manage )
+      description: Chi tiết đơn hàng
+      parameters:
+        - name: id
+          in: path
+          description: ID đơn hàng
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Thành công
+        "400":
+          description: Lỗi đầu vào
+        "401":
+          description: Yêu cầu đăng nhập
+        "403":
+          description: Quyền không được truy cập
+        "404":
+          description: Không tìm thấy đơn hàng
+  /orders/{id}/status/{status}:
+    get:
+      tags:
+        - order-service
+      summary: Thay đổi trạng thái đơn hàng ( Manage )
+      description: Thay đổi trạng thái đơn hàng
+      parameters:
+        - name: id
+          in: path
+          description: ID đơn hàng
+          required: true
+          schema:
+            type: string
+        - name: status
+          in: path
+          description: Trạng thái đơn hàng
+          required: true
+          schema:
+            type: string
+            enum:
+              - pending
+              - complete
+              - cancel
+            default: pending
+      responses:
+        "200":
+          description: Thành công
+        "400":
+          description: Lỗi đầu vào
+        "401":
+          description: Yêu cầu đăng nhập
+        "403":
+          description: Quyền không được truy cập
+        "404":
+          description: Không tìm thấy đơn hàng
+  /orders/details:
+    get:
+      tags:
+        - order-service
+      summary: chi tiết đơn hàng của khách hàng ( Customer )
+      description: chi tiết đơn hàng của khách hàng
+      responses:
+        "200":
+          description: Thành công
+        "401":
+          description: Yêu cầu đăng nhập
+        "403":
+          description: Quyền không được truy cập
+  /reviews:
+    get:
+      tags:
+        - review-service
+      summary: Danh sách đánh giá từ khách hàng ( Manage )
+      description: Danh sách đánh giá từ khách hàng
+      parameters:
+        - name: sort
+          in: query
+          description: Sort order (asc or desc)
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+            default: asc
+        - name: page
+          in: query
+          description: Page number
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          description: Number of items per page
+          required: false
+          schema:
+            type: integer
+            default: 10
+        - name: keyword
+          in: query
+          description: Search with keyword
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Thành công
+        "400":
+          description: Lỗi đầu vào
+        "401":
+          description: Yêu cầu đăng nhập
+        "403":
+          description: Quyền không được truy cập
+  /reviews/{id}:
+    delete:
+      tags:
+        - review-service
+      summary: Xóa đánh giá của khách hàng ( Manage )
+      description: Xóa đánh giá của khách hàng
+      parameters:
+        - name: id
+          in: path
+          description: ID đánh giá
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Thành công
+        "400":
+          description: Lỗi đầu vào
+        "401":
+          description: Yêu cầu đăng nhập
+        "403":
+          description: Quyền không được truy cập
+        "404":
+          description: Không tìm thấy đánh giá
+  /reviews/post_review/{id}:
+    post:
+      tags:
+        - review-service
+      summary: Đánh giá sản phẩm ( Customer )
+      description: Đánh giá sản phẩm
+      parameters:
+        - name: id
+          in: path
+          description: ID hoá đơn
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Review"
+      responses:
+        "200":
+          description: Thành công
+        "400":
+          description: Lỗi đầu vào
+        "401":
+          description: Yêu cầu đăng nhập
+        "403":
+          description: Quyền không được truy cập
+        "404":
+          description: Không tìm thấy sản phẩm
+  /reviews/ratings/{id}:
+    get:
+      tags:
+        - review-service
+      summary: Xem Đánh giá sản phẩm ( Any )
+      description: Xem Đánh giá sản phẩm
+      parameters:
+        - name: id
+          in: path
+          description: ID sản phẩm
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                page:
+                  type: number
+                  example: 1
+                limit:
+                  type: number
+                  example: 10
+                ratings:
+                  type: number
+                  example: 5
+      responses:
+        "200":
+          description: Thành công
+        "400":
+          description: Lỗi đầu vào
+        "404":
+          description: Không tìm thấy sản phẩm
 components:
   schemas:
+    Review:
+      properties:
+        headline:
+          type: string
+          example: "Mau den"
+        comment:
+          type: string
+          example: "Sản phẩm rất đẹp"
+        rating:
+          type: number
+          example: 5
+
+    PlaceOrder:
+      properties:
+        payment_method:
+          type: string
+          example: "COD"
+        address:
+          type: string
+          example: Ha Noi
+        phone_number:
+          type: string
+          example: 0123456789
+    Cart:
+      properties:
+        product_id:
+          type: string
+          example: id product
+        quantity:
+          type: number
+          example: 1
     CustomerUpdate:
       properties:
         first_name:
