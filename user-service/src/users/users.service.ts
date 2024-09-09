@@ -73,9 +73,9 @@ export class UsersService implements OnModuleInit {
     }
   }
 
-  async updateStatus(_id: string, status: boolean) {
+  async updateStatus(_id: string, status: string) {
 
-    if(typeof status !== "boolean") {
+    if(status != 'true' && status != 'false') {
       this.logger.warn('Status is true or false!');
       throw new BadRequestException(USER_CONSTANTS.STATUS);
     }

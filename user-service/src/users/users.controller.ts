@@ -131,7 +131,7 @@ export class UsersController {
   @Roles(ROLE.ADMIN)
   @Get('/:id/status/:status')
   async updateStatus(@Param('id') _id: string,
-                     @Param('status') status: boolean): Promise<ResponseObject> {
+                     @Param('status') status: string): Promise<ResponseObject> {
    await this.usersService.updateStatus(_id, status);
 
     this.redisService.clearAllUserCache();
