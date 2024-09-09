@@ -127,6 +127,22 @@ export class UsersController {
     };
   }
 
+  @UseGuards(JwtAuthGuard, RolesAuthGuard)
+  @Roles(ROLE.ADMIN)
+  @Get('/:id/status/:status')
+  async updateStatus(@Param('id') _id: string,
+                     @Param('status') status: boolean): Promise<ResponseObject> {
+   await this.usersService.updateStatus(_id, status);
+
+    this.redisService.clearAllUserCache();
+
+    return {
+      data: status,
+      status: HttpStatus.OK,
+      message: USER_CONSTANTS.UPDATE_STATUS
+    }
+  }
+
   private buildPaginationDto(
     pagination: RequestPaginationDto,
     users: User[],

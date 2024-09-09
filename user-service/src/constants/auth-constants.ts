@@ -4,4 +4,5 @@ export const AUTH_CONSTANTS = {
   LOGIN: "Log in successfully!",
   REFRESH_TOKEN: "Refresh token successfully!",
   PASSWORD_NOT_MATCH: "Password Not Match",
+  AUTH_STATUS: "Your account has been locked!"
 }

@@ -34,6 +34,11 @@ export class AuthService {
       throw new NotFoundException(DATABASE_CONST.NOTFOUND);
     }
 
+    if(!user.status) {
+      this.logger.log("User status is false!")
+      throw new UnauthorizedException(AUTH_CONSTANTS.AUTH_STATUS);
+    }
+
     const isMatch = await bcrypt.compare(request.password, user.password);
     if (!isMatch) {
       this.logger.warn('User password does not match');

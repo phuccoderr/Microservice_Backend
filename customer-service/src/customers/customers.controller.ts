@@ -143,7 +143,7 @@ export class CustomersController {
       status: HttpStatus.OK,
       message: CUSTOMER_CONSTANTS.UPLOAD_AVATAR,
     };
-  }
+  }z
 
   private buildPaginationDto(
     pagination: RequestPaginationDto,

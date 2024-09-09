@@ -4,4 +4,6 @@ export const USER_CONSTANTS = {
   GET: "Get user successfully!",
   GET_ALL: "Get all user successfully!",
   CREATE: "Create user successfully!",
+  UPDATE_STATUS: "Update status user successfully!",
+  STATUS: "Status is true or false!",
 }

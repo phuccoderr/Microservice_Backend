@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   Logger,
   NotFoundException,
@@ -13,6 +14,7 @@ import { User } from './models/user.schema';
 import { RequestPaginationDto } from './dto/request-pagination.dto';
 import { DATABASE_CONST } from '@src/constants/db-constants';
 import { ROLE } from '@src/auth/decorators/role.enum';
+import { USER_CONSTANTS } from '@src/constants/user-constants';
 
 @Injectable()
 export class UsersService implements OnModuleInit {
@@ -66,6 +68,21 @@ export class UsersService implements OnModuleInit {
   async deleteUser(_id: string): Promise<void> {
     const user = await this.usersRepository.findOneAndDelete({ _id });
     if (!user) {
+      this.logger.warn('User does not exist with id ' + _id);
+      throw new NotFoundException(DATABASE_CONST.NOTFOUND);
+    }
+  }
+
+  async updateStatus(_id: string, status: boolean) {
+
+    if(typeof status !== "boolean") {
+      this.logger.warn('Status is true or false!');
+      throw new BadRequestException(USER_CONSTANTS.STATUS);
+    }
+
+    try {
+      await this.usersRepository.findOneAndUpdate({_id}, {status});
+    } catch (error) {
       this.logger.warn('User does not exist with id ' + _id);
       throw new NotFoundException(DATABASE_CONST.NOTFOUND);
     }

@@ -257,6 +257,38 @@ paths:
           description: Quyền không được truy cập
         "404":
           description: Không tìm thấy người dùng
+  /users/{id}/status/{status}:
+    get:
+      tags:
+        - user-service
+      summary: Thay đổi trạng thái người dùng quản trị ( Manage )
+      description: Thay đổi trạng thái người dùng quản trị
+      parameters:
+        - name: id
+          in: path
+          description: ID người dùng
+          required: true
+          schema:
+            type: string
+        - name: status
+          in: path
+          description: Trạng thái người dùng
+          required: true
+          schema:
+            type: boolean
+            enum:
+              - true
+              - false
+            default: true
+      responses:
+        "200":
+          description: Thành công
+        "400":
+          description: Lỗi đầu vào
+        "401":
+          description: Yêu cầu đăng nhập
+        "403":
+          description: Quyền không được truy cập
   /categories:
     get:
       tags:
