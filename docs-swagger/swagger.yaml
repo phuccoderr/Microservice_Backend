@@ -7,6 +7,10 @@ info:
     Email: phuctapcode@gmail.com
 
     Github: [phuccoderr](https://github.com/phuccoderr)
+
+    Lưu ý: Mỗi servers service tương ứng api của service đó 
+
+    Ví dụ: Servers User-service chỉ có thể truy cập api user-service, không thể truy cập api product-serivce
   version: 1.0.0
 servers:
   - url: http://localhost:9120/api/v1
@@ -1055,6 +1059,27 @@ paths:
           description: Yêu cầu đăng nhập
         "403":
           description: Quyền không được truy cập
+  /customers/change_password:
+    patch:
+      tags:
+        - customer-service
+      summary: Thay đổi mật khách hàng ( Customer )
+      description: Thay đổi mật khách hàng
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChangePassword"
+      responses:
+        "200":
+          description: Thành công
+        "400":
+          description: Lỗi đầu vào
+        "401":
+          description: Yêu cầu đăng nhập
+        "403":
+          description: Quyền không được truy cập
   /cart/add:
     post:
       tags:
@@ -1409,6 +1434,14 @@ paths:
           description: Không tìm thấy sản phẩm
 components:
   schemas:
+    ChangePassword:
+      properties:
+        old_password:
+          type: string
+          example: 123
+        new_password:
+          type: string
+          example: 123
     Review:
       properties:
         headline:

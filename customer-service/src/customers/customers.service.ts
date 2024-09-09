@@ -1,10 +1,19 @@
-import { BadRequestException, HttpStatus, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpStatus,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { Customer } from './models/customer.schema';
 import { CustomersRepository } from './customers.repository';
 import { UpdateAccountDto } from './dto/update-account.dto';
 import { RequestPaginationDto } from './dto/request-pagination.dto';
 import { DATABASE_CONST } from '../constants/db-constants';
 import { CUSTOMER_CONSTANTS } from '@src/constants/customer-constants';
+import { ChangePasswordDto } from '@src/customers/dto/change-password.dto';
+import * as bcrypt from 'bcrypt';
+import { AUTH_CONSTANTS } from '@src/constants/auth-constants';
 
 @Injectable()
 export class CustomersService {
@@ -78,5 +87,25 @@ export class CustomersService {
       this.logger.warn('customer not found!');
       throw new NotFoundException(DATABASE_CONST.NOTFOUND);
     }
+  }
+
+  async changePassword(_id: string, changePassword: ChangePasswordDto): Promise<void> {
+    const customer = await this.customersRepository.findById(_id);
+    if (!customer) {
+      this.logger.warn('customer not found!');
+      throw new NotFoundException(DATABASE_CONST.NOTFOUND);
+    }
+
+    const isMatch = await bcrypt.compare(changePassword.old_password, customer.password);
+    if (!isMatch) {
+      this.logger.log('password not match!');
+      throw new BadRequestException(AUTH_CONSTANTS.PASSWORD_NOT_MATCH);
+    }
+
+    await this.customersRepository.findOneAndUpdate(
+      {_id},
+      {password: await bcrypt.hash(changePassword.new_password, 10)}
+    );
+
   }
 }

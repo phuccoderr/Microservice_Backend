@@ -5,4 +5,5 @@ export const CUSTOMER_CONSTANTS = {
   UPLOAD_AVATAR: "Upload avatar customer successfully",
   UPDATE_STATUS: "Update status user successfully!",
   STATUS: "Status is true or false!",
+  CHANGE_PASSWORD: "Change password successfully!",
 }

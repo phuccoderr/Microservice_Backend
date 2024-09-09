@@ -28,6 +28,7 @@ import { CUSTOMER_CONSTANTS } from '../constants/customer-constants';
 import { RolesAuthGuard } from '@src/auth/guards/roles-auth.guard';
 import { ROLE } from '@src/auth/decorators/role.enum';
 import { Roles } from '@src/auth/decorators/roles.decorator';
+import { ChangePasswordDto } from '@src/customers/dto/change-password.dto';
 
 @Controller('/api/v1/customers')
 export class CustomersController {
@@ -158,6 +159,21 @@ export class CustomersController {
       data: status,
       status: HttpStatus.OK,
       message: CUSTOMER_CONSTANTS.UPDATE_STATUS
+    }
+  }
+
+  @UseGuards(JwtAuthGuard, RolesAuthGuard)
+  @Roles(ROLE.CUSTOMER)
+  @Patch("/change_password")
+  async changePassword(@Request() req,
+                       @Body() changePasswordDto: ChangePasswordDto,) {
+    const { _id } = req.user;
+    await this.customersService.changePassword(_id, changePasswordDto);
+
+    return {
+      data: {},
+      status: HttpStatus.OK,
+      message: CUSTOMER_CONSTANTS.CHANGE_PASSWORD
     }
   }
 
