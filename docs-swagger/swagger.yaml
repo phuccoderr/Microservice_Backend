@@ -1023,6 +1023,38 @@ paths:
           description: Yêu cầu đăng nhập
         "403":
           description: Quyền không được truy cập
+  /customers/{id}/status/{status}:
+    get:
+      tags:
+        - customer-service
+      summary: Thay đổi trạng thái khách hàng ( Manage )
+      description: Thay đổi trạng thái khách hàng
+      parameters:
+        - name: id
+          in: path
+          description: ID khách hàng
+          required: true
+          schema:
+            type: string
+        - name: status
+          in: path
+          description: Trạng thái khách hàng
+          required: true
+          schema:
+            type: boolean
+            enum:
+              - true
+              - false
+            default: true
+      responses:
+        "200":
+          description: Thành công
+        "400":
+          description: Lỗi đầu vào
+        "401":
+          description: Yêu cầu đăng nhập
+        "403":
+          description: Quyền không được truy cập
   /cart/add:
     post:
       tags:

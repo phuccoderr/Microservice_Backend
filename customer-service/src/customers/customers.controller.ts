@@ -143,7 +143,23 @@ export class CustomersController {
       status: HttpStatus.OK,
       message: CUSTOMER_CONSTANTS.UPLOAD_AVATAR,
     };
-  }z
+  }
+
+  @UseGuards(JwtAuthGuard, RolesAuthGuard)
+  @Roles(ROLE.ADMIN)
+  @Get('/:id/status/:status')
+  async updateStatus(@Param('id') _id: string,
+                     @Param('status') status: string): Promise<ResponseObject> {
+    await this.customersService.updateStatus(_id, status);
+
+    this.redisCacheService.clearAllCustomerCache();
+
+    return {
+      data: status,
+      status: HttpStatus.OK,
+      message: CUSTOMER_CONSTANTS.UPDATE_STATUS
+    }
+  }
 
   private buildPaginationDto(
     pagination: RequestPaginationDto,

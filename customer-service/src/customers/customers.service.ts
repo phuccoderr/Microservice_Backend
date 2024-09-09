@@ -1,9 +1,10 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { BadRequestException, HttpStatus, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { Customer } from './models/customer.schema';
 import { CustomersRepository } from './customers.repository';
 import { UpdateAccountDto } from './dto/update-account.dto';
 import { RequestPaginationDto } from './dto/request-pagination.dto';
 import { DATABASE_CONST } from '../constants/db-constants';
+import { CUSTOMER_CONSTANTS } from '@src/constants/customer-constants';
 
 @Injectable()
 export class CustomersService {
@@ -47,6 +48,20 @@ export class CustomersService {
     }
 
     return await this.customersRepository.listByPage(page, limit, sort);
+  }
+
+  async updateStatus(_id: string, status: string) {
+    if(status != 'true' && status != 'false') {
+      this.logger.warn('Status is true or false!');
+      throw new BadRequestException(CUSTOMER_CONSTANTS.STATUS);
+    }
+
+    try {
+      await this.customersRepository.findOneAndUpdate({_id}, {status});
+    } catch (error) {
+      this.logger.warn('Customer does not exist with id ' + _id);
+      throw new NotFoundException(DATABASE_CONST.NOTFOUND);
+    }
   }
 
   async uploadAvatar(

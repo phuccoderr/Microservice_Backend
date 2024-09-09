@@ -18,7 +18,7 @@ export class RedisCacheService {
     await this.cacheManager.del(key);
   }
 
-  async clearAllUserCache() {
+  async clearAllCustomerCache() {
     const keys = await this.cacheManager.store.keys('all_customers:*');
 
     if (keys.length > 0) {
