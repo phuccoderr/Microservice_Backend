@@ -31,10 +31,7 @@ public class Utility {
     public CategoryDto toDto(Category category) {
         CategoryDto dto = modelMapper.map(category, CategoryDto.class);
 
-        dto.setChildren(category.getChildren().stream().map(BaseEntity::getId).toList());
-        if (category.getParent() != null) {
-            dto.setParent(category.getParent().getId());
-        }
+        dto.setHasChildren(category.hasChildren());
         return dto;
     }
 

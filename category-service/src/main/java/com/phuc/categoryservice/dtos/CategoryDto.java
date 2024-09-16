@@ -34,9 +34,9 @@ public class CategoryDto {
     @JsonProperty("status")
     private boolean status;
 
-    @JsonProperty("parent_id")
-    private String parent;
+    @JsonProperty("has_children")
+    private boolean hasChildren;
 
     @JsonProperty("children")
-    private List<String> children = new ArrayList<>();
+    private List<CategoryDto> children = new ArrayList<>();
 }

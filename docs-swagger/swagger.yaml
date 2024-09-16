@@ -262,7 +262,7 @@ paths:
         "404":
           description: Không tìm thấy người dùng
   /users/{id}/status/{status}:
-    get:
+    patch:
       tags:
         - user-service
       summary: Thay đổi trạng thái người dùng quản trị ( Manage )

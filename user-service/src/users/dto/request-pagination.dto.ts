@@ -19,7 +19,6 @@ export class RequestPaginationDto {
   @Type(() => Number)
   @IsInt()
   @IsPositive()
-  @Max(100)
   limit: number = 10;
 
   @IsOptional()

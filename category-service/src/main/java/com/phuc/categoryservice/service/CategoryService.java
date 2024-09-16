@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -48,16 +49,17 @@ public class CategoryService implements ICategoryService {
             throws ParamValidateException {
 
         Utility.checkSortIsAscOrDesc(sort);
+        Specification<Category> spec = Specification.where(null);
 
         Sort sortDir = Sort.by("name");
         sortDir = sort.equals("asc") ? sortDir.ascending() : sortDir.descending();
 
         Pageable pageable = PageRequest.of(page - 1,limit,sortDir);
+        spec = spec.and(CategorySpecifications.defaultRootCategories());
         if (!keyword.isEmpty()) {
-            return repository.search(keyword, pageable);
-        } else  {
-            return repository.findAll(pageable);
+            spec = spec.and(CategorySpecifications.searchWithName(keyword));
         }
+        return repository.findAll(spec,pageable);
     }
 
     @Override

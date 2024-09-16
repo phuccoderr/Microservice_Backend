@@ -72,7 +72,9 @@ export class UsersController {
 
     const users = await this.usersService.getUsers(pagination);
     const paginationDto = this.buildPaginationDto(pagination, users);
-    this.redisService.set(allUserKey(page, limit, sort), paginationDto);
+    if (!keyword) {
+      this.redisService.set(allUserKey(page, limit, sort), paginationDto);
+    }
 
     return {
       data: paginationDto,
@@ -129,18 +131,20 @@ export class UsersController {
 
   @UseGuards(JwtAuthGuard, RolesAuthGuard)
   @Roles(ROLE.ADMIN)
-  @Get('/:id/status/:status')
-  async updateStatus(@Param('id') _id: string,
-                     @Param('status') status: string): Promise<ResponseObject> {
-   await this.usersService.updateStatus(_id, status);
+  @Patch('/:id/status/:status')
+  async updateStatus(
+    @Param('id') _id: string,
+    @Param('status') status: string,
+  ): Promise<ResponseObject> {
+    await this.usersService.updateStatus(_id, status);
 
     this.redisService.clearAllUserCache();
 
     return {
       data: status,
       status: HttpStatus.OK,
-      message: USER_CONSTANTS.UPDATE_STATUS
-    }
+      message: USER_CONSTANTS.UPDATE_STATUS,
+    };
   }
 
   private buildPaginationDto(

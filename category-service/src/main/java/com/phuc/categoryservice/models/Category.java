@@ -32,4 +32,9 @@ public class Category extends BaseEntity {
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
     @JsonManagedReference
     private Set<Category> children = new HashSet<>();
+
+    @Transient
+    public boolean hasChildren() {
+        return children.size() > 0;
+    };
 }
