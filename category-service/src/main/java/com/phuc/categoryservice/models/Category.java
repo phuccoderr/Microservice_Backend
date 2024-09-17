@@ -34,7 +34,5 @@ public class Category extends BaseEntity {
     private Set<Category> children = new HashSet<>();
 
     @Transient
-    public boolean hasChildren() {
-        return children.size() > 0;
-    };
+    public boolean hasChildren;
 }

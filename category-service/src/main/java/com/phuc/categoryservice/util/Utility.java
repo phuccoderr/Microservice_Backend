@@ -30,9 +30,19 @@ public class Utility {
 
     public CategoryDto toDto(Category category) {
         CategoryDto dto = modelMapper.map(category, CategoryDto.class);
-
-        dto.setHasChildren(category.hasChildren());
+        hierachical(dto);
         return dto;
+    }
+
+    public void hierachical(CategoryDto dto) {
+        if (!dto.getChildren().isEmpty()) {
+            dto.setHasChildren(true);
+            dto.getChildren().forEach(item -> {
+                hierachical(item);
+            });
+        } else {
+            dto.setHasChildren(false);
+        }
     }
 
     public void checkSortIsAscOrDesc(String sort) throws ParamValidateException {
