@@ -74,6 +74,8 @@ public class ProductService implements IProductService {
 
         if (mainImage != null && !mainImage.isEmpty()) {
             setMainImage(mainImage,product);
+        } else {
+            product.setUrl(Constants.BASE_URL_IMAGE);
         }
         setExtraImage(extraImages,product);
 
@@ -234,8 +236,8 @@ public class ProductService implements IProductService {
         product.setPrice(reqProduct.getPrice());
         product.setSale(reqProduct.getSale());
         product.setStock(reqProduct.getStock());
-        product.setAverageRating(0f);
-        product.setReviewCount(0);
+        product.setAverageRating(product.getAverageRating() != null ? product.getAverageRating() : 0f);
+        product.setReviewCount(product.getReviewCount() != null ? product.getReviewCount() : 0);
     }
 
 }

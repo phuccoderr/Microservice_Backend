@@ -1,4 +1,4 @@
-import { Body, Controller, HttpCode, HttpStatus, Post, Query } from "@nestjs/common";
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, Query } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { JwtPayload } from './dto/jwt-payload.dto';
@@ -21,7 +21,7 @@ export class AuthController {
     };
   }
 
-  @Post('logout')
+  @Get('logout')
   @HttpCode(HttpStatus.OK)
   async logout(@Query('token') token: string): Promise<ResponseObject> {
      await this.authService.logout(token);
@@ -33,7 +33,7 @@ export class AuthController {
     };
   }
 
-  @Post('refresh')
+  @Get('refresh')
   @HttpCode(HttpStatus.OK)
   async refreshToken(@Query('token') token: string): Promise<ResponseObject> {
     const jwtPayload: JwtPayload = await this.authService.refreshToken(token);

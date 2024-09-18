@@ -21,8 +21,8 @@ public class CategoryService implements ICategoryService {
 
     private final ObjectMapper objectMapper;
     private final RestTemplate restTemplate;
-
-    private final String CATEGORY_SERVICE_URL = "http://category-service:9130/api/v1/categories/";
+//category-service
+    private final String CATEGORY_SERVICE_URL = "http://localhost:9130/api/v1/categories/";
 
     @Override
     public CategoryDto getCategoryById(String categoryId, HttpServletRequest request) {
