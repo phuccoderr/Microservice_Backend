@@ -54,6 +54,7 @@ public class ProductController {
             }
         }
         Page<Product> pages = productService.getAllProducts(page, limit, sort, keyword);
+        System.out.println(pages);
 
         List<ProductDto> listDtos = Utility.toListDtos(pages.getContent());
 

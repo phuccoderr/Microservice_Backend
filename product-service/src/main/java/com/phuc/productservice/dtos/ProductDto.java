@@ -1,6 +1,7 @@
 package com.phuc.productservice.dtos;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.persistence.Column;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -54,6 +55,12 @@ public class ProductDto {
 
     @JsonProperty("category_id")
     private String categoryId;
+
+    @JsonProperty("average_rating")
+    private Float averageRating;
+
+    @JsonProperty("review_count")
+    private Integer reviewCount;
 
 
 }

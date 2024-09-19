@@ -28,6 +28,6 @@ public class Constants {
     public static final String TOKEN_EXPIRED = "JWT token is expired!";
     public static final String TOKEN_INVALID = "Invalid JWT token!";
 
-    public static final String BASE_URL_IMAGE = "https://res-console.cloudinary.com/dp4tp9gwa/thumbnails/v1/image/upload/v1726672733/bWljcm9zZXJ2aWNlL3Byb2R1Y3QtZW1wdHlfb29tdHNy/drilldown";
+
 
 }

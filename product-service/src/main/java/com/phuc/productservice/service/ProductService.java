@@ -74,8 +74,6 @@ public class ProductService implements IProductService {
 
         if (mainImage != null && !mainImage.isEmpty()) {
             setMainImage(mainImage,product);
-        } else {
-            product.setUrl(Constants.BASE_URL_IMAGE);
         }
         setExtraImage(extraImages,product);
 
