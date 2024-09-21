@@ -54,7 +54,6 @@ public class ProductController {
             }
         }
         Page<Product> pages = productService.getAllProducts(page, limit, sort, keyword);
-        System.out.println(pages);
 
         List<ProductDto> listDtos = Utility.toListDtos(pages.getContent());
 
@@ -94,16 +93,14 @@ public class ProductController {
             cateResponse = categoryService.getCategoryById(requestProduct.getCategoryId(), request);
         }
 
-        Product product = productService.createProduct(mainFile,extraFile,requestProduct, cateResponse);
+        Product product = productService.createProduct(mainFile, extraFile, requestProduct, cateResponse);
 
-        productRedisService.clear();
-
-        ProductDto dto = Utility.toDto(product);
+        productService.setExtraImage(extraFile, product);
 
         return new ResponseEntity<>(ResponseObject.builder()
                 .status(HttpStatus.CREATED.value())
                 .message(Constants.CREATE_SUCCESS)
-                .data(dto).build(), HttpStatus.CREATED);
+                .data("").build(), HttpStatus.CREATED);
     }
 
     @PatchMapping("/{id}")
@@ -153,19 +150,15 @@ public class ProductController {
     public ResponseEntity<ResponseObject> addFilesProduct(
             @PathVariable("id") String id,
             @RequestParam(value = "extra_images", required = false) List<MultipartFile> extraFiles
-    ) throws FuncErrorException, DataNotFoundException {
+    ) throws DataNotFoundException {
         Product productInDB = productService.getProduct(id);
 
-        Product productUpdated = productService.addFiles(extraFiles, productInDB);
-
-        ProductDto dto = Utility.toDto(productUpdated);
-
-        productRedisService.clear();
+        productService.setExtraImage(extraFiles, productInDB);
 
         return new ResponseEntity<>(ResponseObject.builder()
                 .status(HttpStatus.OK.value())
                 .message(Constants.ADD_FILES_SUCCESS)
-                .data(dto).build(), HttpStatus.OK);
+                .data("").build(), HttpStatus.OK);
     }
 
     @DeleteMapping("/delete_files/{id}")

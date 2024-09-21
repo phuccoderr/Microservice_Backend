@@ -3,10 +3,7 @@ package com.phuc.productservice.service;
 import com.phuc.productservice.constants.Constants;
 import com.phuc.productservice.dtos.CategoryDto;
 import com.phuc.productservice.dtos.CloudinaryDto;
-import com.phuc.productservice.exceptions.DataErrorException;
-import com.phuc.productservice.exceptions.DataNotFoundException;
-import com.phuc.productservice.exceptions.FuncErrorException;
-import com.phuc.productservice.exceptions.ParamValidateException;
+import com.phuc.productservice.exceptions.*;
 import com.phuc.productservice.models.Product;
 import com.phuc.productservice.models.ProductImage;
 import com.phuc.productservice.repository.ProductImageRepository;
@@ -15,6 +12,8 @@ import com.phuc.productservice.request.RequestProduct;
 import com.phuc.productservice.util.FileUploadUtil;
 import com.phuc.productservice.util.Utility;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -24,17 +23,23 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 @RequiredArgsConstructor
 public class ProductService implements IProductService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProductService.class);
     
     private final ProductRepository proRepository;
     private final ProductImageRepository proImageRepository;
     private final CloudinaryService cloudinaryService;
+    private final SocketIOService socketIOService;
+    private final ProductRedisService productRedisService;
 
     @Override
     public Page<Product> getAllProducts(Integer page, Integer limit, String sort, String keyword)
@@ -75,16 +80,11 @@ public class ProductService implements IProductService {
         if (mainImage != null && !mainImage.isEmpty()) {
             setMainImage(mainImage,product);
         }
-        setExtraImage(extraImages,product);
 
         if(categoryDto != null) {
             product.setCategoryId(categoryDto.getId());
         }
 
-        if (!requestProduct.getExtraImages().isEmpty()) {
-            requestProduct.getExtraImages().forEach(product::addImage
-            );
-        }
         return proRepository.save(product);
     }
 
@@ -138,6 +138,7 @@ public class ProductService implements IProductService {
 
     @Override
     public Product addFiles(List<MultipartFile> extraFiles, Product product) throws FuncErrorException {
+        setExtraImage(extraFiles,product);
         for (MultipartFile file : extraFiles) {
             FileUploadUtil.assertAllowed(file, FileUploadUtil.IMAGE_PATTERN);
 
@@ -162,6 +163,7 @@ public class ProductService implements IProductService {
         });
     }
 
+    @Override
     public Page<Product> getAllProductsByCategory(
             List<String> listCategoryIds,
             Integer page,
@@ -194,34 +196,23 @@ public class ProductService implements IProductService {
 
     }
 
-    private void setMainImage(MultipartFile mainFile,Product product)
-            throws FuncErrorException {
-
-        FileUploadUtil.assertAllowed(mainFile, FileUploadUtil.IMAGE_PATTERN);
-
-        String fileName = FileUploadUtil.getFileName(mainFile.getOriginalFilename());
-
-        CloudinaryDto result = cloudinaryService.uploadImage(mainFile, fileName);
-
-        product.setImageId(result.getPublicId());
-        product.setUrl(result.getUrl());
-
-    }
-
-    private void setExtraImage(List<MultipartFile> extraFile,Product product)
-            throws FuncErrorException {
+    @Override
+    public void setExtraImage(List<MultipartFile> extraFile,Product product) {
 
         if (extraFile != null && !extraFile.isEmpty() ) {
+            List<CompletableFuture<Void>> uploadFutures = new ArrayList<>();
             for (MultipartFile file : extraFile) {
-
-                FileUploadUtil.assertAllowed(file, FileUploadUtil.IMAGE_PATTERN);
-
                 String fileName = FileUploadUtil.getFileName(file.getOriginalFilename());
-
-                CloudinaryDto result = cloudinaryService.uploadImage(file, fileName);
-                product.addImage(result);
+                CompletableFuture<Void> future  = cloudinaryService.uploadImageAsync(file, fileName, product).thenAccept(voidResult -> {
+                    socketIOService.sendMessageToAddImage(fileName);
+                });
+                uploadFutures.add(future);
             }
 
+            CompletableFuture.allOf(uploadFutures.toArray(new CompletableFuture[0])).thenRun(() -> {
+                socketIOService.sendMessageToAddImage("upload success");
+                productRedisService.clear();
+            });
         }
     }
 
@@ -236,6 +227,20 @@ public class ProductService implements IProductService {
         product.setStock(reqProduct.getStock());
         product.setAverageRating(product.getAverageRating() != null ? product.getAverageRating() : 0f);
         product.setReviewCount(product.getReviewCount() != null ? product.getReviewCount() : 0);
+    }
+
+    private void setMainImage(MultipartFile mainFile,Product product)
+            throws FuncErrorException {
+
+        FileUploadUtil.assertAllowed(mainFile, FileUploadUtil.IMAGE_PATTERN);
+
+        String fileName = FileUploadUtil.getFileName(mainFile.getOriginalFilename());
+
+        CloudinaryDto result = cloudinaryService.uploadImage(mainFile, fileName);
+
+        product.setImageId(result.getPublicId());
+        product.setUrl(result.getUrl());
+
     }
 
 }

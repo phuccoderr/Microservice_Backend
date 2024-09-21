@@ -12,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 public interface IProductService {
     Page<Product> getAllProducts(Integer page, Integer limit, String sort, String keyword) throws ParamValidateException;
@@ -33,10 +34,20 @@ public interface IProductService {
 
     void deleteProductById(String proId) throws DataErrorException, DataNotFoundException;
 
+
+    Product addFiles(List<MultipartFile> extraFiles, Product product) throws FuncErrorException;
+    Page<Product> getAllProductsByCategory(
+            List<String> listCategoryIds,
+            Integer page,
+            Integer limit,
+            String sort,
+            String sortField,
+            String keyword
+    ) throws ParamValidateException;
+    void setExtraImage(List<MultipartFile> extraFile,Product product);
+    void deleteFiles(List<String> listFiles, Product product);
+
     void checkNameUnique(String oldName, String newName) throws DataErrorException;
 
     void checkNameUnique(String name) throws DataErrorException;
-
-    Product addFiles(List<MultipartFile> extraFiles, Product product) throws FuncErrorException;
-    void deleteFiles(List<String> listFiles, Product product);
 }

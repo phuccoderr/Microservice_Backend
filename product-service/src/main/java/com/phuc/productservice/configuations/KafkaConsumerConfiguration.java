@@ -1,9 +1,7 @@
 package com.phuc.productservice.configuations;
 
-import com.phuc.productservice.events.message.AvgRatingEvent;
 import com.phuc.productservice.events.message.PlaceOrderEvent;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
-import org.apache.kafka.common.serialization.ByteArrayDeserializer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
