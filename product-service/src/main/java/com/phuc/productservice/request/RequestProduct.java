@@ -39,7 +39,7 @@ public class RequestProduct {
     @JsonProperty("sale")
     @NotNull(message = "sale cannot be null")
     @Min(value = 0, message = "sale cannot be less than 0")
-    @Max(value = 100, message = "sale cannot greater than 0")
+    @Max(value = 100, message = "sale cannot greater than 100")
     private Float sale;
 
     @JsonProperty("stock")

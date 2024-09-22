@@ -203,14 +203,12 @@ public class ProductService implements IProductService {
             List<CompletableFuture<Void>> uploadFutures = new ArrayList<>();
             for (MultipartFile file : extraFile) {
                 String fileName = FileUploadUtil.getFileName(file.getOriginalFilename());
-                CompletableFuture<Void> future  = cloudinaryService.uploadImageAsync(file, fileName, product).thenAccept(voidResult -> {
-                    socketIOService.sendMessageToAddImage(fileName);
-                });
+                CompletableFuture<Void> future  = cloudinaryService.uploadImageAsync(file, fileName, product);
                 uploadFutures.add(future);
             }
 
             CompletableFuture.allOf(uploadFutures.toArray(new CompletableFuture[0])).thenRun(() -> {
-                socketIOService.sendMessageToAddImage("upload success");
+                socketIOService.sendMessageToAddImage(String.format("File của sản phẩm %s đã upload hoàn tất", product.getName()));
                 productRedisService.clear();
             });
         }

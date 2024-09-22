@@ -10,7 +10,7 @@ public class SocketIOConfiguration {
     @Bean
     public SocketIOServer socketIOServer() {
         com.corundumstudio.socketio.Configuration socketIOConfig = new com.corundumstudio.socketio.Configuration();
-        socketIOConfig.setHostname("localhost");
+        socketIOConfig.setHostname("0.0.0.0");
         socketIOConfig.setPort(7000);
 
         return new SocketIOServer(socketIOConfig);
