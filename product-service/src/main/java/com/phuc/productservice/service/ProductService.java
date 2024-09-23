@@ -137,21 +137,6 @@ public class ProductService implements IProductService {
     }
 
     @Override
-    public Product addFiles(List<MultipartFile> extraFiles, Product product) throws FuncErrorException {
-        setExtraImage(extraFiles,product);
-        for (MultipartFile file : extraFiles) {
-            FileUploadUtil.assertAllowed(file, FileUploadUtil.IMAGE_PATTERN);
-
-            String fileName = FileUploadUtil.getFileName(file.getOriginalFilename());
-
-            CloudinaryDto cloudinaryDto = cloudinaryService.uploadImage(file, fileName);
-
-            product.addImage(cloudinaryDto);
-        }
-        return proRepository.save(product);
-    }
-
-    @Override
     @Transactional
     public void deleteFiles(List<String> listFiles, Product product) {
         listFiles.forEach(fileId -> {
@@ -197,7 +182,7 @@ public class ProductService implements IProductService {
     }
 
     @Override
-    public void setExtraImage(List<MultipartFile> extraFile,Product product) {
+    public void setExtraImage(List<MultipartFile> extraFile, Product product, String socketId) {
 
         if (extraFile != null && !extraFile.isEmpty() ) {
             List<CompletableFuture<Void>> uploadFutures = new ArrayList<>();
@@ -208,7 +193,7 @@ public class ProductService implements IProductService {
             }
 
             CompletableFuture.allOf(uploadFutures.toArray(new CompletableFuture[0])).thenRun(() -> {
-                socketIOService.sendMessageToAddImage(String.format("File của sản phẩm %s đã upload hoàn tất", product.getName()));
+                socketIOService.sendMessageToAddImage(socketId,String.format("File của sản phẩm %s đã upload hoàn tất", product.getName()));
                 productRedisService.clear();
             });
         }

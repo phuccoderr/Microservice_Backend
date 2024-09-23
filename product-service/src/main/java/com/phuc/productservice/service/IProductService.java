@@ -33,9 +33,6 @@ public interface IProductService {
     ) throws FuncErrorException, IOException;
 
     void deleteProductById(String proId) throws DataErrorException, DataNotFoundException;
-
-
-    Product addFiles(List<MultipartFile> extraFiles, Product product) throws FuncErrorException;
     Page<Product> getAllProductsByCategory(
             List<String> listCategoryIds,
             Integer page,
@@ -44,7 +41,7 @@ public interface IProductService {
             String sortField,
             String keyword
     ) throws ParamValidateException;
-    void setExtraImage(List<MultipartFile> extraFile,Product product);
+    void setExtraImage(List<MultipartFile> extraFile,Product product, String socketId);
     void deleteFiles(List<String> listFiles, Product product);
 
     void checkNameUnique(String oldName, String newName) throws DataErrorException;

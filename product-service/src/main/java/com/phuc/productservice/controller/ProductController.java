@@ -1,5 +1,6 @@
 package com.phuc.productservice.controller;
 
+import com.corundumstudio.socketio.SocketIOServer;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.phuc.productservice.constants.Constants;
 import com.phuc.productservice.dtos.CategoryDto;
@@ -15,6 +16,7 @@ import com.phuc.productservice.response.ResponseObject;
 import com.phuc.productservice.service.CategoryService;
 import com.phuc.productservice.service.ProductRedisService;
 import com.phuc.productservice.service.ProductService;
+import com.phuc.productservice.service.SocketIOService;
 import com.phuc.productservice.util.Utility;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -26,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/products")
@@ -72,6 +75,7 @@ public class ProductController {
 
         ProductDto dto = Utility.toDto(product);
 
+
         return new ResponseEntity<>(ResponseObject.builder()
                 .status(HttpStatus.OK.value())
                 .message(Constants.GET_SUCCESS)
@@ -83,6 +87,7 @@ public class ProductController {
             @RequestPart("product") @Valid RequestProduct requestProduct,
             @RequestParam(value = "main_image", required = false)MultipartFile mainFile,
             @RequestParam(value = "extra_images", required = false) List<MultipartFile> extraFile,
+            @RequestHeader("Socket-ID") String socketId,
             HttpServletRequest request
             ) throws DataErrorException, FuncErrorException {
 
@@ -95,7 +100,7 @@ public class ProductController {
 
         Product product = productService.createProduct(mainFile, extraFile, requestProduct, cateResponse);
 
-        productService.setExtraImage(extraFile, product);
+        productService.setExtraImage(extraFile, product, socketId);
 
         return new ResponseEntity<>(ResponseObject.builder()
                 .status(HttpStatus.CREATED.value())
@@ -149,11 +154,12 @@ public class ProductController {
     @PatchMapping("/add_files/{id}")
     public ResponseEntity<ResponseObject> addFilesProduct(
             @PathVariable("id") String id,
-            @RequestParam(value = "extra_images", required = false) List<MultipartFile> extraFiles
+            @RequestParam(value = "extra_images", required = false) List<MultipartFile> extraFiles,
+            @RequestHeader("Socket-ID") String socketId
     ) throws DataNotFoundException {
         Product productInDB = productService.getProduct(id);
 
-        productService.setExtraImage(extraFiles, productInDB);
+        productService.setExtraImage(extraFiles, productInDB, socketId);
 
         return new ResponseEntity<>(ResponseObject.builder()
                 .status(HttpStatus.OK.value())
