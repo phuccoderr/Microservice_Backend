@@ -28,9 +28,8 @@ public interface IProductService {
     Product updateProduct(
             Product proInDB,
             RequestProduct requestProduct,
-            CategoryDto categoryDto,
-            MultipartFile mainImage
-    ) throws FuncErrorException, IOException;
+            CategoryDto categoryDto
+    ) ;
 
     void deleteProductById(String proId) throws DataErrorException, DataNotFoundException;
     Page<Product> getAllProductsByCategory(

@@ -36,8 +36,11 @@ public class CategoryController {
             throws DataNotFoundException, DataErrorException {
 
         Category category = categoryService.saveCategory(requestCreateCategory);
+
         CategoryDto categoryDto = Utility.toDto(category);
+
         categoryRedisService.clear();
+
         return new ResponseEntity<>(ResponseObject.builder()
                 .status(HttpStatus.OK.value())
                 .message(Constants.CREATE_SUCCESS)
@@ -67,7 +70,10 @@ public class CategoryController {
         List<CategoryDto> listDtos = Utility.toListDtos(pages.getContent());
 
         PaginationDto paginationDto = new PaginationDto(pages,listDtos);
-        categoryRedisService.saveAllCategories(paginationDto,page, limit, sort);
+
+        if (keyword.isEmpty()) {
+            categoryRedisService.saveAllCategories(paginationDto,page, limit, sort);
+        }
 
         return new ResponseEntity<>(ResponseObject.builder()
                 .status(HttpStatus.OK.value())
@@ -95,7 +101,9 @@ public class CategoryController {
             throws DataNotFoundException, DataErrorException {
 
         Category category = categoryService.updateCategory(id, requestUpdateCategory);
+
         CategoryDto categoryDto = Utility.toDto(category);
+
         categoryRedisService.clear();
 
         return new ResponseEntity<>(ResponseObject.builder()
@@ -107,8 +115,8 @@ public class CategoryController {
     @DeleteMapping("/{id}")
     public ResponseEntity<ResponseObject> deleteCategory(@PathVariable("id") String id)
             throws DataNotFoundException, DataErrorException {
-
         categoryService.deleteCategory(id);
+
         categoryRedisService.clear();
 
         return new ResponseEntity<>(ResponseObject.builder()

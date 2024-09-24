@@ -29,7 +29,7 @@ public class ProductRedisService implements IProductRedisService{
     }
 
     @Override
-    public PaginationDto getAllCategories(Integer page, Integer limit, String sort) throws ParamValidateException, JsonProcessingException {
+    public PaginationDto getAllProducts(Integer page, Integer limit, String sort) throws ParamValidateException, JsonProcessingException {
         Utility.checkSortIsAscOrDesc(sort);
 
         String key = getKeyFrom(page,limit,sort);
@@ -40,7 +40,7 @@ public class ProductRedisService implements IProductRedisService{
     }
 
     @Override
-    public void saveAllCategories(PaginationDto paginationDto, Integer page, Integer limit, String sort) throws JsonProcessingException {
+    public void saveAllProducts(PaginationDto paginationDto, Integer page, Integer limit, String sort) throws JsonProcessingException {
         String key = getKeyFrom(page,limit,sort);
         String json = redisObjectMapper.writeValueAsString(paginationDto);
         redisTemplate.opsForValue().set(key,json,10, TimeUnit.MINUTES);

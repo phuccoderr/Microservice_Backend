@@ -48,7 +48,7 @@ public class ProductController {
     ) throws ParamValidateException, JsonProcessingException {
 
         if (keyword.isEmpty()) {
-            PaginationDto paginationDto = productRedisService.getAllCategories(page, limit, sort);
+            PaginationDto paginationDto = productRedisService.getAllProducts(page, limit, sort);
             if (paginationDto != null ) {
                 return new ResponseEntity<>(ResponseObject.builder()
                         .status(HttpStatus.OK.value())
@@ -61,7 +61,9 @@ public class ProductController {
         List<ProductDto> listDtos = Utility.toListDtos(pages.getContent());
 
         PaginationDto paginationDto = new PaginationDto(pages,listDtos);
-        productRedisService.saveAllCategories(paginationDto,page, limit, sort);
+        if (keyword.isEmpty()) {
+            productRedisService.saveAllProducts(paginationDto,page, limit, sort);
+        }
 
         return new ResponseEntity<>(ResponseObject.builder()
                 .status(HttpStatus.OK.value())
@@ -87,7 +89,7 @@ public class ProductController {
             @RequestPart("product") @Valid RequestProduct requestProduct,
             @RequestParam(value = "main_image", required = false)MultipartFile mainFile,
             @RequestParam(value = "extra_images", required = false) List<MultipartFile> extraFile,
-            @RequestHeader("Socket-ID") String socketId,
+            @RequestHeader(value = "Socket-ID", required = false) String socketId,
             HttpServletRequest request
             ) throws DataErrorException, FuncErrorException {
 
@@ -111,10 +113,9 @@ public class ProductController {
     @PatchMapping("/{id}")
     public ResponseEntity<ResponseObject> updateProduct(
             @PathVariable("id") String id,
-            @RequestPart("product") @Valid RequestProduct requestProduct,
-            @RequestParam(value = "main_image", required = false)MultipartFile mainFile,
+            @RequestBody @Valid RequestProduct requestProduct,
             HttpServletRequest request
-    ) throws DataErrorException, FuncErrorException, DataNotFoundException {
+    ) throws DataErrorException, DataNotFoundException {
 
         Product productInDB = productService.getProduct(id);
 
@@ -125,7 +126,7 @@ public class ProductController {
             cateResponse = categoryService.getCategoryById(requestProduct.getCategoryId(), request);
         }
 
-        Product productUpdated = productService.updateProduct(productInDB, requestProduct, cateResponse, mainFile);
+        Product productUpdated = productService.updateProduct(productInDB, requestProduct, cateResponse);
 
         productRedisService.clear();
 
@@ -151,15 +152,35 @@ public class ProductController {
                 .data("").build(), HttpStatus.OK);
     }
 
+    @PatchMapping("/add_file/{id}")
+    public ResponseEntity<ResponseObject> addMainImageProduct(
+            @PathVariable("id") String id,
+            @RequestParam(value = "main_image") MultipartFile mainImage
+    ) throws DataNotFoundException, FuncErrorException {
+        Product productInDB = productService.getProduct(id);
+
+        if (!mainImage.isEmpty()) {
+            productService.addMainImage(productInDB,mainImage);
+        }
+        productRedisService.clear();
+
+        return new ResponseEntity<>(ResponseObject.builder()
+                .status(HttpStatus.OK.value())
+                .message(Constants.ADD_FILES_SUCCESS)
+                .data("").build(), HttpStatus.OK);
+    }
+
     @PatchMapping("/add_files/{id}")
     public ResponseEntity<ResponseObject> addFilesProduct(
             @PathVariable("id") String id,
             @RequestParam(value = "extra_images", required = false) List<MultipartFile> extraFiles,
-            @RequestHeader("Socket-ID") String socketId
+            @RequestHeader(value = "Socket-ID", required = false) String socketId
     ) throws DataNotFoundException {
         Product productInDB = productService.getProduct(id);
 
         productService.setExtraImage(extraFiles, productInDB, socketId);
+
+        productRedisService.clear();
 
         return new ResponseEntity<>(ResponseObject.builder()
                 .status(HttpStatus.OK.value())

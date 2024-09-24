@@ -78,7 +78,9 @@ public class ProductService implements IProductService {
         setDtoToEntity(product,requestProduct);
 
         if (mainImage != null && !mainImage.isEmpty()) {
-            setMainImage(mainImage,product);
+            CloudinaryDto cloudinaryDto = setMainImage(mainImage, product);
+            product.setImageId(cloudinaryDto.getPublicId());
+            product.setUrl(cloudinaryDto.getUrl());
         }
 
         if(categoryDto != null) {
@@ -92,22 +94,26 @@ public class ProductService implements IProductService {
     public Product updateProduct(
             Product proInDB,
             RequestProduct requestProduct,
-            CategoryDto categoryDto,
-            MultipartFile mainImage
-    ) throws FuncErrorException {
-
+            CategoryDto categoryDto
+    ) {
         setDtoToEntity(proInDB,requestProduct);
-
-        if (mainImage != null && !mainImage.isEmpty()) {
-            cloudinaryService.deleteAsyncImage(proInDB.getImageId());
-            setMainImage(mainImage,proInDB);
-        }
 
         if(categoryDto != null) {
             proInDB.setCategoryId(categoryDto.getId());
         }
 
         return proRepository.save(proInDB);
+    }
+
+    public void addMainImage(Product product, MultipartFile mainImage) throws FuncErrorException {
+        CloudinaryDto cloudinaryDto = setMainImage(mainImage, product);
+
+        cloudinaryService.deleteAsyncImage(product.getImageId());
+
+        product.setImageId(cloudinaryDto.getPublicId());
+        product.setUrl(cloudinaryDto.getUrl());
+
+        proRepository.save(product);
     }
 
     @Override
@@ -212,17 +218,14 @@ public class ProductService implements IProductService {
         product.setReviewCount(product.getReviewCount() != null ? product.getReviewCount() : 0);
     }
 
-    private void setMainImage(MultipartFile mainFile,Product product)
+    private CloudinaryDto setMainImage(MultipartFile mainFile,Product product)
             throws FuncErrorException {
 
         FileUploadUtil.assertAllowed(mainFile, FileUploadUtil.IMAGE_PATTERN);
 
         String fileName = FileUploadUtil.getFileName(mainFile.getOriginalFilename());
 
-        CloudinaryDto result = cloudinaryService.uploadImage(mainFile, fileName);
-
-        product.setImageId(result.getPublicId());
-        product.setUrl(result.getUrl());
+        return cloudinaryService.uploadImage(mainFile, fileName);
 
     }
 
