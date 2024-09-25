@@ -102,7 +102,7 @@ public class ProductController {
 
         Product product = productService.createProduct(mainFile, extraFile, requestProduct, cateResponse);
 
-        productService.setExtraImage(extraFile, product, socketId);
+        productService.setExtraImageAsync(extraFile, product, socketId);
 
         return new ResponseEntity<>(ResponseObject.builder()
                 .status(HttpStatus.CREATED.value())
@@ -173,12 +173,11 @@ public class ProductController {
     @PatchMapping("/add_files/{id}")
     public ResponseEntity<ResponseObject> addFilesProduct(
             @PathVariable("id") String id,
-            @RequestParam(value = "extra_images", required = false) List<MultipartFile> extraFiles,
-            @RequestHeader(value = "Socket-ID", required = false) String socketId
-    ) throws DataNotFoundException {
+            @RequestParam(value = "extra_images", required = false) List<MultipartFile> extraFiles
+    ) throws DataNotFoundException, FuncErrorException {
         Product productInDB = productService.getProduct(id);
 
-        productService.setExtraImage(extraFiles, productInDB, socketId);
+        productService.setExtraImage(extraFiles, productInDB);
 
         productRedisService.clear();
 
@@ -202,7 +201,7 @@ public class ProductController {
         return new ResponseEntity<>(ResponseObject.builder()
                 .status(HttpStatus.OK.value())
                 .message(Constants.DELETE_FILES_SUCCESS)
-                .data("").build(), HttpStatus.OK);
+                .data(productInDB.getId()).build(), HttpStatus.OK);
     }
 
     @GetMapping("/c/{cateId}")

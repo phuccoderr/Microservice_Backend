@@ -188,7 +188,20 @@ public class ProductService implements IProductService {
     }
 
     @Override
-    public void setExtraImage(List<MultipartFile> extraFile, Product product, String socketId) {
+    public void  setExtraImage(List<MultipartFile> extraFile, Product product) throws FuncErrorException {
+
+        if (extraFile != null && !extraFile.isEmpty() ) {
+            for (MultipartFile file : extraFile) {
+                String fileName = FileUploadUtil.getFileName(file.getOriginalFilename());
+                CloudinaryDto cloudinaryDto = cloudinaryService.uploadImage(file, fileName);
+                proImageRepository.save(new ProductImage(cloudinaryDto,product));
+            }
+
+        }
+    }
+
+    @Override
+    public void  setExtraImageAsync(List<MultipartFile> extraFile, Product product, String socketId) {
 
         if (extraFile != null && !extraFile.isEmpty() ) {
             List<CompletableFuture<Void>> uploadFutures = new ArrayList<>();

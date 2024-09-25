@@ -40,7 +40,8 @@ public interface IProductService {
             String sortField,
             String keyword
     ) throws ParamValidateException;
-    void setExtraImage(List<MultipartFile> extraFile,Product product, String socketId);
+    void setExtraImageAsync(List<MultipartFile> extraFile,Product product, String socketId);
+    void setExtraImage(List<MultipartFile> extraFile,Product product) throws FuncErrorException;
     void deleteFiles(List<String> listFiles, Product product);
 
     void checkNameUnique(String oldName, String newName) throws DataErrorException;
