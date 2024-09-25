@@ -167,7 +167,7 @@ public class ProductController {
         return new ResponseEntity<>(ResponseObject.builder()
                 .status(HttpStatus.OK.value())
                 .message(Constants.ADD_FILES_SUCCESS)
-                .data("").build(), HttpStatus.OK);
+                .data(productInDB.getId()).build(), HttpStatus.OK);
     }
 
     @PatchMapping("/add_files/{id}")
@@ -185,7 +185,7 @@ public class ProductController {
         return new ResponseEntity<>(ResponseObject.builder()
                 .status(HttpStatus.OK.value())
                 .message(Constants.ADD_FILES_SUCCESS)
-                .data("").build(), HttpStatus.OK);
+                .data(productInDB.getId()).build(), HttpStatus.OK);
     }
 
     @DeleteMapping("/delete_files/{id}")
