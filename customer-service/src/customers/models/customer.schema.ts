@@ -17,7 +17,7 @@ export class Customer extends AbstractDocument {
 
   @Prop({
     default:
-      'https://res-console.cloudinary.com/dp4tp9gwa/thumbnails/v1/image/upload/v1722999166/YXZhdGFyLWRlZmF1bHRfYWg5eHln/drilldown',
+      '',
   })
   avatar?: string;
 

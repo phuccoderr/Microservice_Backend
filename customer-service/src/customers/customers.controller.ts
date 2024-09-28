@@ -148,7 +148,7 @@ export class CustomersController {
 
   @UseGuards(JwtAuthGuard, RolesAuthGuard)
   @Roles(ROLE.ADMIN)
-  @Get('/:id/status/:status')
+  @Patch('/:id/status/:status')
   async updateStatus(@Param('id') _id: string,
                      @Param('status') status: string): Promise<ResponseObject> {
     await this.customersService.updateStatus(_id, status);

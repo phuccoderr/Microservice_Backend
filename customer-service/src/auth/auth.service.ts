@@ -53,7 +53,7 @@ export class AuthService {
     );
     if (!isMatch) {
       this.logger.warn("customer password doesn't match");
-      throw new UnauthorizedException(AUTH_CONSTANTS.PASSWORD_NOT_MATCH);
+      throw new NotFoundException(AUTH_CONSTANTS.PASSWORD_NOT_MATCH);
     }
 
     const tokenPayload: TokenPayload = {

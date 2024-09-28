@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Patch, Post, Query } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { ResponseObject } from '../response/response-object.dto';
@@ -111,10 +111,10 @@ export class AuthController {
     }
   }
 
-  @Get('reset_password')
+  @Patch('reset_password')
   @HttpCode(HttpStatus.OK)
   async resetPassword(@Query('token') token: string,
-                      @Query('password') password: string): Promise<ResponseObject> {
+                      @Body('password') password: string): Promise<ResponseObject> {
     await this.authService.resetPassword(token,password);
 
     return {
