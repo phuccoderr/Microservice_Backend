@@ -39,7 +39,7 @@ export class AuthController {
     };
   }
 
-  @Post('logout')
+  @Get('logout')
   @HttpCode(HttpStatus.OK)
   async logout(@Query('token') token: string): Promise<ResponseObject> {
     await this.authService.logout(token);
