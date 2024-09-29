@@ -15,6 +15,15 @@ public class CategorySpecifications {
         };
     }
 
+    public static Specification<Category> publicRootCategories() {
+        return (root, query, criteriaBuilder) -> {
+            query.distinct(true); // Đảm bảo không có các danh mục trùng lặp được trả về
+            query.multiselect(root.get("id"), root.get("name"), root.get("parent"), root.get("children"));
+            root.fetch("children", JoinType.LEFT); // Lấy các con một cách tự nhiên
+            return criteriaBuilder.isNull(root.get("parent")); // Chỉ lấy các danh mục gốc
+        };
+    }
+
     public static Specification<Category> searchWithName(String keyword) {
         return (root, query, builder) -> {
             Predicate spec = builder.like(root.get("name"),"%" + keyword + "%");

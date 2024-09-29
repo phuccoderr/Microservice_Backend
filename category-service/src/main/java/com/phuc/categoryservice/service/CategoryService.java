@@ -1,6 +1,7 @@
 package com.phuc.categoryservice.service;
 
 import com.phuc.categoryservice.constants.Constants;
+import com.phuc.categoryservice.dtos.CategoryDto;
 import com.phuc.categoryservice.exceptions.*;
 import com.phuc.categoryservice.models.Category;
 import com.phuc.categoryservice.repository.CategoryRepository;
@@ -62,6 +63,15 @@ public class CategoryService implements ICategoryService {
         return repository.findAll(spec,pageable);
     }
 
+    public List<Category> getAllCategoryCustomer() {
+        Specification<Category> spec = Specification.where(null);
+        spec = spec.and(CategorySpecifications.publicRootCategories());
+
+        return repository.findAll(spec);
+
+    }
+
+
     @Override
     public Category getCategory(String id) throws DataNotFoundException {
         return repository.findById(id).orElseThrow(DataNotFoundException::new);
@@ -117,6 +127,7 @@ public class CategoryService implements ICategoryService {
             });
         }
     }
+
 
 
     private void checkNameUnique(String name) throws DataErrorException {

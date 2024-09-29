@@ -1,6 +1,7 @@
 package com.phuc.categoryservice.dtos;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.phuc.categoryservice.models.Category;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -42,4 +43,12 @@ public class CategoryDto {
 
     @JsonProperty("children")
     private List<CategoryDto> children = new ArrayList<>();
+
+    public static CategoryDto copyIdAndName(Category category) {
+        CategoryDto copyCategory = new CategoryDto();
+        copyCategory.setId(category.getId());
+        copyCategory.setName(category.getName());
+
+        return copyCategory;
+    }
 }

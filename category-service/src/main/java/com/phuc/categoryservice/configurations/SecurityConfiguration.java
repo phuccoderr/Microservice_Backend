@@ -32,6 +32,7 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests( authz ->
                 authz
                         .requestMatchers(HttpMethod.GET, Constants.API_CATEGORIES).hasAnyAuthority("ADMIN","USER")
+                        .requestMatchers(HttpMethod.GET, Constants.API_CATEGORIES + "/all").permitAll()
                         .requestMatchers(HttpMethod.GET, Constants.API_CATEGORIES + "/*").hasAnyAuthority("ADMIN","USER")
                         .requestMatchers(HttpMethod.POST, Constants.API_CATEGORIES).hasAnyAuthority("ADMIN")
                         .requestMatchers(HttpMethod.PATCH, Constants.API_CATEGORIES + "/*").hasAnyAuthority("ADMIN")

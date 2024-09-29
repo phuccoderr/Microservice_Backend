@@ -126,6 +126,19 @@ public class CategoryController {
 
     }
 
+
+    @GetMapping("/all")
+    public ResponseEntity<ResponseObject> getAllCategoryForCustomer() {
+        List<Category> allCategoryCustomer = categoryService.getAllCategoryCustomer();
+
+        List<CategoryDto> listDtos = Utility.toListDtos(allCategoryCustomer);
+
+        return new ResponseEntity<>(ResponseObject.builder()
+                .status(HttpStatus.OK.value())
+                .message(Constants.GET_ALL_SUCCESS)
+                .data(listDtos).build(), HttpStatus.OK);
+    }
+
     @GetMapping("/parent/{id}")
     public ResponseEntity<ResponseObject> getCategoryById(@PathVariable String id) throws DataNotFoundException {
         List<String> children = categoryService.getChildren(id);
