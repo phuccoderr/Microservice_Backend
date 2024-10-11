@@ -9,6 +9,7 @@ import {
   Patch,
   Post,
   Query,
+  Request,
   UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
@@ -32,6 +33,17 @@ export class UsersController {
     private readonly usersService: UsersService,
     private readonly redisService: RedisCacheService,
   ) {}
+
+  @UseGuards(JwtAuthGuard)
+  @Get('me')
+  async getGetMe(@Request() req): Promise<ResponseObject> {
+    const user = await this.usersService.getUser(req.user._id);
+    return {
+      data: user,
+      status: HttpStatus.OK,
+      message: USER_CONSTANTS.GET,
+    };
+  }
 
   @Post()
   @UseGuards(JwtAuthGuard, RolesAuthGuard)
@@ -131,7 +143,7 @@ export class UsersController {
 
   @UseGuards(JwtAuthGuard, RolesAuthGuard)
   @Roles(ROLE.ADMIN)
-  @Patch('/:id/status/:status')
+  @Patch(':id/status/:status')
   async updateStatus(
     @Param('id') _id: string,
     @Param('status') status: string,

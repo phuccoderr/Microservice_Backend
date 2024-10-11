@@ -166,7 +166,10 @@ public class ProductService implements IProductService {
         Utility.checkSortIsAscOrDesc(sort);
 
         Specification<Product> spec = Specification.where(null);
-        spec = spec.and(ProductSpecifications.withCategory(listCategoryIds));
+
+        if (!listCategoryIds.isEmpty()) {
+            spec = spec.and(ProductSpecifications.withCategory(listCategoryIds));
+        }
 
         if (!keyword.isEmpty()) {
             spec = spec.and(ProductSpecifications.withKeyword(keyword));

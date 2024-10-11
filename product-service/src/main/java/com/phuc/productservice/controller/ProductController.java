@@ -204,9 +204,9 @@ public class ProductController {
                 .data(productInDB.getId()).build(), HttpStatus.OK);
     }
 
-    @GetMapping("/c/{cateId}")
+    @GetMapping("/category")
     public ResponseEntity<ResponseObject> viewCategoryListByPage(
-            @PathVariable(name = "cateId") String cateId,
+            @RequestParam(name = "cate_id") String cateId,
             @RequestParam(value = "page", defaultValue = "1") Integer page,
             @RequestParam(value = "limit", defaultValue = "10") Integer limit,
             @RequestParam(value = "sort", defaultValue = "asc") String sort,
@@ -216,6 +216,7 @@ public class ProductController {
     ) throws ParamValidateException {
 
         List<String> listCategoriesIds = categoryService.getChildrenCateId(cateId, request);
+
         Page<Product> pages = productService.getAllProductsByCategory(listCategoriesIds, page, limit, sort, sortField, keyword);
 
         List<ProductDto> listDtos = Utility.toListDtos(pages.getContent());

@@ -13,6 +13,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -48,6 +50,10 @@ public class CategoryService implements ICategoryService {
 
     @Override
     public List<String> getChildrenCateId(String id, HttpServletRequest request) {
+        if (id.isEmpty()) {
+            return Collections.emptyList();
+        }
+
         String url = CATEGORY_SERVICE_URL + "parent/" + id;
 
         HttpEntity<Void> entity = new HttpEntity<>(null);

@@ -10,6 +10,7 @@ type CartRequest struct {
 type CartDto struct {
 	ProductId    string  `json:"product_id"`
 	ProductImage string  `json:"product_image"`
+	Name         string  `json:"name"`
 	Cost         float64 `json:"cost"`
 	Price        float64 `json:"price"`
 	Quantity     int64   `json:"quantity"`
@@ -21,6 +22,7 @@ func ToCartDto(product *response.ProductResponse, customerId string, quantity in
 		ProductId:    product.Id,
 		ProductImage: product.URL,
 		Cost:         product.Cost * float64(quantity),
+		Name:         product.Name,
 		Price:        product.Price,
 		Quantity:     quantity,
 		Total:        product.Price * float64(quantity),
