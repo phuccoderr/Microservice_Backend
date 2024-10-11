@@ -6,6 +6,7 @@ import lombok.experimental.UtilityClass;
 public class Constants {
 
     public static final String API_PRODUCTS = "/api/v1/products";
+    public static final String API_DISCOUNTS = "/api/v1/discounts";
 
     public static final String GET_ALL_SUCCESS = "Get products successfully!";
     public static final String GET_SUCCESS = "Get product successfully!";
@@ -14,6 +15,12 @@ public class Constants {
     public static final String DELETE_SUCCESS = "Delete product successfully!";
     public static final String ADD_FILES_SUCCESS = "Add files product successfully!";
     public static final String DELETE_FILES_SUCCESS = "Delete files product successfully!";
+
+
+    public static final String CREATE_DISCOUNT_SUCCESS = "Create discount successfully!";
+    public static final String GET_DISCOUNT_SUCCESS = "Get discount successfully!";
+    public static final String DELETE_DISCOUNT_SUCCESS = "Delete discount successfully!";
+    public static final String APPLY_DISCOUNT_SUCCESS = "Apply discount fail!";
 
     public static final String CLOUD_FOLDER = "microservice/product/";
     public static final String UPLOAD_FILE_FAIL = "File upload fail!";

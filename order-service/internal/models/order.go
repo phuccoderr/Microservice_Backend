@@ -26,6 +26,7 @@ type Order struct {
 	ShippingCost float64        `gorm:"column:shipping_cost; not null"`
 	Status       string         `gorm:"column:status; not null"`
 	CreatedAt    time.Time      `gorm:"column:created_at; not null; autoCreateTime"`
+	Note         string         `gorm:"column:note; not null"`
 }
 
 func (o *Order) BeforeCreate(tx *gorm.DB) (err error) {

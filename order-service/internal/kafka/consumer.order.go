@@ -35,6 +35,7 @@ func ConsumeOrder(service service.IOrderRedisService) {
 		Total:        placeOrderMessage.CheckOut.ProductTotal,
 		DeliveryDays: placeOrderMessage.CheckOut.DeliverDays,
 		Status:       models.StatusPending,
+		Note:         placeOrderMessage.Note,
 	}
 
 	for _, item := range placeOrderMessage.Items {

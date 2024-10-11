@@ -2,9 +2,11 @@ package com.phuc.productservice.util;
 
 import com.phuc.productservice.constants.Constants;
 import com.phuc.productservice.dtos.CloudinaryDto;
+import com.phuc.productservice.dtos.DiscountDto;
 import com.phuc.productservice.dtos.ProductDto;
 import com.phuc.productservice.dtos.ProductImageDto;
 import com.phuc.productservice.exceptions.ParamValidateException;
+import com.phuc.productservice.models.Discount;
 import com.phuc.productservice.models.Product;
 import com.phuc.productservice.models.ProductImage;
 import lombok.experimental.UtilityClass;
@@ -47,5 +49,13 @@ public class Utility {
 
     public static List<ProductDto> toListDtos(List<Product> products) {
         return products.stream().map(Utility::toDto).toList();
+    }
+
+    public DiscountDto toDiscountDto(Discount discount) {
+        return modelMapper.map(discount, DiscountDto.class);
+    }
+
+    public List<DiscountDto> toListDiscountDtos(List<Discount> discounts) {
+        return discounts.stream().map(Utility::toDiscountDto).toList();
     }
 }

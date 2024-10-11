@@ -1,4 +1,4 @@
-package com.phuc.productservice.service;
+package com.phuc.productservice.specifications;
 
 import com.phuc.productservice.models.Product;
 import jakarta.persistence.criteria.CriteriaBuilder;

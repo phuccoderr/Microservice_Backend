@@ -4,6 +4,7 @@ type PlaceOrderRequest struct {
 	Address       string `json:"address" binding:"required"`
 	PhoneNumber   string `json:"phone_number" binding:"required"`
 	PaymentMethod string `json:"payment_method" binding:"required"`
+	Note          string `json:"note" binding:"required"`
 }
 
 type PlaceOrderMessage struct {
@@ -15,4 +16,5 @@ type PlaceOrderMessage struct {
 	PhoneNumber   string       `json:"phone_number"`
 	CheckOut      *CheckoutDto `json:"check_out"`
 	Items         []CartDto    `json:"items"`
+	Note          string       `json:"note"`
 }

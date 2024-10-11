@@ -62,7 +62,8 @@ export class UsersController {
     };
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesAuthGuard)
+  @Roles(ROLE.ADMIN)
   @Get()
   async getUsers(
     @Query() pagination: RequestPaginationDto,
@@ -95,7 +96,8 @@ export class UsersController {
     };
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesAuthGuard)
+  @Roles(ROLE.ADMIN)
   @Get(':id')
   async getUser(@Param('id') _id: string): Promise<ResponseObject> {
     const user = await this.usersService.getUser(_id);

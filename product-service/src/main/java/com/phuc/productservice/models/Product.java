@@ -46,6 +46,7 @@ public class Product extends BaseEntity{
     @Column(name = "review_count")
     private Integer reviewCount;
 
+
     public void addImage(CloudinaryDto cloudinaryDto) {
         if (extraImages == null) {
             extraImages = new HashSet<>();

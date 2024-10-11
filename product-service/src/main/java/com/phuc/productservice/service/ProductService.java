@@ -9,6 +9,7 @@ import com.phuc.productservice.models.ProductImage;
 import com.phuc.productservice.repository.ProductImageRepository;
 import com.phuc.productservice.repository.ProductRepository;
 import com.phuc.productservice.request.RequestProduct;
+import com.phuc.productservice.specifications.ProductSpecifications;
 import com.phuc.productservice.util.FileUploadUtil;
 import com.phuc.productservice.util.Utility;
 import lombok.RequiredArgsConstructor;

@@ -23,4 +23,5 @@ type PlaceOrderMessage struct {
 		Quantity     int64   `json:"quantity"`
 		Total        float64 `json:"total"`
 	} `json:"items"`
+	Note string `json:"note"`
 }

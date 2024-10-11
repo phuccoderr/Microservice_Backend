@@ -37,6 +37,11 @@ public class SecurityConfiguration {
                                 .requestMatchers(HttpMethod.DELETE, Constants.API_PRODUCTS + "/*").hasAnyAuthority("ADMIN")
                                 .requestMatchers(HttpMethod.PATCH, Constants.API_PRODUCTS + "/add_files/*").hasAnyAuthority("ADMIN")
                                 .requestMatchers(HttpMethod.DELETE, Constants.API_PRODUCTS + "/delete_files/*").hasAnyAuthority("ADMIN")
+
+                                .requestMatchers(HttpMethod.GET, Constants.API_DISCOUNTS).hasAnyAuthority("ADMIN","USER")
+                                .requestMatchers(HttpMethod.POST, Constants.API_DISCOUNTS).hasAnyAuthority("ADMIN","USER")
+                                .requestMatchers(HttpMethod.DELETE, Constants.API_DISCOUNTS + "/*").hasAnyAuthority("ADMIN","USER")
+
                                 .requestMatchers(HttpMethod.GET, Constants.API_PRODUCTS + "/*").permitAll()
                                 .anyRequest().permitAll())
                 .sessionManagement(

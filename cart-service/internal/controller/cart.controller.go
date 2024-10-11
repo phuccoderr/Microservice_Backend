@@ -226,6 +226,7 @@ func (cc *CartController) PlaceOrder(c *gin.Context) {
 	orderMessage.Address = placeOrder.Address
 	orderMessage.PaymentMethod = placeOrder.PaymentMethod
 	orderMessage.PhoneNumber = placeOrder.PhoneNumber
+	orderMessage.Note = placeOrder.Note
 
 	marshal, err := json.Marshal(orderMessage)
 	if err != nil {
