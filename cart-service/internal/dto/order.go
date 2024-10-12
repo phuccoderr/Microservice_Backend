@@ -5,6 +5,7 @@ type PlaceOrderRequest struct {
 	PhoneNumber   string `json:"phone_number" binding:"required"`
 	PaymentMethod string `json:"payment_method" binding:"required"`
 	Note          string `json:"note" binding:"required"`
+	Sale          int64  `json:"sale" binding:"required"`
 }
 
 type PlaceOrderMessage struct {

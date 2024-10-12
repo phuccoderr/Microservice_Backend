@@ -25,7 +25,11 @@ public class DiscountService implements IDiscountService {
     private final DiscountRepository repository;
 
     @Override
-    public Discount create(RequestDiscount reqDiscount) {
+    public Discount create(RequestDiscount reqDiscount) throws DataErrorException {
+        Discount discount = repository.findByCode(reqDiscount.getCode());
+        if (discount != null) {
+            throw new DataErrorException(Constants.DB_ALREADY_EXISTS);
+        }
         Discount newDiscount = Discount.builder()
                 .name(reqDiscount.getName())
                 .code(reqDiscount.getCode())

@@ -16,7 +16,7 @@ type ICartService interface {
 	AddProductToCart(customerId string, productId string, quantity int64) (int64, error)
 	GetCart(customerId string) ([]dto.CartRequest, error)
 	DeleteCart(customerId string, productId string) error
-	Checkout(carts []dto.CartDto) *dto.CheckoutDto
+	Checkout(carts []dto.CartDto, sale int64) *dto.CheckoutDto
 	DeleteAllCart(customerId string) error
 	CheckProductInCart(customerId string, productId string) (bool, error)
 }
@@ -74,16 +74,23 @@ func (s cartService) DeleteCart(customerId string, productId string) error {
 	return nil
 }
 
-func (s cartService) Checkout(carts []dto.CartDto) *dto.CheckoutDto {
+func (s cartService) Checkout(carts []dto.CartDto, sale int64) *dto.CheckoutDto {
 	checkout := &dto.CheckoutDto{}
 	for _, item := range carts {
-		checkout.ProductTotal += item.Total
+		checkout.ProductTotal += item.Total * float64(item.Quantity)
 		checkout.ProductCost += item.Cost
+
 	}
 
-	checkout.DeliverDays = time.Now().AddDate(0, 0, 7)
+	checkout.DeliverDays = time.Now().AddDate(0, 0, 3)
 	checkout.ShippingCost = 30000
-	checkout.ProductTotal += checkout.ShippingCost
+
+	if sale > 0 {
+		var discountAmount float64
+		discountAmount = checkout.ProductTotal * (float64(sale) / 100)
+		checkout.ProductTotal = checkout.ProductTotal - discountAmount
+		checkout.ProductTotal += checkout.ShippingCost
+	}
 	return checkout
 }
 

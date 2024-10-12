@@ -31,7 +31,7 @@ public class PaginationDto {
     @JsonProperty("entities")
     private List<?> entities;
 
-    public PaginationDto(Page<Product> pages, List<ProductDto> listDtos) {
+    public PaginationDto(Page<?> pages, List<?> listDtos) {
         int pageSize = pages.getSize();
         int oldCurrentPage = pages.getNumber();
 

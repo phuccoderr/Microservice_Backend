@@ -79,7 +79,7 @@ func (cc *CartController) GetCart(c *gin.Context) {
 			response.ErrorResponse(c, err.Error(), constants.STATUS_INTERNAL_ERROR, http.StatusInternalServerError)
 			return
 		}
-		carts = append(carts, dto.ToCartDto(product, customer.ID, cart.Quantity))
+		carts = append(carts, dto.ToCartDto(product, cart.Quantity))
 	}
 
 	response.SuccessResponse(c, http.StatusOK, constants.GET_SUCCESS, carts)
@@ -155,7 +155,7 @@ func (cc *CartController) Checkout(c *gin.Context) {
 				http.StatusUnprocessableEntity)
 			return
 		}
-		carts = append(carts, dto.ToCartDto(product, customer.ID, cart.Quantity))
+		carts = append(carts, dto.ToCartDto(product, cart.Quantity))
 	}
 	if len(carts) == 0 {
 		global.Logger.Info("Cart not exists!")
@@ -163,7 +163,7 @@ func (cc *CartController) Checkout(c *gin.Context) {
 		return
 	}
 
-	checkOutInfo := cc.cartService.Checkout(carts)
+	checkOutInfo := cc.cartService.Checkout(carts, 0)
 	response.SuccessResponse(c, http.StatusOK, constants.CHECKOUT_SUCCESS, checkOutInfo)
 }
 
@@ -207,7 +207,7 @@ func (cc *CartController) PlaceOrder(c *gin.Context) {
 				http.StatusUnprocessableEntity)
 			return
 		}
-		carts = append(carts, dto.ToCartDto(product, customer.ID, cart.Quantity))
+		carts = append(carts, dto.ToCartDto(product, cart.Quantity))
 	}
 
 	if len(carts) == 0 {
@@ -216,7 +216,7 @@ func (cc *CartController) PlaceOrder(c *gin.Context) {
 		return
 	}
 
-	checkOutInfo := cc.cartService.Checkout(carts)
+	checkOutInfo := cc.cartService.Checkout(carts, placeOrder.Sale)
 
 	orderMessage.CheckOut = checkOutInfo
 	orderMessage.CustomerId = customer.ID

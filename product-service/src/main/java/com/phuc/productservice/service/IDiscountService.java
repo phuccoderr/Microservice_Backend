@@ -8,7 +8,7 @@ import org.springframework.data.domain.Page;
 
 public interface IDiscountService {
 
-    Discount create(RequestDiscount reqDiscount);
+    Discount create(RequestDiscount reqDiscount) throws DataErrorException;
     void deleteById(String id);
     Page<Discount> getAllProductsByCategory(
             Integer page,

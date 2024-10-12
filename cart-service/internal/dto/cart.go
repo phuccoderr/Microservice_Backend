@@ -13,11 +13,12 @@ type CartDto struct {
 	Name         string  `json:"name"`
 	Cost         float64 `json:"cost"`
 	Price        float64 `json:"price"`
+	Sale         float64 `json:"sale"`
 	Quantity     int64   `json:"quantity"`
 	Total        float64 `json:"total"`
 }
 
-func ToCartDto(product *response.ProductResponse, customerId string, quantity int64) CartDto {
+func ToCartDto(product *response.ProductResponse, quantity int64) CartDto {
 	return CartDto{
 		ProductId:    product.Id,
 		ProductImage: product.URL,
@@ -25,6 +26,6 @@ func ToCartDto(product *response.ProductResponse, customerId string, quantity in
 		Name:         product.Name,
 		Price:        product.Price,
 		Quantity:     quantity,
-		Total:        product.Price * float64(quantity),
+		Total:        (product.Price - (product.Price * (product.Sale / 100))) * float64(quantity),
 	}
 }

@@ -3,6 +3,7 @@ package com.phuc.productservice.controller;
 
 import com.phuc.productservice.constants.Constants;
 import com.phuc.productservice.dtos.DiscountDto;
+import com.phuc.productservice.dtos.PaginationDto;
 import com.phuc.productservice.exceptions.DataErrorException;
 import com.phuc.productservice.exceptions.ParamValidateException;
 import com.phuc.productservice.models.Discount;
@@ -34,16 +35,18 @@ public class DiscountController {
             @RequestParam(value = "keyword", defaultValue = "") String keyword) throws ParamValidateException {
         Page<Discount> pages = service.getAllProductsByCategory(page, limit, sort, keyword);
         List<Discount> discounts = pages.getContent();
-        List<DiscountDto> dtos = Utility.toListDiscountDtos(discounts);
+        List<DiscountDto> listDtos = Utility.toListDiscountDtos(discounts);
+
+        PaginationDto paginationDto = new PaginationDto(pages,listDtos);
 
         return new ResponseEntity<>(ResponseObject.builder()
                 .status(HttpStatus.OK.value())
-                .message(Constants.GET_DISCOUNT_SUCCESS)
-                .data(dtos).build(), HttpStatus.OK);
+                .message(Constants.GET_ALL_SUCCESS)
+                .data(paginationDto).build(), HttpStatus.OK);
     }
 
     @PostMapping
-    public ResponseEntity<ResponseObject> create(@RequestBody() @Valid RequestDiscount discount) {
+    public ResponseEntity<ResponseObject> create(@RequestBody() @Valid RequestDiscount discount) throws DataErrorException {
         Discount newDiscount = service.create(discount);
 
         DiscountDto dto = Utility.toDiscountDto(newDiscount);

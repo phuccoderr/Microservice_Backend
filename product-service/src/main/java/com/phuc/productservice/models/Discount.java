@@ -16,6 +16,7 @@ public class Discount extends BaseEntity {
 
     private String name;
 
+    @Column(unique = true)
     private String code;
 
     @Column(name = "expiry_date")
