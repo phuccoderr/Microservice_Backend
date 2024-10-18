@@ -25,6 +25,7 @@ func ToCartDto(product *response.ProductResponse, quantity int64) CartDto {
 		Cost:         product.Cost * float64(quantity),
 		Name:         product.Name,
 		Price:        product.Price,
+		Sale:         product.Sale,
 		Quantity:     quantity,
 		Total:        (product.Price - (product.Price * (product.Sale / 100))) * float64(quantity),
 	}

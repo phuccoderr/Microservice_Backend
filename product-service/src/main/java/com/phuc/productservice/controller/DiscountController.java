@@ -68,8 +68,19 @@ public class DiscountController {
     }
 
     @PostMapping("/apply/{code}")
-    public ResponseEntity<ResponseObject> get(@PathVariable("code") String code) throws DataErrorException {
+    public ResponseEntity<ResponseObject> applyCode(@PathVariable("code") String code) throws DataErrorException {
         Discount discount = service.applyCode(code);
+        DiscountDto discountDto = Utility.toDiscountDto(discount);
+
+        return new ResponseEntity<>(ResponseObject.builder()
+                .status(HttpStatus.OK.value())
+                .message(Constants.DELETE_DISCOUNT_SUCCESS)
+                .data(discountDto).build(), HttpStatus.OK);
+    }
+
+    @GetMapping("/{code}")
+    public ResponseEntity<ResponseObject> get(@PathVariable("code") String code) throws DataErrorException {
+        Discount discount = service.getCode(code);
         DiscountDto discountDto = Utility.toDiscountDto(discount);
 
         return new ResponseEntity<>(ResponseObject.builder()

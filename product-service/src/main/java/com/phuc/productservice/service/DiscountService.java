@@ -88,4 +88,20 @@ public class DiscountService implements IDiscountService {
         return repository.save(discount);
     }
 
+    public Discount getCode(String code) throws DataErrorException {
+        Discount discount = repository.findByCode(code);
+        if (discount == null) {
+            throw new DataErrorException(Constants.DB_NOT_FOUND);
+        }
+
+        if (!discount.getExpiryDate().isAfter(LocalDateTime.now())) {
+            throw new DataErrorException(Constants.APPLY_DISCOUNT_SUCCESS);
+        }
+
+        if (discount.getQuantity() <= 0) {
+            throw new DataErrorException(Constants.APPLY_DISCOUNT_SUCCESS);
+        }
+        return discount;
+    }
+
 }
