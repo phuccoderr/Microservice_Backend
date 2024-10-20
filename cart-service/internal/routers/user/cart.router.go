@@ -22,7 +22,6 @@ func (cr *CartRouter) InitCartRouter(router *gin.RouterGroup) {
 		private.POST("/add", cartController.AddProductToCart)
 		private.GET("", cartController.GetCart)
 		private.DELETE("/product/:id", cartController.DeleteCart)
-		private.GET("/checkout", cartController.Checkout)
 		private.POST("/place_order", cartController.PlaceOrder)
 	}
 }

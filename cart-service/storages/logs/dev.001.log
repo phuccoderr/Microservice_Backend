@@ -27,3 +27,19 @@
 {"level":"INFO","timestamp":"2024-10-12T10:05:39.700+0700","caller":"service/cart.service.go:85","msg":"checkout product total: %!d(float64=76000)"}
 {"level":"INFO","timestamp":"2024-10-12T10:05:39.700+0700","caller":"service/cart.service.go:94","msg":"checkout product total: %!d(float64=72200)"}
 {"level":"INFO","timestamp":"2024-10-12T10:05:39.700+0700","caller":"service/cart.service.go:96","msg":"checkout product total: %!d(float64=102200)"}
+{"level":"INFO","timestamp":"2024-10-20T20:45:38.233+0700","caller":"service/product.service.go:55","msg":"Get product successfully","ProductId":"2821f4ba-40ad-42ab-879a-8dd6a183c161"}
+{"level":"INFO","timestamp":"2024-10-20T20:45:38.246+0700","caller":"service/product.service.go:55","msg":"Get product successfully","ProductId":"65a0eafb-06d7-47fa-8416-ce3951b15921"}
+{"level":"INFO","timestamp":"2024-10-20T20:48:02.271+0700","caller":"service/cart.service.go:65","msg":"2"}
+{"level":"INFO","timestamp":"2024-10-20T20:48:02.272+0700","caller":"service/cart.service.go:65","msg":"3"}
+{"level":"INFO","timestamp":"2024-10-20T20:48:02.288+0700","caller":"service/product.service.go:55","msg":"Get product successfully","ProductId":"65a0eafb-06d7-47fa-8416-ce3951b15921"}
+{"level":"INFO","timestamp":"2024-10-20T20:48:02.296+0700","caller":"service/product.service.go:55","msg":"Get product successfully","ProductId":"2821f4ba-40ad-42ab-879a-8dd6a183c161"}
+{"level":"INFO","timestamp":"2024-10-20T20:48:51.152+0700","caller":"service/cart.service.go:65","msg":"2"}
+{"level":"INFO","timestamp":"2024-10-20T20:48:51.153+0700","caller":"service/cart.service.go:65","msg":"3"}
+{"level":"INFO","timestamp":"2024-10-20T20:48:51.163+0700","caller":"service/product.service.go:55","msg":"Get product successfully","ProductId":"65a0eafb-06d7-47fa-8416-ce3951b15921"}
+{"level":"INFO","timestamp":"2024-10-20T20:48:51.169+0700","caller":"service/product.service.go:55","msg":"Get product successfully","ProductId":"2821f4ba-40ad-42ab-879a-8dd6a183c161"}
+{"level":"INFO","timestamp":"2024-10-20T20:50:39.477+0700","caller":"service/product.service.go:55","msg":"Get product successfully","ProductId":"65a0eafb-06d7-47fa-8416-ce3951b15921"}
+{"level":"INFO","timestamp":"2024-10-20T20:50:39.485+0700","caller":"service/product.service.go:55","msg":"Get product successfully","ProductId":"2821f4ba-40ad-42ab-879a-8dd6a183c161"}
+{"level":"INFO","timestamp":"2024-10-20T21:05:19.080+0700","caller":"service/product.service.go:55","msg":"Get product successfully","ProductId":"65a0eafb-06d7-47fa-8416-ce3951b15921"}
+{"level":"INFO","timestamp":"2024-10-20T21:05:19.089+0700","caller":"service/product.service.go:55","msg":"Get product successfully","ProductId":"2821f4ba-40ad-42ab-879a-8dd6a183c161"}
+{"level":"INFO","timestamp":"2024-10-20T21:14:18.288+0700","caller":"service/product.service.go:55","msg":"Get product successfully","ProductId":"65a0eafb-06d7-47fa-8416-ce3951b15921"}
+{"level":"INFO","timestamp":"2024-10-20T21:14:18.321+0700","caller":"service/product.service.go:55","msg":"Get product successfully","ProductId":"2821f4ba-40ad-42ab-879a-8dd6a183c161"}

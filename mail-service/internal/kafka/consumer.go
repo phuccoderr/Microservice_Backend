@@ -91,7 +91,7 @@ func HandlePlaceOrderCustomer(message *kafka.Message) error {
 
 	formMail := mail.Message{
 		From:     constants.EMAIL_FROM,
-		To:       placeOrder.CustomerEmail,
+		To:       placeOrder.CustomerId.Email,
 		Subject:  constants.VERIFY_PLACEORDER,
 		Body:     constants.BODY,
 		HTMLBody: fmt.Sprintf(`<h3>%s</h3>`, constants.TITLE_PLACE_ORDER),

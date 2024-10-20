@@ -2,6 +2,7 @@ package com.phuc.productservice.events.message;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.phuc.productservice.dtos.ProductDto;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,13 +13,20 @@ import java.util.List;
 public class PlaceOrderEvent {
 
     @JsonProperty("customer_id")
-    private String customerId;
+    private Customer customerId;
 
-    @JsonProperty("customer_email")
-    private String customerEmail;
+    @Setter
+    @Getter
+    public static class Customer {
+        @JsonProperty("_id")
+        private String id;
 
-    @JsonProperty("customer_name")
-    private String customerName;
+        @JsonProperty("email")
+        private String email;
+
+        @JsonProperty("name")
+        private String name;
+    }
 
     @JsonProperty("address")
     private String address;
@@ -29,48 +37,30 @@ public class PlaceOrderEvent {
     @JsonProperty("phone_number")
     private String phoneNumber;
 
-    @JsonProperty("check_out")
-    private CheckOut checkOut;
+    @JsonProperty("total")
+    private Float total;
 
-    @JsonProperty("items")
-    private List<Item> items;
+    @JsonProperty("product_cost")
+    private Float productCost;
+
+    @JsonProperty("shipping_cost")
+    private Float shippingCost;
+
+    @JsonProperty("deliver_days")
+    private String deliverDays;
+
+
+    @JsonProperty("order_details")
+    private List<OrderDetail> OrderDetails;
 
     @Setter
     @Getter
-    public static class Item {
+    public static class OrderDetail {
         @JsonProperty("product_id")
-        private String productId;
-
-        @JsonProperty("product_image")
-        private String productImage;
+        private ProductDto productId;
 
         @JsonProperty("quantity")
         private int quantity;
-
-        @JsonProperty("cost")
-        private float cost;
-
-        @JsonProperty("price")
-        private float price;
-
-        @JsonProperty("total")
-        private float total;
     }
 
-
-    @Setter
-    @Getter
-    public static class CheckOut {
-        @JsonProperty("product_total")
-        private Float productTotal;
-
-        @JsonProperty("product_cost")
-        private Float productCost;
-
-        @JsonProperty("shipping_cost")
-        private Float shippingCost;
-
-        @JsonProperty("deliver_days")
-        private String deliverDays;
-    }
 }

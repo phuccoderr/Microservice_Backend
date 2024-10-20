@@ -25,25 +25,27 @@ func ConsumeOrder(service service.IOrderRedisService) {
 	}
 
 	newOrder := models.Order{
-		Name:         placeOrderMessage.CustomerName,
+		Name:         placeOrderMessage.CustomerId.Name,
 		Address:      placeOrderMessage.Address,
 		PhoneNumber:  placeOrderMessage.PhoneNumber,
-		CustomerId:   placeOrderMessage.CustomerId,
+		CustomerId:   placeOrderMessage.CustomerId.ID,
 		Payment:      placeOrderMessage.PaymentMethod,
-		ProductCost:  placeOrderMessage.CheckOut.ProductCost,
-		ShippingCost: placeOrderMessage.CheckOut.ShippingCost,
-		Total:        placeOrderMessage.CheckOut.ProductTotal,
-		DeliveryDays: placeOrderMessage.CheckOut.DeliverDays,
+		ProductCost:  placeOrderMessage.ProductCost,
+		ShippingCost: placeOrderMessage.ShippingCost,
+		Total:        placeOrderMessage.Total,
+		DeliveryDays: placeOrderMessage.DeliverDays,
 		Status:       models.StatusPending,
 		Note:         placeOrderMessage.Note,
 	}
 
-	for _, item := range placeOrderMessage.Items {
+	for _, item := range placeOrderMessage.OrderDetails {
+		var sale float64
+		sale = item.ProductId.Price * (item.ProductId.Sale / 100)
 		detail := models.OrderDetails{
-			ProductCost: item.Cost,
-			Total:       item.Total,
+			ProductCost: item.ProductId.Cost,
+			Total:       (item.ProductId.Price - sale) * float64(item.Quantity),
 			Quantity:    item.Quantity,
-			ProductID:   item.ProductId,
+			ProductID:   item.ProductId.Id,
 		}
 		newOrder.OrderDetails = append(newOrder.OrderDetails, detail)
 	}

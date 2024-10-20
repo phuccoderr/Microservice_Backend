@@ -10,7 +10,7 @@ type ProductResponse struct {
 	Cost        float64 `json:"cost"`
 	Price       float64 `json:"price"`
 	Sale        float64 `json:"sale"`
-	ImageID     string  `gorm:"column:image_id" json:"image_id"`
+	ImageID     string  `json:"image_id"`
 	URL         string  `json:"url"`
 
 	ExtraImages []interface{} `json:"extra_images"`

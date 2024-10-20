@@ -1,6 +1,9 @@
 package dto
 
-import "cart-service/pkg/response"
+import (
+	"cart-service/internal/middleware"
+	"cart-service/pkg/response"
+)
 
 type CartRequest struct {
 	ProductId string `json:"product_id"`
@@ -8,25 +11,18 @@ type CartRequest struct {
 }
 
 type CartDto struct {
-	ProductId    string  `json:"product_id"`
-	ProductImage string  `json:"product_image"`
-	Name         string  `json:"name"`
-	Cost         float64 `json:"cost"`
-	Price        float64 `json:"price"`
-	Sale         float64 `json:"sale"`
-	Quantity     int64   `json:"quantity"`
-	Total        float64 `json:"total"`
+	ProductId  *response.ProductResponse `json:"product_id"`
+	CustomerId CustomerDto               `json:"customer_id"`
+	Quantity   int64                     `json:"quantity"`
 }
 
-func ToCartDto(product *response.ProductResponse, quantity int64) CartDto {
-	return CartDto{
-		ProductId:    product.Id,
-		ProductImage: product.URL,
-		Cost:         product.Cost * float64(quantity),
-		Name:         product.Name,
-		Price:        product.Price,
-		Sale:         product.Sale,
-		Quantity:     quantity,
-		Total:        (product.Price - (product.Price * (product.Sale / 100))) * float64(quantity),
-	}
+func ToCartDto(product *response.ProductResponse, customerDto *middleware.CustomClaims, quantity int64) CartDto {
+	var cartDto CartDto
+	cartDto.ProductId = product
+	cartDto.CustomerId.ID = customerDto.ID
+	cartDto.CustomerId.Name = customerDto.Name
+	cartDto.CustomerId.Email = customerDto.Email
+	cartDto.Quantity = quantity
+
+	return cartDto
 }

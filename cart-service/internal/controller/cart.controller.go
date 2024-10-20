@@ -79,7 +79,7 @@ func (cc *CartController) GetCart(c *gin.Context) {
 			response.ErrorResponse(c, err.Error(), constants.STATUS_INTERNAL_ERROR, http.StatusInternalServerError)
 			return
 		}
-		carts = append(carts, dto.ToCartDto(product, cart.Quantity))
+		carts = append(carts, dto.ToCartDto(product, customer, cart.Quantity))
 	}
 
 	response.SuccessResponse(c, http.StatusOK, constants.GET_SUCCESS, carts)
@@ -125,48 +125,6 @@ func (cc *CartController) DeleteCart(c *gin.Context) {
 	response.SuccessResponse(c, http.StatusOK, constants.DELETE_SUCCESS, nil)
 }
 
-func (cc *CartController) Checkout(c *gin.Context) {
-	_, customer, err := middleware.JWTGetTokenAndCustomer(c)
-	if err != nil {
-		global.Logger.Error("Get Token Error", zap.Error(err))
-		response.ErrorResponse(c, err.Error(), constants.STATUS_UNAUTHORIZED, http.StatusUnauthorized)
-		return
-	}
-
-	cartsRedis, err := cc.cartService.GetCart(customer.ID)
-	if err != nil {
-		global.Logger.Error("Get Cart Error", zap.Error(err))
-		response.ErrorResponse(c, err.Error(), constants.STATUS_INTERNAL_ERROR, http.StatusInternalServerError)
-		return
-	}
-
-	var carts []dto.CartDto
-	for _, cart := range cartsRedis {
-		product, err := cc.productService.GetProductById(cart.ProductId)
-		if err != nil {
-			global.Logger.Error("Get Product Error", zap.Error(err))
-			response.ErrorResponse(c, err.Error(), constants.STATUS_INTERNAL_ERROR, http.StatusInternalServerError)
-			return
-		}
-		if cart.Quantity > product.Stock {
-			global.Logger.Info(fmt.Sprintf("quantity %s less than %v", product.Name, product.Stock))
-			response.ErrorResponse(c, fmt.Sprintf("quantity %s less than %v", product.Name, product.Stock),
-				constants.STATUS_STATUS_UNPROCESSABLEENTITTY,
-				http.StatusUnprocessableEntity)
-			return
-		}
-		carts = append(carts, dto.ToCartDto(product, cart.Quantity))
-	}
-	if len(carts) == 0 {
-		global.Logger.Info("Cart not exists!")
-		response.ErrorResponse(c, constants.DB_NOT_FOUND, constants.STATUS_NOT_FOUND, http.StatusNotFound)
-		return
-	}
-
-	checkOutInfo := cc.cartService.Checkout(carts, 0)
-	response.SuccessResponse(c, http.StatusOK, constants.CHECKOUT_SUCCESS, checkOutInfo)
-}
-
 func (cc *CartController) PlaceOrder(c *gin.Context) {
 	placeOrder := &dto.PlaceOrderRequest{}
 	err := c.ShouldBindJSON(&placeOrder)
@@ -190,8 +148,6 @@ func (cc *CartController) PlaceOrder(c *gin.Context) {
 		return
 	}
 
-	orderMessage := dto.PlaceOrderMessage{}
-
 	var carts []dto.CartDto
 	for _, cart := range cartsRedis {
 		product, err := cc.productService.GetProductById(cart.ProductId)
@@ -207,7 +163,7 @@ func (cc *CartController) PlaceOrder(c *gin.Context) {
 				http.StatusUnprocessableEntity)
 			return
 		}
-		carts = append(carts, dto.ToCartDto(product, cart.Quantity))
+		carts = append(carts, dto.ToCartDto(product, customer, cart.Quantity))
 	}
 
 	if len(carts) == 0 {
@@ -216,13 +172,10 @@ func (cc *CartController) PlaceOrder(c *gin.Context) {
 		return
 	}
 
-	checkOutInfo := cc.cartService.Checkout(carts, placeOrder.Sale)
+	orderMessage := cc.cartService.Checkout(carts, placeOrder.Sale)
 
-	orderMessage.CheckOut = checkOutInfo
-	orderMessage.CustomerId = customer.ID
-	orderMessage.CustomerEmail = customer.Email
-	orderMessage.CustomerName = customer.Name
-	orderMessage.Items = carts
+	dto.ToDtoPlaceOrderMessage(orderMessage, carts, customer)
+
 	orderMessage.Address = placeOrder.Address
 	orderMessage.PaymentMethod = placeOrder.PaymentMethod
 	orderMessage.PhoneNumber = placeOrder.PhoneNumber

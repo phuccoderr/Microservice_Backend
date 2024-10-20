@@ -36,8 +36,8 @@ public class ConsumerEventHandler {
     public void listener(PlaceOrderEvent placeOrderEvent) {
         LOGGER.info("Received message: {}", placeOrderEvent);
 
-        placeOrderEvent.getItems().forEach( item -> {
-            String proId = item.getProductId();
+        placeOrderEvent.getOrderDetails().forEach( item -> {
+            String proId = item.getProductId().getId();
             int quantity = item.getQuantity();
 
             Optional<Product> productOptional  = productRepository.findById(proId);
