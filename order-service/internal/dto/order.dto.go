@@ -3,6 +3,7 @@ package dto
 import (
 	"github.com/google/uuid"
 	"order-service/internal/models"
+	"order-service/pkg/response"
 	"time"
 )
 
@@ -23,12 +24,13 @@ type OrderDto struct {
 }
 
 type OrderDetailsDto struct {
-	ID          uuid.UUID `json:"id"`
-	ProductCost float64   `json:"product_cost"`
-	ProductID   string    `json:"product_id"`
-	Quantity    int64     `json:"quantity"`
-	OrderID     uuid.UUID `json:"order_id"`
-	Total       float64   `json:"total"`
+	ID          uuid.UUID                 `json:"id"`
+	ProductCost float64                   `json:"product_cost"`
+	ProductID   string                    `json:"product_id"`
+	Product     *response.ProductResponse `json:"product"`
+	Quantity    int64                     `json:"quantity"`
+	OrderID     uuid.UUID                 `json:"order_id"`
+	Total       float64                   `json:"total"`
 }
 
 func ListEntityToDto(orders []models.Order) []OrderDto {

@@ -2,7 +2,9 @@ package controller
 
 import (
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 	"net/http"
+	"order-service/global"
 	"order-service/internal/cache"
 	"order-service/internal/constants"
 	"order-service/internal/dto"
@@ -15,12 +17,14 @@ import (
 type OrderController struct {
 	orderService      service.IOrderService
 	orderRedisService service.IOrderRedisService
+	productService    service.IProductService
 }
 
-func NewOrderController(orderService service.IOrderService, redisService service.IOrderRedisService) *OrderController {
+func NewOrderController(orderService service.IOrderService, redisService service.IOrderRedisService, productService service.IProductService) *OrderController {
 	return &OrderController{
 		orderService:      orderService,
 		orderRedisService: redisService,
+		productService:    productService,
 	}
 }
 
@@ -42,7 +46,19 @@ func (oc *OrderController) GetAllOrders(c *gin.Context) {
 		return
 	}
 
-	paginationDto := dto.BuildPaginationDto(orders, page, limit)
+	ordersDto := dto.ListEntityToDto(orders)
+	for i, orderDto := range ordersDto {
+		for j, detail := range orderDto.OrderDetails {
+			product, err := oc.productService.GetProductById(detail.ProductID)
+			if err != nil {
+				global.Logger.Error("Get Product Error", zap.Error(err))
+				response.ErrorResponse(c, err.Error(), constants.STATUS_INTERNAL_ERROR, http.StatusInternalServerError)
+				return
+			}
+			ordersDto[i].OrderDetails[j].Product = product
+		}
+	}
+	paginationDto := dto.BuildPaginationDto(ordersDto, page, limit)
 	oc.orderRedisService.SetOrder(paginationDto, cache.OrdersKey(page, limit, sort))
 
 	response.SuccessResponse(c, http.StatusOK, paginationDto)
@@ -57,7 +73,19 @@ func (oc *OrderController) GetOrder(c *gin.Context) {
 		return
 	}
 
-	response.SuccessResponse(c, http.StatusOK, dto.EntityToDto(order))
+	orderDto := dto.EntityToDto(order)
+
+	for i, detail := range orderDto.OrderDetails {
+		product, err := oc.productService.GetProductById(detail.ProductID)
+		if err != nil {
+			global.Logger.Error("Get Product Error", zap.Error(err))
+			response.ErrorResponse(c, err.Error(), constants.STATUS_INTERNAL_ERROR, http.StatusInternalServerError)
+			return
+		}
+		orderDto.OrderDetails[i].Product = product
+	}
+
+	response.SuccessResponse(c, http.StatusOK, orderDto)
 
 }
 
@@ -89,6 +117,17 @@ func (oc *OrderController) GetOrderByCustomer(c *gin.Context) {
 	}
 
 	ordersDto := dto.ListEntityToDto(orders)
+	for i, orderDto := range ordersDto {
+		for j, detail := range orderDto.OrderDetails {
+			product, err := oc.productService.GetProductById(detail.ProductID)
+			if err != nil {
+				global.Logger.Error("Get Product Error", zap.Error(err))
+				response.ErrorResponse(c, err.Error(), constants.STATUS_INTERNAL_ERROR, http.StatusInternalServerError)
+				return
+			}
+			ordersDto[i].OrderDetails[j].Product = product
+		}
+	}
 	oc.orderRedisService.SetOrder(ordersDto, cache.OrdersByCustomerKey(customer.ID))
 
 	response.SuccessResponse(c, http.StatusOK, ordersDto)

@@ -1,7 +1,5 @@
 package dto
 
-import "order-service/internal/models"
-
 type PaginationDTO struct {
 	TotalItems  int         `json:"total_items"`
 	TotalPages  int         `json:"total_pages"`
@@ -11,7 +9,7 @@ type PaginationDTO struct {
 	Entities    interface{} `json:"entities"`
 }
 
-func BuildPaginationDto(orders []models.Order, page, limit int) PaginationDTO {
+func BuildPaginationDto(orders []OrderDto, page, limit int) PaginationDTO {
 	startCount := (page-1)*limit + 1
 
 	return PaginationDTO{
@@ -20,6 +18,6 @@ func BuildPaginationDto(orders []models.Order, page, limit int) PaginationDTO {
 		CurrentPage: page,
 		StartCount:  startCount,
 		EndCount:    startCount + len(orders) - 1,
-		Entities:    ListEntityToDto(orders),
+		Entities:    orders,
 	}
 }

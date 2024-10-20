@@ -17,7 +17,8 @@ func (pr *OrderRouter) InitOrderRouter(router *gin.RouterGroup) {
 	orderRepository := repository.NewOrderRepo(global.Mdb)
 	orderService := service.NewOrderService(orderRepository)
 	redisService := service.NewOrderRedisService(global.Rdb)
-	orderController := controller.NewOrderController(orderService, redisService)
+	productService := service.NewProductService()
+	orderController := controller.NewOrderController(orderService, redisService, productService)
 
 	private := router.Group("/orders")
 	private.Use(middlewares.JWTMiddleware("CUSTOMER"))
