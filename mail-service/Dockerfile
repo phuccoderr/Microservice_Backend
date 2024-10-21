@@ -12,6 +12,8 @@ FROM scratch
 
 COPY ./config /config
 
-COPY --from=builder /build/mailService /
+COPY ./internal/kafka/templates /internal/kafka/templates
+
+COPY --from=builder /build/mailService /mailService
 
 ENTRYPOINT ["./mailService", "config/local.yaml"]

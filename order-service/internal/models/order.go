@@ -25,7 +25,7 @@ type Order struct {
 	ProductCost  float64        `gorm:"column:product_cost; not null"`
 	ShippingCost float64        `gorm:"column:shipping_cost; not null"`
 	Status       string         `gorm:"column:status; not null"`
-	CreatedAt    time.Time      `gorm:"column:created_at; not null; autoCreateTime"`
+	CreatedAt    time.Time      `gorm:"column:created_at; not null"`
 	Note         string         `gorm:"column:note; not null"`
 }
 

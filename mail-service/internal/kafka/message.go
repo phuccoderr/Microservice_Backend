@@ -20,6 +20,7 @@ type PlaceOrderMessage struct {
 	ProductCost   float64   `json:"product_cost"`
 	ShippingCost  float64   `json:"shipping_cost"`
 	DeliverDays   time.Time `json:"deliver_days"`
+	CreatedAt     time.Time `json:"created_at"`
 	OrderDetails  []struct {
 		ProductId struct {
 			Id          string  `json:"id"`

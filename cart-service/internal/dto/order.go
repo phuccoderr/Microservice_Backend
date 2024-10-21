@@ -24,6 +24,7 @@ type PlaceOrderMessage struct {
 	DeliverDays   time.Time   `json:"deliver_days"`
 	OrderDetails  []CartDto   `json:"order_details"`
 	Note          string      `json:"note"`
+	CreatedAt     time.Time   `json:"created_at"`
 }
 
 func ToDtoPlaceOrderMessage(placeOrderMessage *PlaceOrderMessage, cartDto []CartDto, customerDto *middleware.CustomClaims) {

@@ -14,6 +14,7 @@ import (
 	"github.com/segmentio/kafka-go"
 	"go.uber.org/zap"
 	"net/http"
+	"time"
 )
 
 type CartController struct {
@@ -180,6 +181,7 @@ func (cc *CartController) PlaceOrder(c *gin.Context) {
 	orderMessage.PaymentMethod = placeOrder.PaymentMethod
 	orderMessage.PhoneNumber = placeOrder.PhoneNumber
 	orderMessage.Note = placeOrder.Note
+	orderMessage.CreatedAt = time.Now()
 
 	marshal, err := json.Marshal(orderMessage)
 	if err != nil {

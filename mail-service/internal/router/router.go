@@ -28,5 +28,4 @@ func NewRouter(r *gin.Engine) {
 			global.Logger.Info("unknown topic", zap.String("topic", message.Topic))
 		}
 	}
-
 }

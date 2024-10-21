@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hóa Đơn</title>
+</head>
+<body style="
+      font-family: Arial, sans-serif;
+      background-color: #f8f9fa;
+      padding: 20px;
+    ">
+<div
+        style="
+        max-width: 600px;
+        margin: auto;
+        padding: 20px;
+        background-color: #ffffff;
+        border-radius: 10px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+      "
+>
+    <div style="display: flex; align-items: center">
+        <img
+                style="
+            width: 180px;
+            height: 80px;
+            object-fit: cover;
+            object-position: top;
+            border-radius: 5%;
+          "
+                src="https://res.cloudinary.com/dp4tp9gwa/image/upload/v1729503335/microservice/logo_cwis8t.png"
+                alt="Nhun cc"
+        />
+        <div style="width: 220px">
+            <h1 style="text-align: center; color: rgb(34 211 238)">HOÁ ĐƠN</h1>
+        </div>
+    </div>
+    <p style="text-align: right; margin: 0">Ngày lập: {{ .CreatedAt | formatDate}}</p>
+    <div
+            style="
+          margin-top: 20px;
+          padding: 10px;
+          background-color: rgb(34 211 238);
+          color: black;
+          border-radius: 5px;
+        "
+    >
+        <p style="margin: 5px 0"><strong>Hóa đơn khách hàng:</strong></p>
+        <p style="margin: 5px 0">Tên: {{.CustomerId.Name}}</p>
+        <p style="margin: 5px 0">Địa chi: {{.Address}}</p>
+        <p style="margin: 5px 0">Sdt: {{.PhoneNumber}}</p>
+    </div>
+
+    <div
+            style="
+          margin-top: 20px;
+          padding: 10px;
+          background-color: #f1f1f1;
+          border-radius: 5px;
+        "
+    >
+        <p style="margin: 5px 0"><strong>Thanh toán cho:</strong></p>
+        <p style="margin: 5px 0">Shop NStore</p>
+        <p style="margin: 5px 0">Gmail: m@example.com</p>
+        <p style="margin: 5px 0">Sdt: 0298092389</p>
+    </div>
+
+    <table
+            style="
+          width: 100%;
+          margin-top: 20px;
+          border-collapse: collapse;
+          text-align: center;
+          vertical-align: middle;
+        "
+    >
+        <thead style="background-color: rgb(34 211 238); color: white">
+        <tr>
+            <th style="padding: 10px; border: 1px solid #ddd">Sản Phẩm</th>
+            <th style="padding: 10px; border: 1px solid #ddd">Số lượng</th>
+            <th style="padding: 10px; border: 1px solid #ddd">Đơn giá</th>
+            <th style="padding: 10px; border: 1px solid #ddd">Giảm giá</th>
+            <th style="padding: 10px; border: 1px solid #ddd;">Thành tiền</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{ range .OrderDetails }}
+        <tr>
+            <td style="padding: 10px; border: 1px solid #ddd">
+                {{.ProductId.Name}}
+            </td>
+            <td style="padding: 10px; border: 1px solid #ddd">
+                {{.Quantity}}
+            </td>
+            <td style="padding: 10px; border: 1px solid #ddd">
+                {{.ProductId.Price}}
+            </td>
+            <td style="padding: 10px; border: 1px solid #ddd">
+                {{.ProductId.Sale}}%
+            </td>
+            <td style="padding: 10px; border: 1px solid #ddd;">
+                {{ calTotal .ProductId.Price .ProductId.Sale .Quantity }}
+            </td>
+        </tr>
+        {{ end }}
+        </tbody>
+    </table>
+    <h4
+            style="
+          text-align: right;
+          margin-top: 20px;
+          color: rgb(34 211 238);
+        "
+    >
+        Phí Ship: 30.000VND
+    </h4>
+
+    <h2
+            style="
+          text-align: right;
+          margin-top: 20px;
+          color: rgb(34 211 238);
+        "
+    >
+        Tổng Thành Tiền: {{.Total}}VND
+    </h2>
+
+    <div
+            style="
+          margin-top: 30px;
+          text-align: center;
+          color: #777;
+          font-size: 12px;
+        "
+    >
+        <p>NStore</p>
+        <p style="margin: 0">Gmail: m@example.com</p>
+        <p style="margin: 0">Lựa chọn tin tưởng trên đôi chân mình</p>
+        <p style="margin: 0">Đồng hành cùng bạn khắp nơi</p>
+    </div>
+</div>
+</body>
+</html>

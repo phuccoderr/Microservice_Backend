@@ -1,13 +1,17 @@
 package kafka
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"github.com/segmentio/kafka-go"
 	"go.uber.org/zap"
+	"html/template"
+	"log"
 	"mail-service/global"
 	"mail-service/internal/constants"
 	"mail-service/internal/mail"
+	"time"
 )
 
 func HandleVerifyCustomer(message *kafka.Message) error {
@@ -89,12 +93,26 @@ func HandlePlaceOrderCustomer(message *kafka.Message) error {
 		return err
 	}
 
+	global.Logger.Info("Place order received", zap.Any("placeOrder", placeOrder))
+
+	funcMap := template.FuncMap{
+		"formatDate": formatDate,
+		"calTotal":   calTotal,
+	}
+
+	tmpl, _ := template.New("place-order.html").Funcs(funcMap).ParseFiles("internal/kafka/templates/place-order.html")
+	var body bytes.Buffer
+	err = tmpl.Execute(&body, placeOrder)
+	if err != nil {
+		log.Fatalf("Error executing template: %v", err)
+	}
+
 	formMail := mail.Message{
 		From:     constants.EMAIL_FROM,
 		To:       placeOrder.CustomerId.Email,
 		Subject:  constants.VERIFY_PLACEORDER,
-		Body:     constants.BODY,
-		HTMLBody: fmt.Sprintf(`<h3>%s</h3>`, constants.TITLE_PLACE_ORDER),
+		Body:     body.String(),
+		HTMLBody: body.String(),
 	}
 
 	err = mail.SendSMTPMessage(formMail)
@@ -103,4 +121,14 @@ func HandlePlaceOrderCustomer(message *kafka.Message) error {
 		return err
 	}
 	return nil
+}
+
+func formatDate(t time.Time) string {
+	return t.Format("02/01/2006 15:04:05") // dd/MM/yyyy HH:mm:ss format
+}
+
+func calTotal(price float64, sale float64, quantity int64) float64 {
+	sale = price * (sale / 100)
+	total := (price - sale) * float64(quantity)
+	return total
 }
