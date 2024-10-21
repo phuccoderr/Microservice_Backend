@@ -58,6 +58,7 @@ func (oc *OrderController) GetAllOrders(c *gin.Context) {
 			ordersDto[i].OrderDetails[j].Product = product
 		}
 	}
+
 	paginationDto := dto.BuildPaginationDto(ordersDto, page, limit)
 	oc.orderRedisService.SetOrder(paginationDto, cache.OrdersKey(page, limit, sort))
 

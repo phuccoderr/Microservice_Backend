@@ -25,12 +25,15 @@ func (or *OrderRouter) InitOrderRouter(router *gin.RouterGroup) {
 			kafka.ConsumeOrder(redisService)
 		}
 	}()
+	public := router.Group("/orders")
+	{
+		public.GET("/:id", orderController.GetOrder)
+	}
 
 	private := router.Group("/orders")
 	private.Use(middlewares.JWTMiddleware("ADMIN", "SALE"))
 	{
 		private.GET("", orderController.GetAllOrders)
-		private.GET("/:id", orderController.GetOrder)
 		private.GET("/:id/status/:status", orderController.ChangeStatus)
 	}
 }

@@ -12,6 +12,7 @@ import com.phuc.productservice.request.RequestProduct;
 import com.phuc.productservice.specifications.ProductSpecifications;
 import com.phuc.productservice.util.FileUploadUtil;
 import com.phuc.productservice.util.Utility;
+import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -166,7 +167,10 @@ public class ProductService implements IProductService {
     ) throws ParamValidateException {
         Utility.checkSortIsAscOrDesc(sort);
 
-        Specification<Product> spec = Specification.where(null);
+        Specification<Product> spec = Specification.where((root, query, criteriaBuilder) -> {
+            Predicate enabled = criteriaBuilder.isTrue(root.get("status"));
+            return criteriaBuilder.and(enabled);
+        });
 
         if (!listCategoryIds.isEmpty()) {
             spec = spec.and(ProductSpecifications.withCategory(listCategoryIds));

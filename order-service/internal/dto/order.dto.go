@@ -10,6 +10,7 @@ import (
 type OrderDto struct {
 	ID           uuid.UUID         `json:"id"`
 	CustomerId   string            `json:"customer_id"`
+	Email        string            `json:"email"`
 	Name         string            `json:"name"`
 	Address      string            `json:"address"`
 	PhoneNumber  string            `json:"phone_number"`
@@ -46,6 +47,7 @@ func EntityToDto(order *models.Order) *OrderDto {
 	orderDto := &OrderDto{
 		ID:           order.ID,
 		CustomerId:   order.CustomerId,
+		Email:        order.Email,
 		Name:         order.Name,
 		Address:      order.Address,
 		PhoneNumber:  order.PhoneNumber,

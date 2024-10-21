@@ -26,6 +26,7 @@ func ConsumeOrder(service service.IOrderRedisService) {
 
 	newOrder := models.Order{
 		Name:         placeOrderMessage.CustomerId.Name,
+		Email:        placeOrderMessage.CustomerId.Email,
 		Address:      placeOrderMessage.Address,
 		PhoneNumber:  placeOrderMessage.PhoneNumber,
 		CustomerId:   placeOrderMessage.CustomerId.ID,
