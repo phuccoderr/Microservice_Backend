@@ -78,7 +78,7 @@ public class DiscountController {
                 .data(discountDto).build(), HttpStatus.OK);
     }
 
-    @GetMapping("/{code}")
+    @PostMapping("/{code}")
     public ResponseEntity<ResponseObject> get(@PathVariable("code") String code) throws DataErrorException {
         Discount discount = service.getCode(code);
         DiscountDto discountDto = Utility.toDiscountDto(discount);
