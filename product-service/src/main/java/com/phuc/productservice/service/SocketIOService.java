@@ -23,4 +23,6 @@ public class SocketIOService implements ISocketIOService{
             client.sendEvent("add-image", message); // Gửi event "addImage" đến client cụ thể
         }
     }
+
+
 }

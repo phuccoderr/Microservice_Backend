@@ -25,6 +25,10 @@ public class SocketIOConfiguration {
         server.addConnectListener(socketIOClient -> System.out.println("client connect: " + socketIOClient.getSessionId()));
         server.addDisconnectListener(socketIOClient -> System.out.println("client disconnect: " + socketIOClient.getSessionId()));
 
+        server.addEventListener("order-status", String.class, ((socketIOClient, email, ackRequest) -> {
+            server.getBroadcastOperations().sendEvent("order-status", email);
+        }));
+
         return server;
     }
 

@@ -9,7 +9,7 @@ import (
 )
 
 func InitRouter() *gin.Engine {
-	var r *gin.Engine
+	r := gin.Default()
 
 	if global.Config.Server.Mode == "dev" {
 		gin.SetMode(gin.DebugMode)
@@ -31,5 +31,6 @@ func InitRouter() *gin.Engine {
 		manage.InitOrderRouter(MainGroup)
 		user.InitOrderRouter(MainGroup)
 	}
+
 	return r
 }
