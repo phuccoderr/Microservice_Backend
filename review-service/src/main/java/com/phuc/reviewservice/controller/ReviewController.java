@@ -132,4 +132,17 @@ public class ReviewController {
                 .message("OK")
                 .data(null).build());
     }
+
+    @GetMapping("/can_review")
+    public ResponseEntity<ResponseObject> canReview(
+            @RequestParam(value = "product_id") String proId,
+            @RequestParam(value = "customer_id") String customerId) {
+        boolean isReview = reviewService.canCustomerReviewProduct(customerId, proId);
+
+        return ResponseEntity.ok(ResponseObject.builder()
+                .status(HttpStatus.OK.value())
+                .message("OK")
+                .data(isReview).build());
+
+    }
 }

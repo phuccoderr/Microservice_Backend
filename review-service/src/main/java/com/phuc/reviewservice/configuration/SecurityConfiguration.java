@@ -33,6 +33,7 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests( authz ->
                         authz
                                 .requestMatchers(HttpMethod.GET,Constants.API_REVIEWS).hasAnyAuthority("ADMIN", "USER")
+                                .requestMatchers(HttpMethod.GET, Constants.API_REVIEWS + "/can_review").hasAnyAuthority("CUSTOMER")
                                 .requestMatchers(HttpMethod.DELETE, Constants.API_REVIEWS + "/*").hasAnyAuthority("ADMIN", "USER")
                                 .requestMatchers(HttpMethod.POST, Constants.API_REVIEWS + "/post_review/*").hasAnyAuthority("CUSTOMER")
                                 .anyRequest().permitAll())

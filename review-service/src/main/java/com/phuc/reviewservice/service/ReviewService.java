@@ -76,4 +76,9 @@ public class ReviewService implements IReviewService{
 
         return reviewRepository.findByProduct(proId,pageable);
     }
+
+    public boolean canCustomerReviewProduct(String customerId,String productId) {
+        Long count = reviewRepository.countByCustomerAndProduct(customerId,productId);
+        return count > 0;
+    }
 }
