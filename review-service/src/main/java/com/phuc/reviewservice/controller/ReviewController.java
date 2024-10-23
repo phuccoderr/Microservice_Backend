@@ -130,7 +130,7 @@ public class ReviewController {
         return ResponseEntity.ok(ResponseObject.builder()
                 .status(HttpStatus.OK.value())
                 .message("OK")
-                .data(null).build());
+                .data(proId).build());
     }
 
     @GetMapping("/can_review")
