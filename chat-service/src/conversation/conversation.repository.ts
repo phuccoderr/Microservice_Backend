@@ -16,7 +16,10 @@ export class ConversationRepository {
   async get({ sender_id, receiver_id }: ConversationDto) {
     return await this.model
       .findOne({
-        participants: { $all: [sender_id, receiver_id] },
+        $and: [
+          { participants: { $elemMatch: { id: sender_id } } },
+          { participants: { $elemMatch: { id: receiver_id } } },
+        ],
       })
       .populate('messages');
   }
@@ -24,14 +27,14 @@ export class ConversationRepository {
   async findAll(user_id: string) {
     return await this.model
       .find({
-        participants: { $in: [user_id] },
+        participants: { $elemMatch: { id: user_id } },
       })
       .populate('messages');
   }
 
   async create({ sender, receiver }: UserSendMessageDto) {
     return await this.model.create({
-      participants: [sender.id, receiver.id],
+      participants: [sender, receiver],
       _id: new Types.ObjectId(),
     });
   }

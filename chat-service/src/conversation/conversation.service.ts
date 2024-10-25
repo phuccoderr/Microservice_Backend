@@ -17,7 +17,6 @@ export class ConversationService {
   }
 
   async getAll(user_id: string) {
-    console.log(user_id);
     return await this.repository.findAll(user_id);
   }
 

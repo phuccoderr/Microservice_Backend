@@ -19,8 +19,6 @@ export class MessageService {
       receiver_id: receiver.id,
     });
 
-    console.log('conversation', conversation);
-
     if (!conversation) {
       conversation =
         await this.conversationService.createConversation(sendMessage);
