@@ -7,7 +7,7 @@ import { ROLES_KEY } from '@src/auth/decorators/roles.decorator';
 
 @Injectable()
 export class RolesAuthGuard extends JwtAuthGuard implements CanActivate {
-  constructor(private reflector: Reflector) {
+  constructor(private readonly reflector: Reflector) {
     super();
   }
 

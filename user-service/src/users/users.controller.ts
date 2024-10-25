@@ -96,9 +96,9 @@ export class UsersController {
     };
   }
 
-  @UseGuards(JwtAuthGuard, RolesAuthGuard)
-  @Roles(ROLE.ADMIN)
   @Get(':id')
+  @UseGuards(JwtAuthGuard, RolesAuthGuard)
+  @Roles(ROLE.ADMIN, ROLE.USER)
   async getUser(@Param('id') _id: string): Promise<ResponseObject> {
     const user = await this.usersService.getUser(_id);
 

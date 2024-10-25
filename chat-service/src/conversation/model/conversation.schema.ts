@@ -1,19 +1,20 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Message } from '@src/chat/model/message.schema';
 import { AbstractDocument } from '@src/database/abstract.schema';
+import { Message } from '@src/message/model/message.schema';
 import { SchemaTypes, Types } from 'mongoose';
 
-@Schema()
+@Schema({ versionKey: false })
 export class Conversation extends AbstractDocument {
-  @Prop({
-    ref: 'Customer',
-  })
+  @Prop({ type: [SchemaTypes.ObjectId] })
   participants: Types.ObjectId[];
 
-  @Prop([{ type: SchemaTypes.ObjectId, ref: Message.name }])
-  messages: Types.ObjectId[];
+  @Prop([{ type: SchemaTypes.ObjectId, ref: Message.name, default: [] }])
+  messages?: Types.ObjectId[];
 
-  @Prop({})
+  @Prop({
+    type: Date,
+    default: new Date(),
+  })
   created_at: Date;
 }
 

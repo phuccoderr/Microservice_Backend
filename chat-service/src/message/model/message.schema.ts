@@ -2,13 +2,19 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { AbstractDocument } from '@src/database/abstract.schema';
 import { SchemaTypes, Types } from 'mongoose';
 
-@Schema()
-export class Message extends AbstractDocument {
-  @Prop({ type: SchemaTypes.ObjectId, required: true })
-  sender_id: Types.ObjectId;
+class Person {
+  id: string;
+  name: string;
+  email: string;
+}
 
-  @Prop({ type: SchemaTypes.ObjectId, required: true })
-  receiver_id: Types.ObjectId;
+@Schema({ versionKey: false })
+export class Message extends AbstractDocument {
+  @Prop({ type: Person, required: true })
+  sender: Person;
+
+  @Prop({ type: Person, required: true })
+  receiver: Person;
 
   @Prop({ type: String, required: true })
   message: string;

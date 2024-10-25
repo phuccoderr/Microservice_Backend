@@ -1,9 +1,13 @@
+import { UserSendMessageDto } from './dto/user-message.dto';
 import {
+  MessageBody,
   OnGatewayConnection,
   OnGatewayDisconnect,
+  SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
+import { MessageService } from '@src/message/message.service';
 import { Server, Socket } from 'socket.io';
 
 @WebSocketGateway({
@@ -12,6 +16,8 @@ import { Server, Socket } from 'socket.io';
   },
 })
 export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
+  constructor(private readonly messageService: MessageService) {}
+
   @WebSocketServer() server: Server;
 
   handleDisconnect(socket: Socket) {
@@ -19,5 +25,12 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
   handleConnection(socket: Socket) {
     console.log('Client connected:', socket.id);
+  }
+
+  @SubscribeMessage('send-messages')
+  async handleMessage(@MessageBody() data: UserSendMessageDto) {
+    const response = await this.messageService.sendMessage(data);
+
+    this.server.emit('receive-messages', response);
   }
 }

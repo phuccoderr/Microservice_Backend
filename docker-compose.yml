@@ -294,6 +294,24 @@ services:
     networks:
       - default
 
+  chat-service:
+    container_name: chat-service-container
+    build:
+      context: ./chat-service
+      dockerfile: Dockerfile
+    restart: always
+    depends_on:
+      - mongo
+      - redis
+      - postgresql
+      - kafka
+    env_file:
+      - ./chat-service/.env
+    ports:
+      - "9190:9190"
+    networks:
+      - default
+
 networks:
   default:
     driver: bridge

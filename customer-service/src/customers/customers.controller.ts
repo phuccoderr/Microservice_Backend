@@ -32,9 +32,11 @@ import { ChangePasswordDto } from '@src/customers/dto/change-password.dto';
 
 @Controller('/api/v1/customers')
 export class CustomersController {
-  constructor(private readonly customersService: CustomersService,
-              private readonly redisCacheService: RedisCacheService,
-              private readonly cloudinaryService: CloudinaryService,) {}
+  constructor(
+    private readonly customersService: CustomersService,
+    private readonly redisCacheService: RedisCacheService,
+    private readonly cloudinaryService: CloudinaryService,
+  ) {}
 
   @Get('account')
   @UseGuards(JwtAuthGuard, RolesAuthGuard)
@@ -64,9 +66,15 @@ export class CustomersController {
   @UseGuards(JwtAuthGuard, RolesAuthGuard)
   @Roles(ROLE.CUSTOMER)
   @HttpCode(HttpStatus.OK)
-  async updateAccount(@Request() req,@Body() updateAccountDto: UpdateAccountDto): Promise<ResponseObject> {
+  async updateAccount(
+    @Request() req,
+    @Body() updateAccountDto: UpdateAccountDto,
+  ): Promise<ResponseObject> {
     const { _id } = req.user;
-    const customer = await this.customersService.updateCustomer(_id,updateAccountDto);
+    const customer = await this.customersService.updateCustomer(
+      _id,
+      updateAccountDto,
+    );
     this.redisCacheService.del(customerKey(_id));
 
     this.redisCacheService.set(_id, customer);
@@ -80,8 +88,10 @@ export class CustomersController {
 
   @Get()
   @UseGuards(JwtAuthGuard, RolesAuthGuard)
-  @Roles(ROLE.ADMIN,ROLE.USER)
-  async getAllCustomers(@Query() pagination: RequestPaginationDto): Promise<ResponseObject> {
+  @Roles(ROLE.ADMIN, ROLE.USER)
+  async getAllCustomers(
+    @Query() pagination: RequestPaginationDto,
+  ): Promise<ResponseObject> {
     const { keyword, page, limit, sort } = pagination;
 
     if (!keyword) {
@@ -97,10 +107,14 @@ export class CustomersController {
       }
     }
 
-    const customers = await this.customersService.getAllCustomers(pagination)
+    const customers = await this.customersService.getAllCustomers(pagination);
     const paginationDto = this.buildPaginationDto(pagination, customers);
 
-    customers.length !== 0 && this.redisCacheService.set(allCustomerKey(page, limit, sort), paginationDto);
+    customers.length !== 0 &&
+      this.redisCacheService.set(
+        allCustomerKey(page, limit, sort),
+        paginationDto,
+      );
 
     return {
       data: paginationDto,
@@ -111,7 +125,7 @@ export class CustomersController {
 
   @Get(':id')
   @UseGuards(JwtAuthGuard, RolesAuthGuard)
-  @Roles(ROLE.ADMIN,ROLE.USER)
+  @Roles(ROLE.ADMIN, ROLE.USER)
   async getUser(@Param('id') _id: string): Promise<ResponseObject> {
     const customer = await this.customersService.findByCustomerId(_id);
 
@@ -127,12 +141,15 @@ export class CustomersController {
   @UseGuards(JwtAuthGuard, RolesAuthGuard)
   @Roles(ROLE.CUSTOMER)
   @HttpCode(HttpStatus.OK)
-  async uploadImage(@UploadedFile() file: Express.Multer.File,@Request() req): Promise<ResponseObject> {
+  async uploadImage(
+    @UploadedFile() file: Express.Multer.File,
+    @Request() req,
+  ): Promise<ResponseObject> {
     const { _id } = req.user;
     const customer = await this.customersService.findByCustomerId(_id);
 
     const result = await this.cloudinaryService.uploadFile(file);
-    this.cloudinaryService.deleteImage(customer.image_id)
+    this.cloudinaryService.deleteImage(customer.image_id);
 
     await this.customersService.uploadAvatar(_id, result.url, result.public_id);
 
@@ -149,8 +166,10 @@ export class CustomersController {
   @UseGuards(JwtAuthGuard, RolesAuthGuard)
   @Roles(ROLE.ADMIN)
   @Patch('/:id/status/:status')
-  async updateStatus(@Param('id') _id: string,
-                     @Param('status') status: string): Promise<ResponseObject> {
+  async updateStatus(
+    @Param('id') _id: string,
+    @Param('status') status: string,
+  ): Promise<ResponseObject> {
     await this.customersService.updateStatus(_id, status);
 
     this.redisCacheService.clearAllCustomerCache();
@@ -158,23 +177,25 @@ export class CustomersController {
     return {
       data: status,
       status: HttpStatus.OK,
-      message: CUSTOMER_CONSTANTS.UPDATE_STATUS
-    }
+      message: CUSTOMER_CONSTANTS.UPDATE_STATUS,
+    };
   }
 
   @UseGuards(JwtAuthGuard, RolesAuthGuard)
   @Roles(ROLE.CUSTOMER)
-  @Patch("/change_password")
-  async changePassword(@Request() req,
-                       @Body() changePasswordDto: ChangePasswordDto,) {
+  @Patch('/change_password')
+  async changePassword(
+    @Request() req,
+    @Body() changePasswordDto: ChangePasswordDto,
+  ) {
     const { _id } = req.user;
     await this.customersService.changePassword(_id, changePasswordDto);
 
     return {
       data: {},
       status: HttpStatus.OK,
-      message: CUSTOMER_CONSTANTS.CHANGE_PASSWORD
-    }
+      message: CUSTOMER_CONSTANTS.CHANGE_PASSWORD,
+    };
   }
 
   private buildPaginationDto(
@@ -188,9 +209,9 @@ export class CustomersController {
       total_pages: Math.ceil(customers.length / limit),
       current_page: parseInt(String(page)),
       start_count: (page - 1) * limit + 1,
-      end_count: page * limit > customers.length ? customers.length : page * limit,
+      end_count:
+        page * limit > customers.length ? customers.length : page * limit,
       entities: customers,
     };
   }
-
 }
