@@ -284,15 +284,15 @@ services:
     networks:
       - default
 
-  docs-swagger:
-    container_name: docs-swagger-container
-    build:
-      context: ./docs-swagger
-      dockerfile: Dockerfile
-    ports:
-      - "3000:3000"
-    networks:
-      - default
+  # docs-swagger:
+  #   container_name: docs-swagger-container
+  #   build:
+  #     context: ./docs-swagger
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "3000:3000"
+  #   networks:
+  #     - default
 
   chat-service:
     container_name: chat-service-container

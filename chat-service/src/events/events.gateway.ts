@@ -33,4 +33,9 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     this.server.emit('receive-messages', response);
   }
+
+  @SubscribeMessage('typing')
+  async handleTyping(@MessageBody() id: string) {
+    this.server.emit('typing', id);
+  }
 }
