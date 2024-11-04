@@ -11,5 +11,5 @@ func Run() {
 	InitKafka()
 	router := InitRouter()
 
-	router.Run(fmt.Sprintf(":%s", global.Config.Server.Port))
+	router.Run(fmt.Sprintf(":%d", global.Config.Server.Port))
 }

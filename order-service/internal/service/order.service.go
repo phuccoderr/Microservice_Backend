@@ -2,9 +2,11 @@ package service
 
 import (
 	"errors"
+	"order-service/internal/dto"
 	"order-service/internal/models"
 	"order-service/internal/repository"
 	"strings"
+	"time"
 )
 
 type IOrderService interface {
@@ -12,6 +14,8 @@ type IOrderService interface {
 	FindOne(id string) (*models.Order, error)
 	UpdateStatus(id string, status string) error
 	FindByCustomer(customerId string) ([]models.Order, error)
+	FindLastOptionDaysOrder(day int) ([]dto.ReportItemDto, error)
+	FindLastOptionMonthsOrder(months int) ([]dto.ReportItemDto, error)
 }
 
 type orderService struct {
@@ -74,4 +78,69 @@ func (os *orderService) FindByCustomer(customerId string) ([]models.Order, error
 		return nil, err
 	}
 	return orders, nil
+}
+
+func (os *orderService) FindLastOptionDaysOrder(day int) ([]dto.ReportItemDto, error) {
+	var reportItems []dto.ReportItemDto
+	currentDate := time.Now()
+
+	for i := 0; i < day; i++ {
+		startDate := currentDate.AddDate(0, 0, -i)
+		endDate := startDate.AddDate(0, 0, 1)
+
+		orders, err := os.repo.FindByPeriod(startDate, endDate)
+		if err != nil {
+			return nil, err
+		}
+
+		var grossSales, netSales float64
+		for _, order := range orders {
+			grossSales += order.Total
+			netSales += order.Total - order.ProductCost
+		}
+
+		reportItem := dto.ReportItemDto{
+			GrossSales:  grossSales,
+			NetSales:    netSales,
+			OrdersCount: len(orders),
+			Date:        startDate,
+		}
+
+		reportItems = append(reportItems, reportItem)
+	}
+
+	return reportItems, nil
+}
+
+func (os *orderService) FindLastOptionMonthsOrder(months int) ([]dto.ReportItemDto, error) {
+
+	var reportItems []dto.ReportItemDto
+	currentDate := time.Now()
+
+	for i := 0; i < months; i++ {
+		startDate := time.Date(currentDate.Year(), currentDate.Month()-time.Month(i), 1, 0, 0, 0, 0, time.Local)
+		endDate := startDate.AddDate(0, 1, 0)
+
+		// Fetch orders for the month range in UTC and convert them to Vietnam time if necessary
+		orders, err := os.repo.FindByPeriod(startDate.UTC(), endDate.UTC())
+		if err != nil {
+			return nil, err
+		}
+
+		var grossSales, netSales float64
+		for _, order := range orders {
+			grossSales += order.Total
+			netSales += order.Total - order.ProductCost
+		}
+
+		reportItem := dto.ReportItemDto{
+			GrossSales:  grossSales,
+			NetSales:    netSales,
+			OrdersCount: len(orders),
+			Date:        startDate,
+		}
+		reportItems = append(reportItems, reportItem)
+	}
+
+	return reportItems, nil
 }

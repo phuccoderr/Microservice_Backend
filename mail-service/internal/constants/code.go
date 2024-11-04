@@ -7,6 +7,7 @@ const (
 	CHANGE_PASSWORD   = "Thay đổi mật khẩu"
 	VERIFY_ACCOUNT    = "Xác thực tài khoản"
 	VERIFY_PLACEORDER = "Xác thực đơn hàng"
+	FEEDBACK_CUSTOMER = "Khách hàng báo cáo"
 
 	TITLE_VERIFY_ACCOUNT = `Vui lòng nhấn đường link dưới đây để xác thực tài khoản của bạn!`
 	TITLE_RESET_PASSWORD = `Vui lòng nhấn đường link dưới đây để thay đổi mật khẩu tài khoản của bạn!`

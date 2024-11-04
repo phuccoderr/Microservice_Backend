@@ -901,3 +901,39 @@
 {"level":"INFO","timestamp":"2024-10-22T14:07:44.639+0700","caller":"cache/redis.go:28","msg":"Connected to Redis"}
 {"level":"INFO","timestamp":"2024-10-22T14:17:08.295+0700","caller":"initialize/postgres.go:28","msg":"InitPostgres success"}
 {"level":"INFO","timestamp":"2024-10-22T14:17:08.392+0700","caller":"cache/redis.go:28","msg":"Connected to Redis"}
+{"level":"ERROR","timestamp":"2024-11-04T21:45:24.758+0700","caller":"initialize/postgres.go:14","msg":"InitPostgres error","error":"failed to connect to `user=postgres database=users`:\n\t[::1]:5432 (localhost): dial error: dial tcp [::1]:5432: connectex: No connection could be made because the target machine actively refused it.\n\t127.0.0.1:5432 (localhost): dial error: dial tcp 127.0.0.1:5432: connectex: No connection could be made because the target machine actively refused it.","stacktrace":"order-service/internal/initialize.checkErrorPanic\n\tD:/project/microservices_super/order-service/internal/initialize/postgres.go:14\norder-service/internal/initialize.InitPostgres\n\tD:/project/microservices_super/order-service/internal/initialize/postgres.go:26\norder-service/internal/initialize.Run\n\tD:/project/microservices_super/order-service/internal/initialize/run.go:6\nmain.main\n\tD:/project/microservices_super/order-service/cmd/server/main.go:6\nruntime.main\n\tC:/Program Files/Go/src/runtime/proc.go:271"}
+{"level":"INFO","timestamp":"2024-11-04T21:45:53.525+0700","caller":"initialize/postgres.go:28","msg":"InitPostgres success"}
+{"level":"INFO","timestamp":"2024-11-04T21:45:53.630+0700","caller":"cache/redis.go:28","msg":"Connected to Redis"}
+{"level":"INFO","timestamp":"2024-11-04T21:49:25.631+0700","caller":"initialize/postgres.go:28","msg":"InitPostgres success"}
+{"level":"INFO","timestamp":"2024-11-04T21:49:25.715+0700","caller":"cache/redis.go:28","msg":"Connected to Redis"}
+{"level":"INFO","timestamp":"2024-11-04T21:49:41.601+0700","caller":"initialize/postgres.go:28","msg":"InitPostgres success"}
+{"level":"INFO","timestamp":"2024-11-04T21:49:41.702+0700","caller":"cache/redis.go:28","msg":"Connected to Redis"}
+{"level":"INFO","timestamp":"2024-11-04T21:51:25.805+0700","caller":"initialize/postgres.go:28","msg":"InitPostgres success"}
+{"level":"INFO","timestamp":"2024-11-04T21:51:25.907+0700","caller":"cache/redis.go:28","msg":"Connected to Redis"}
+{"level":"INFO","timestamp":"2024-11-04T21:52:08.769+0700","caller":"initialize/postgres.go:28","msg":"InitPostgres success"}
+{"level":"INFO","timestamp":"2024-11-04T21:52:08.880+0700","caller":"cache/redis.go:28","msg":"Connected to Redis"}
+{"level":"INFO","timestamp":"2024-11-04T21:52:33.115+0700","caller":"initialize/postgres.go:28","msg":"InitPostgres success"}
+{"level":"INFO","timestamp":"2024-11-04T21:52:33.195+0700","caller":"cache/redis.go:28","msg":"Connected to Redis"}
+{"level":"INFO","timestamp":"2024-11-04T21:58:37.937+0700","caller":"initialize/postgres.go:28","msg":"InitPostgres success"}
+{"level":"INFO","timestamp":"2024-11-04T21:58:38.030+0700","caller":"cache/redis.go:28","msg":"Connected to Redis"}
+{"level":"INFO","timestamp":"2024-11-04T21:58:39.510+0700","caller":"service/order.service.go:99","msg":"Gia: %!d(float64=66000)"}
+{"level":"INFO","timestamp":"2024-11-04T21:58:39.510+0700","caller":"service/order.service.go:99","msg":"Gia: %!d(float64=49000)"}
+{"level":"INFO","timestamp":"2024-11-04T21:58:39.510+0700","caller":"service/order.service.go:99","msg":"Gia: %!d(float64=116450)"}
+{"level":"INFO","timestamp":"2024-11-04T22:01:54.864+0700","caller":"initialize/postgres.go:28","msg":"InitPostgres success"}
+{"level":"INFO","timestamp":"2024-11-04T22:01:54.943+0700","caller":"cache/redis.go:28","msg":"Connected to Redis"}
+{"level":"INFO","timestamp":"2024-11-04T22:01:56.848+0700","caller":"service/order.service.go:103","msg":"Gia: %!d(float64=66000)"}
+{"level":"INFO","timestamp":"2024-11-04T22:01:56.849+0700","caller":"service/order.service.go:103","msg":"Gia: %!d(float64=49000)"}
+{"level":"INFO","timestamp":"2024-11-04T22:01:56.849+0700","caller":"service/order.service.go:103","msg":"Gia: %!d(float64=116450)"}
+{"level":"INFO","timestamp":"2024-11-04T22:03:24.599+0700","caller":"initialize/postgres.go:28","msg":"InitPostgres success"}
+{"level":"INFO","timestamp":"2024-11-04T22:03:24.674+0700","caller":"cache/redis.go:28","msg":"Connected to Redis"}
+{"level":"INFO","timestamp":"2024-11-04T22:03:31.727+0700","caller":"service/order.service.go:103","msg":"Gia: %!d(float64=66000)"}
+{"level":"INFO","timestamp":"2024-11-04T22:03:31.727+0700","caller":"service/order.service.go:103","msg":"Gia: %!d(float64=49000)"}
+{"level":"INFO","timestamp":"2024-11-04T22:03:31.727+0700","caller":"service/order.service.go:103","msg":"Gia: %!d(float64=116450)"}
+{"level":"INFO","timestamp":"2024-11-04T22:12:33.448+0700","caller":"initialize/postgres.go:28","msg":"InitPostgres success"}
+{"level":"INFO","timestamp":"2024-11-04T22:12:33.534+0700","caller":"cache/redis.go:28","msg":"Connected to Redis"}
+{"level":"INFO","timestamp":"2024-11-04T22:18:03.755+0700","caller":"initialize/postgres.go:28","msg":"InitPostgres success"}
+{"level":"INFO","timestamp":"2024-11-04T22:18:03.859+0700","caller":"cache/redis.go:28","msg":"Connected to Redis"}
+{"level":"INFO","timestamp":"2024-11-04T22:19:52.944+0700","caller":"initialize/postgres.go:28","msg":"InitPostgres success"}
+{"level":"INFO","timestamp":"2024-11-04T22:19:53.032+0700","caller":"cache/redis.go:28","msg":"Connected to Redis"}
+{"level":"INFO","timestamp":"2024-11-04T22:23:57.620+0700","caller":"initialize/postgres.go:28","msg":"InitPostgres success"}
+{"level":"INFO","timestamp":"2024-11-04T22:23:57.700+0700","caller":"cache/redis.go:28","msg":"Connected to Redis"}

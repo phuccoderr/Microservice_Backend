@@ -7,6 +7,7 @@ import (
 	"gorm.io/gorm"
 	"order-service/global"
 	"order-service/internal/models"
+	"time"
 )
 
 type IOrderRepo interface {
@@ -14,6 +15,7 @@ type IOrderRepo interface {
 	FindById(id string) (*models.Order, error)
 	FindByCustomerId(customerId string) ([]models.Order, error)
 	UpdateStatus(order *models.Order) error
+	FindByPeriod(startDate, endDate time.Time) ([]models.Order, error)
 }
 
 type orderRepo struct {
@@ -82,6 +84,16 @@ func (or *orderRepo) FindByCustomerId(customerId string) ([]models.Order, error)
 	err := or.db.Preload("OrderDetails").Find(&orders, "customer_id = ?", customerId).Error
 	if err != nil {
 		global.Logger.Error("Find ByCustomerId error", zap.Error(err))
+		return nil, err
+	}
+
+	return orders, nil
+}
+
+func (or *orderRepo) FindByPeriod(startDate, endDate time.Time) ([]models.Order, error) {
+	var orders []models.Order
+
+	if err := or.db.Where("created_at BETWEEN ? AND ?", startDate, endDate).Find(&orders).Error; err != nil {
 		return nil, err
 	}
 

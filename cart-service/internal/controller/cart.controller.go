@@ -181,7 +181,13 @@ func (cc *CartController) PlaceOrder(c *gin.Context) {
 	orderMessage.PaymentMethod = placeOrder.PaymentMethod
 	orderMessage.PhoneNumber = placeOrder.PhoneNumber
 	orderMessage.Note = placeOrder.Note
-	orderMessage.CreatedAt = time.Now()
+
+	location, err := time.LoadLocation("Asia/Ho_Chi_Minh")
+	if err != nil {
+		fmt.Println("Error loading location:", err)
+		return
+	}
+	orderMessage.CreatedAt = time.Now().In(location)
 
 	marshal, err := json.Marshal(orderMessage)
 	if err != nil {

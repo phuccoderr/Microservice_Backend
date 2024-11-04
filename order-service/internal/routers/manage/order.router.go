@@ -28,6 +28,7 @@ func (or *OrderRouter) InitOrderRouter(router *gin.RouterGroup) {
 	public := router.Group("/orders")
 	{
 		public.GET("/:id", orderController.GetOrder)
+		public.GET("/reports/:period", orderController.GetReports)
 	}
 
 	private := router.Group("/orders")

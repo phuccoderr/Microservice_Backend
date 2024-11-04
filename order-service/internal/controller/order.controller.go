@@ -133,3 +133,40 @@ func (oc *OrderController) GetOrderByCustomer(c *gin.Context) {
 
 	response.SuccessResponse(c, http.StatusOK, ordersDto)
 }
+
+func (oc *OrderController) GetReports(c *gin.Context) {
+	period := c.Param("period")
+
+	switch period {
+	case "last_7_days":
+		order, err := oc.orderService.FindLastOptionDaysOrder(7)
+		if err != nil {
+			response.ErrorResponse(c, err.Error(), constants.STATUS_NOT_FOUND, http.StatusNotFound)
+		}
+		response.SuccessResponse(c, http.StatusOK, order)
+	case "last_28_days":
+		order, err := oc.orderService.FindLastOptionDaysOrder(28)
+		if err != nil {
+			response.ErrorResponse(c, err.Error(), constants.STATUS_NOT_FOUND, http.StatusNotFound)
+		}
+		response.SuccessResponse(c, http.StatusOK, order)
+	case "last_6_months":
+		order, err := oc.orderService.FindLastOptionMonthsOrder(6)
+		if err != nil {
+			response.ErrorResponse(c, err.Error(), constants.STATUS_NOT_FOUND, http.StatusNotFound)
+		}
+		response.SuccessResponse(c, http.StatusOK, order)
+	case "last_year":
+		order, err := oc.orderService.FindLastOptionMonthsOrder(12)
+		if err != nil {
+			response.ErrorResponse(c, err.Error(), constants.STATUS_NOT_FOUND, http.StatusNotFound)
+		}
+		response.SuccessResponse(c, http.StatusOK, order)
+	default:
+		order, err := oc.orderService.FindLastOptionDaysOrder(7)
+		if err != nil {
+			response.ErrorResponse(c, err.Error(), constants.STATUS_NOT_FOUND, http.StatusNotFound)
+		}
+		response.SuccessResponse(c, http.StatusOK, order)
+	}
+}
