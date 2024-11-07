@@ -37,7 +37,7 @@ func (s cartService) AddProductToCart(customerId string, productId string, quant
 		return 0, err
 	}
 
-	if result < 0 {
+	if result < 1 {
 		s.Rdb.HDel(context.Background(), cache.CartKey(customerId), productId)
 		return 0, errors.New("quantity cannot less than 0!")
 	}
