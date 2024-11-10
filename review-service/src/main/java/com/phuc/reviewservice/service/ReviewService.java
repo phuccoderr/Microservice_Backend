@@ -87,4 +87,8 @@ public class ReviewService implements IReviewService{
 
         return review;
     }
+
+    public Review getById(String id) throws DataErrorException {
+        return reviewRepository.findById(id).orElseThrow(() -> new DataErrorException(Constants.DB_NOT_FOUND));
+    }
 }

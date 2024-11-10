@@ -147,4 +147,17 @@ public class ReviewController {
                 .data(dto).build());
 
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ResponseObject> getOne(
+            @PathVariable("id") String id
+    ) throws DataErrorException {
+        Review review = reviewService.getById(id);
+        ReviewDto dto = Utility.toDto(review);
+
+        return ResponseEntity.ok(ResponseObject.builder()
+                .status(HttpStatus.OK.value())
+                .message("OK")
+                .data(dto).build());
+    }
 }
