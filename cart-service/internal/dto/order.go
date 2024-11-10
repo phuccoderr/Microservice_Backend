@@ -9,7 +9,7 @@ type PlaceOrderRequest struct {
 	Address       string `json:"address" binding:"required"`
 	PhoneNumber   string `json:"phone_number" binding:"required"`
 	PaymentMethod string `json:"payment_method" binding:"required"`
-	Note          string `json:"note" binding:"required"`
+	Note          string `json:"note"`
 	Sale          int64  `json:"sale"`
 }
 
