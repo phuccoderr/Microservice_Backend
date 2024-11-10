@@ -37,4 +37,9 @@ public class JwtTokenUtil {
         return principal.get("_id").toString();
     }
 
+    public String getNameCustomer(Authentication authentication) {
+        Map<String, String> principal = (Map<String, String>) authentication.getPrincipal();
+        return principal.get("name").toString();
+    }
+
 }

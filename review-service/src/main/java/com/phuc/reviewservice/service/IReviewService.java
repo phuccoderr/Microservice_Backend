@@ -7,7 +7,7 @@ import com.phuc.reviewservice.request.RequestReview;
 import org.springframework.data.domain.Page;
 
 public interface IReviewService {
-    void postReview(String customerId,String proId, RequestReview reqReview);
+    void postReview(String customerId, String customerName,String proId, RequestReview reqReview);
     Review deleteReview(String reviewId) throws DataErrorException;
     Page<Review> getAllReviews(Integer page, Integer limit, String sort, String keyword) throws ParamValidateException;
     Page<Review> getAllReviewsByProduct(String proId, Integer page,Integer limit, Integer rating) throws ParamValidateException;

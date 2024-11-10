@@ -33,9 +33,10 @@ public class ReviewService implements IReviewService{
 
         return review;
     }
-    public void postReview(String customerId,String proId, RequestReview reqReview) {
+    public void postReview(String customerId, String customerName,String proId, RequestReview reqReview) {
 
         Review review = Review.builder()
+                .name(customerName)
                 .customerId(customerId)
                 .productId(proId)
                 .headline(reqReview.getHeadline())
@@ -77,8 +78,13 @@ public class ReviewService implements IReviewService{
         return reviewRepository.findByProduct(proId,pageable);
     }
 
-    public boolean canCustomerReviewProduct(String customerId,String productId) {
-        Long count = reviewRepository.countByCustomerAndProduct(customerId,productId);
-        return count > 0;
+    public Review canCustomerReviewProduct(String customerId,String productId) throws DataErrorException {
+        Review review = reviewRepository.findByCustomerIdAndProductId(customerId, productId);
+
+        if (review == null) {
+            throw new DataErrorException(Constants.DB_NOT_FOUND);
+        }
+
+        return review;
     }
 }

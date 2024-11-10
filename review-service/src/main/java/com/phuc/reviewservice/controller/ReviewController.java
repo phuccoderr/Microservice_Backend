@@ -122,8 +122,9 @@ public class ReviewController {
                                                      @RequestBody @Valid RequestReview review ) {
 
         String customerId = jwtTokenUtil.getCustomerId(SecurityContextHolder.getContext().getAuthentication());
+        String customerName = jwtTokenUtil.getNameCustomer(SecurityContextHolder.getContext().getAuthentication());
 
-        reviewService.postReview(customerId,proId,review);
+        reviewService.postReview(customerId, customerName,proId,review);
         reviewRedisService.clearAllReviews();
         reviewRedisService.clearAllReviewsByProduct(proId);
 
@@ -136,13 +137,14 @@ public class ReviewController {
     @GetMapping("/can_review")
     public ResponseEntity<ResponseObject> canReview(
             @RequestParam(value = "product_id") String proId,
-            @RequestParam(value = "customer_id") String customerId) {
-        boolean isReview = reviewService.canCustomerReviewProduct(customerId, proId);
+            @RequestParam(value = "customer_id") String customerId) throws DataErrorException {
+        Review review = reviewService.canCustomerReviewProduct(customerId, proId);
+        ReviewDto dto = Utility.toDto(review);
 
         return ResponseEntity.ok(ResponseObject.builder()
                 .status(HttpStatus.OK.value())
                 .message("OK")
-                .data(isReview).build());
+                .data(dto).build());
 
     }
 }
