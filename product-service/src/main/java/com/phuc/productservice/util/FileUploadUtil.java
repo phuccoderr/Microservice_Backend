@@ -22,10 +22,10 @@ public class FileUploadUtil {
     public static final String FILE_NAME_FORMAT = "%s_%s";
 
     public void assertAllowed(MultipartFile file, String pattern) throws FuncErrorException {
-        long size = file.getSize();
-        if (size > MAX_FILE_SIZE) {
-            throw new FuncErrorException(Constants.FILE_MAX_SIZE);
-        }
+//        long size = file.getSize();
+//        if (size > MAX_FILE_SIZE) {
+//            throw new FuncErrorException(Constants.FILE_MAX_SIZE);
+//        }
 
         String fileName = file.getOriginalFilename();
         if (!isAllowedExtension(fileName,pattern)) {

@@ -22,6 +22,7 @@ public class Product extends BaseEntity{
     @Column(unique = true)
     private String alias;
 
+    @Column(length = Integer.MAX_VALUE)
     private String description;
     private Boolean status;
     private Integer stock;
